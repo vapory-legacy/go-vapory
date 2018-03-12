@@ -78,7 +78,7 @@ matrix:
             - fakeroot
       script:
         # Build for the primary platforms that Trusty can manage
-        - go run build/ci.go debsrc -signer "Go Vapory Linux Builder <gvap-ci@vapory.org>" -upload ppa:vapory/vapory
+        - go run build/ci.go debsrc -signer "Go Vapory Linux Builder <gvap-ci@vapory.co>" -upload ppa:vapory/vapory
         - go run build/ci.go install
         - go run build/ci.go archive -type tar -signer LINUX_SIGNING_KEY -upload gethstore/builds
         - go run build/ci.go install -arch 386

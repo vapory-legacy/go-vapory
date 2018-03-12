@@ -54,7 +54,7 @@ var _dashboardHtml = []byte(`<!DOCTYPE html>
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>Go Vapory Dashboard</title>
-        <link rel="shortcut icon" type="image/ico" href="https://vapory.org/favicon.ico" />
+        <link rel="shortcut icon" type="image/ico" href="https://vapory.co/favicon.ico" />
         <style>
             ::-webkit-scrollbar {
                 width: 16px;

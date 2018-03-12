@@ -5713,7 +5713,7 @@ module.exports = Personal;
 */
 /** @file shh.js
  * @authors:
- *   Fabian Vogelsteller <fabian@vapory.org>
+ *   Fabian Vogelsteller <fabian@vapory.co>
  *   Marek Kotewicz <marek@ethcore.io>
  * @date 2017
  */

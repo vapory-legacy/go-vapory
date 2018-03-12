@@ -120,7 +120,7 @@ var dashboardContent = `
 											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --cache=1024 --syncmode=full{{if .Vapstats}} --vapstats='{{.Vapstats}}'{{end}} --bootnodes={{.BootnodesFullFlat}}</pre>
 										</p>
 										<br/>
-										<p>You can download Gvap from <a href="https://gvap.vapory.org/downloads/" target="about:blank">https://gvap.vapory.org/downloads/</a>.</p>
+										<p>You can download Gvap from <a href="https://gvap.vapory.co/downloads/" target="about:blank">https://gvap.vapory.co/downloads/</a>.</p>
 									</div>
 								</div>
 							</div>
@@ -139,7 +139,7 @@ var dashboardContent = `
 											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --cache=512{{if .Vapstats}} --vapstats='{{.Vapstats}}'{{end}} --bootnodes={{.BootnodesFullFlat}}</pre>
 										</p>
 										<br/>
-										<p>You can download Gvap from <a href="https://gvap.vapory.org/downloads/" target="about:blank">https://gvap.vapory.org/downloads/</a>.</p>
+										<p>You can download Gvap from <a href="https://gvap.vapory.co/downloads/" target="about:blank">https://gvap.vapory.co/downloads/</a>.</p>
 									</div>
 								</div>
 							</div>
@@ -161,7 +161,7 @@ var dashboardContent = `
 											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --syncmode=light{{if .Vapstats}} --vapstats='{{.Vapstats}}'{{end}} --bootnodes={{.BootnodesLightFlat}}</pre>
 										</p>
 										<br/>
-										<p>You can download Gvap from <a href="https://gvap.vapory.org/downloads/" target="about:blank">https://gvap.vapory.org/downloads/</a>.</p>
+										<p>You can download Gvap from <a href="https://gvap.vapory.co/downloads/" target="about:blank">https://gvap.vapory.co/downloads/</a>.</p>
 									</div>
 								</div>
 							</div>
@@ -180,7 +180,7 @@ var dashboardContent = `
 											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --cache=16 --vapash.cachesinmem=1 --syncmode=light{{if .Vapstats}} --vapstats='{{.Vapstats}}'{{end}} --bootnodes={{.BootnodesLightFlat}}</pre>
 										</p>
 										<br/>
-										<p>You can download Gvap from <a href="https://gvap.vapory.org/downloads/" target="about:blank">https://gvap.vapory.org/downloads/</a>.</p>
+										<p>You can download Gvap from <a href="https://gvap.vapory.co/downloads/" target="about:blank">https://gvap.vapory.co/downloads/</a>.</p>
 									</div>
 								</div>
 							</div>
@@ -419,7 +419,7 @@ try! node?.start();
 										<p>Puppeth is a tool to aid you in creating a new Vapory network down to the genesis block, bootnodes, signers, vapstats server, crypto faucet, wallet browsers, block explorer, dashboard and more; without the hassle that it would normally entail to manually configure all these services one by one.</p>
 										<p>Puppeth uses ssh to dial in to remote servers, and builds its network components out of docker containers using docker-compose. The user is guided through the process via a command line wizard that does the heavy lifting and topology configuration automatically behind the scenes.</p>
 										<br/>
-										<p>Puppeth is distributed as part of the <a href="https://gvap.vapory.org/downloads/" target="about:blank">Gvap &amp; Tools</a> bundles, but can also be installed separately via:<pre>go get github.com/vaporyco/go-vapory/cmd/puppeth</pre></p>
+										<p>Puppeth is distributed as part of the <a href="https://gvap.vapory.co/downloads/" target="about:blank">Gvap &amp; Tools</a> bundles, but can also be installed separately via:<pre>go get github.com/vaporyco/go-vapory/cmd/puppeth</pre></p>
 										<br/>
 										<p><em>Copyright 2017. The go-vapory Authors.</em></p>
 									</div>

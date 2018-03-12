@@ -4,7 +4,7 @@ Priority: extra
 Maintainer: {{.Author}}
 Build-Depends: debhelper (>= 8.0.0), golang-1.9
 Standards-Version: 3.9.5
-Homepage: https://vapory.org
+Homepage: https://vapory.co
 Vcs-Git: git://github.com/vaporyco/go-vapory.git
 Vcs-Browser: https://github.com/vaporyco/go-vapory
 
