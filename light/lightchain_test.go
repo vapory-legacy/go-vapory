@@ -1,18 +1,18 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package light
 
@@ -21,12 +21,12 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/consensus/vapash"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/core/types"
+	"github.com/vaporyco/go-vapory/vapdb"
+	"github.com/vaporyco/go-vapory/params"
 )
 
 // So we can deterministically seed different blockchains
@@ -36,8 +36,8 @@ var (
 )
 
 // makeHeaderChain creates a deterministic chain of headers rooted at parent.
-func makeHeaderChain(parent *types.Header, n int, db ethdb.Database, seed int) []*types.Header {
-	blocks, _ := core.GenerateChain(params.TestChainConfig, types.NewBlockWithHeader(parent), ethash.NewFaker(), db, n, func(i int, b *core.BlockGen) {
+func makeHeaderChain(parent *types.Header, n int, db vapdb.Database, seed int) []*types.Header {
+	blocks, _ := core.GenerateChain(params.TestChainConfig, types.NewBlockWithHeader(parent), vapash.NewFaker(), db, n, func(i int, b *core.BlockGen) {
 		b.SetCoinbase(common.Address{0: byte(seed), 19: byte(i)})
 	})
 	headers := make([]*types.Header, len(blocks))
@@ -50,11 +50,11 @@ func makeHeaderChain(parent *types.Header, n int, db ethdb.Database, seed int) [
 // newCanonical creates a chain database, and injects a deterministic canonical
 // chain. Depending on the full flag, if creates either a full block chain or a
 // header only chain.
-func newCanonical(n int) (ethdb.Database, *LightChain, error) {
-	db, _ := ethdb.NewMemDatabase()
+func newCanonical(n int) (vapdb.Database, *LightChain, error) {
+	db, _ := vapdb.NewMemDatabase()
 	gspec := core.Genesis{Config: params.TestChainConfig}
 	genesis := gspec.MustCommit(db)
-	blockchain, _ := NewLightChain(&dummyOdr{db: db}, gspec.Config, ethash.NewFaker())
+	blockchain, _ := NewLightChain(&dummyOdr{db: db}, gspec.Config, vapash.NewFaker())
 
 	// Create and inject the requested chain
 	if n == 0 {
@@ -68,13 +68,13 @@ func newCanonical(n int) (ethdb.Database, *LightChain, error) {
 
 // newTestLightChain creates a LightChain that doesn't validate anything.
 func newTestLightChain() *LightChain {
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	gspec := &core.Genesis{
 		Difficulty: big.NewInt(1),
 		Config:     params.TestChainConfig,
 	}
 	gspec.MustCommit(db)
-	lc, err := NewLightChain(&dummyOdr{db: db}, gspec.Config, ethash.NewFullFaker())
+	lc, err := NewLightChain(&dummyOdr{db: db}, gspec.Config, vapash.NewFullFaker())
 	if err != nil {
 		panic(err)
 	}
@@ -264,10 +264,10 @@ func makeHeaderChainWithDiff(genesis *types.Block, d []int, seed byte) []*types.
 
 type dummyOdr struct {
 	OdrBackend
-	db ethdb.Database
+	db vapdb.Database
 }
 
-func (odr *dummyOdr) Database() ethdb.Database {
+func (odr *dummyOdr) Database() vapdb.Database {
 	return odr.db
 }
 
@@ -338,7 +338,7 @@ func TestReorgBadHeaderHashes(t *testing.T) {
 	defer func() { delete(core.BadHashes, headers[3].Hash()) }()
 
 	// Create a new LightChain and check that it rolled back the state.
-	ncm, err := NewLightChain(&dummyOdr{db: bc.chainDb}, params.TestChainConfig, ethash.NewFaker())
+	ncm, err := NewLightChain(&dummyOdr{db: bc.chainDb}, params.TestChainConfig, vapash.NewFaker())
 	if err != nil {
 		t.Fatalf("failed to create new chain manager: %v", err)
 	}

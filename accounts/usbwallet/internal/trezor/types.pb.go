@@ -42,9 +42,9 @@ It has these top-level messages:
 	GetPublicKey
 	PublicKey
 	GetAddress
-	EthereumGetAddress
+	VaporyGetAddress
 	Address
-	EthereumAddress
+	VaporyAddress
 	WipeDevice
 	LoadDevice
 	ResetDevice
@@ -69,12 +69,12 @@ It has these top-level messages:
 	SimpleSignTx
 	TxRequest
 	TxAck
-	EthereumSignTx
-	EthereumTxRequest
-	EthereumTxAck
-	EthereumSignMessage
-	EthereumVerifyMessage
-	EthereumMessageSignature
+	VaporySignTx
+	VaporyTxRequest
+	VaporyTxAck
+	VaporySignMessage
+	VaporyVerifyMessage
+	VaporyMessageSignature
 	SignIdentity
 	SignedIdentity
 	GetECDHSessionKey

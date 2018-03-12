@@ -1,18 +1,18 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package api
 
@@ -29,9 +29,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/swarm/storage"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/log"
+	"github.com/vaporyco/go-vapory/swarm/storage"
 )
 
 var hashMatcher = regexp.MustCompile("^[0-9A-Fa-f]{64}")
@@ -43,7 +43,7 @@ type Resolver interface {
 /*
 Api implements webserver/file system related content storage and retrieval
 on top of the dpa
-it is the public interface of the dpa which is included in the ethereum stack
+it is the public interface of the dpa which is included in the vapory stack
 */
 type Api struct {
 	dpa *storage.DPA

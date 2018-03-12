@@ -1,18 +1,18 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package swap
 
@@ -26,14 +26,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/contracts/chequebook"
-	"github.com/ethereum/go-ethereum/contracts/chequebook/contract"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/swarm/services/swap/swap"
+	"github.com/vaporyco/go-vapory/accounts/abi/bind"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/contracts/chequebook"
+	"github.com/vaporyco/go-vapory/contracts/chequebook/contract"
+	"github.com/vaporyco/go-vapory/core/types"
+	"github.com/vaporyco/go-vapory/crypto"
+	"github.com/vaporyco/go-vapory/log"
+	"github.com/vaporyco/go-vapory/swarm/services/swap/swap"
 )
 
 // SwAP       Swarm Accounting Protocol with

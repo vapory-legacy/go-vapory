@@ -1,22 +1,22 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package bind
 
-import "github.com/ethereum/go-ethereum/accounts/abi"
+import "github.com/vaporyco/go-vapory/accounts/abi"
 
 // tmplData is the data structure required to fill the binding template.
 type tmplData struct {
@@ -65,7 +65,7 @@ package {{.Package}}
 		// {{.Type}}Bin is the compiled bytecode used for deploying new contracts.
 		const {{.Type}}Bin = ` + "`" + `{{.InputBin}}` + "`" + `
 
-		// Deploy{{.Type}} deploys a new Ethereum contract, binding an instance of {{.Type}} to it.
+		// Deploy{{.Type}} deploys a new Vapory contract, binding an instance of {{.Type}} to it.
 		func Deploy{{.Type}}(auth *bind.TransactOpts, backend bind.ContractBackend {{range .Constructor.Inputs}}, {{.Name}} {{bindtype .Type}}{{end}}) (common.Address, *types.Transaction, *{{.Type}}, error) {
 		  parsed, err := abi.JSON(strings.NewReader({{.Type}}ABI))
 		  if err != nil {
@@ -79,23 +79,23 @@ package {{.Package}}
 		}
 	{{end}}
 
-	// {{.Type}} is an auto generated Go binding around an Ethereum contract.
+	// {{.Type}} is an auto generated Go binding around an Vapory contract.
 	type {{.Type}} struct {
 	  {{.Type}}Caller     // Read-only binding to the contract
 	  {{.Type}}Transactor // Write-only binding to the contract
 	}
 
-	// {{.Type}}Caller is an auto generated read-only Go binding around an Ethereum contract.
+	// {{.Type}}Caller is an auto generated read-only Go binding around an Vapory contract.
 	type {{.Type}}Caller struct {
 	  contract *bind.BoundContract // Generic contract wrapper for the low level calls
 	}
 
-	// {{.Type}}Transactor is an auto generated write-only Go binding around an Ethereum contract.
+	// {{.Type}}Transactor is an auto generated write-only Go binding around an Vapory contract.
 	type {{.Type}}Transactor struct {
 	  contract *bind.BoundContract // Generic contract wrapper for the low level calls
 	}
 
-	// {{.Type}}Session is an auto generated Go binding around an Ethereum contract,
+	// {{.Type}}Session is an auto generated Go binding around an Vapory contract,
 	// with pre-set call and transact options.
 	type {{.Type}}Session struct {
 	  Contract     *{{.Type}}        // Generic contract binding to set the session for
@@ -103,31 +103,31 @@ package {{.Package}}
 	  TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
 	}
 
-	// {{.Type}}CallerSession is an auto generated read-only Go binding around an Ethereum contract,
+	// {{.Type}}CallerSession is an auto generated read-only Go binding around an Vapory contract,
 	// with pre-set call options.
 	type {{.Type}}CallerSession struct {
 	  Contract *{{.Type}}Caller // Generic contract caller binding to set the session for
 	  CallOpts bind.CallOpts    // Call options to use throughout this session
 	}
 
-	// {{.Type}}TransactorSession is an auto generated write-only Go binding around an Ethereum contract,
+	// {{.Type}}TransactorSession is an auto generated write-only Go binding around an Vapory contract,
 	// with pre-set transact options.
 	type {{.Type}}TransactorSession struct {
 	  Contract     *{{.Type}}Transactor // Generic contract transactor binding to set the session for
 	  TransactOpts bind.TransactOpts    // Transaction auth options to use throughout this session
 	}
 
-	// {{.Type}}Raw is an auto generated low-level Go binding around an Ethereum contract.
+	// {{.Type}}Raw is an auto generated low-level Go binding around an Vapory contract.
 	type {{.Type}}Raw struct {
 	  Contract *{{.Type}} // Generic contract binding to access the raw methods on
 	}
 
-	// {{.Type}}CallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
+	// {{.Type}}CallerRaw is an auto generated low-level read-only Go binding around an Vapory contract.
 	type {{.Type}}CallerRaw struct {
 		Contract *{{.Type}}Caller // Generic read-only contract binding to access the raw methods on
 	}
 
-	// {{.Type}}TransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
+	// {{.Type}}TransactorRaw is an auto generated low-level write-only Go binding around an Vapory contract.
 	type {{.Type}}TransactorRaw struct {
 		Contract *{{.Type}}Transactor // Generic write-only contract binding to access the raw methods on
 	}
@@ -274,8 +274,8 @@ const tmplSourceJava = `
 
 package {{.Package}};
 
-import org.ethereum.geth.*;
-import org.ethereum.geth.internal.*;
+import org.vapory.gvap.*;
+import org.vapory.gvap.internal.*;
 
 {{range $contract := .Contracts}}
 	public class {{.Type}} {
@@ -286,13 +286,13 @@ import org.ethereum.geth.internal.*;
 			// BYTECODE is the compiled bytecode used for deploying new contracts.
 			public final static byte[] BYTECODE = "{{.InputBin}}".getBytes();
 
-			// deploy deploys a new Ethereum contract, binding an instance of {{.Type}} to it.
-			public static {{.Type}} deploy(TransactOpts auth, EthereumClient client{{range .Constructor.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
-				Interfaces args = Geth.newInterfaces({{(len .Constructor.Inputs)}});
+			// deploy deploys a new Vapory contract, binding an instance of {{.Type}} to it.
+			public static {{.Type}} deploy(TransactOpts auth, VaporyClient client{{range .Constructor.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
+				Interfaces args = Gvap.newInterfaces({{(len .Constructor.Inputs)}});
 				{{range $index, $element := .Constructor.Inputs}}
-				  args.set({{$index}}, Geth.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
+				  args.set({{$index}}, Gvap.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
 				{{end}}
-				return new {{.Type}}(Geth.deployContract(auth, ABI, BYTECODE, client, args));
+				return new {{.Type}}(Gvap.deployContract(auth, ABI, BYTECODE, client, args));
 			}
 
 			// Internal constructor used by contract deployment.
@@ -303,18 +303,18 @@ import org.ethereum.geth.internal.*;
 			}
 		{{end}}
 
-		// Ethereum address where this contract is located at.
+		// Vapory address where this contract is located at.
 		public final Address Address;
 
-		// Ethereum transaction in which this contract was deployed (if known!).
+		// Vapory transaction in which this contract was deployed (if known!).
 		public final Transaction Deployer;
 
 		// Contract instance bound to a blockchain address.
 		private final BoundContract Contract;
 
 		// Creates a new instance of {{.Type}}, bound to a specific deployed contract.
-		public {{.Type}}(Address address, EthereumClient client) throws Exception {
-			this(Geth.bindContract(address, ABI, client));
+		public {{.Type}}(Address address, VaporyClient client) throws Exception {
+			this(Gvap.bindContract(address, ABI, client));
 		}
 
 		{{range .Calls}}
@@ -330,16 +330,16 @@ import org.ethereum.geth.internal.*;
 			//
 			// Solidity: {{.Original.String}}
 			public {{if gt (len .Normalized.Outputs) 1}}{{capitalise .Normalized.Name}}Results{{else}}{{range .Normalized.Outputs}}{{bindtype .Type}}{{end}}{{end}} {{.Normalized.Name}}(CallOpts opts{{range .Normalized.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
-				Interfaces args = Geth.newInterfaces({{(len .Normalized.Inputs)}});
-				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, Geth.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
+				Interfaces args = Gvap.newInterfaces({{(len .Normalized.Inputs)}});
+				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, Gvap.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
 				{{end}}
 
-				Interfaces results = Geth.newInterfaces({{(len .Normalized.Outputs)}});
-				{{range $index, $item := .Normalized.Outputs}}Interface result{{$index}} = Geth.newInterface(); result{{$index}}.setDefault{{namedtype (bindtype .Type) .Type}}(); results.set({{$index}}, result{{$index}});
+				Interfaces results = Gvap.newInterfaces({{(len .Normalized.Outputs)}});
+				{{range $index, $item := .Normalized.Outputs}}Interface result{{$index}} = Gvap.newInterface(); result{{$index}}.setDefault{{namedtype (bindtype .Type) .Type}}(); results.set({{$index}}, result{{$index}});
 				{{end}}
 
 				if (opts == null) {
-					opts = Geth.newCallOpts();
+					opts = Gvap.newCallOpts();
 				}
 				this.Contract.call(opts, results, "{{.Original.Name}}", args);
 				{{if gt (len .Normalized.Outputs) 1}}
@@ -357,8 +357,8 @@ import org.ethereum.geth.internal.*;
 			//
 			// Solidity: {{.Original.String}}
 			public Transaction {{.Normalized.Name}}(TransactOpts opts{{range .Normalized.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
-				Interfaces args = Geth.newInterfaces({{(len .Normalized.Inputs)}});
-				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, Geth.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
+				Interfaces args = Gvap.newInterfaces({{(len .Normalized.Inputs)}});
+				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, Gvap.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
 				{{end}}
 
 				return this.Contract.transact(opts, "{{.Original.Name}}"	, args);

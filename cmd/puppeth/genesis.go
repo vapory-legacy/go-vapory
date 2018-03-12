@@ -1,18 +1,18 @@
 // Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// This file is part of go-vapory.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-vapory is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-vapory is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-vapory. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -21,16 +21,16 @@ import (
 	"errors"
 	"math"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/common/hexutil"
+	"github.com/vaporyco/go-vapory/consensus/vapash"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/params"
 )
 
-// cppEthereumGenesisSpec represents the genesis specification format used by the
-// C++ Ethereum implementation.
-type cppEthereumGenesisSpec struct {
+// cppVaporyGenesisSpec represents the genesis specification format used by the
+// C++ Vapory implementation.
+type cppVaporyGenesisSpec struct {
 	SealEngine string `json:"sealEngine"`
 	Params     struct {
 		AccountStartNonce       hexutil.Uint64 `json:"accountStartNonce"`
@@ -62,39 +62,39 @@ type cppEthereumGenesisSpec struct {
 		GasLimit   hexutil.Uint64 `json:"gasLimit"`
 	} `json:"genesis"`
 
-	Accounts map[common.Address]*cppEthereumGenesisSpecAccount `json:"accounts"`
+	Accounts map[common.Address]*cppVaporyGenesisSpecAccount `json:"accounts"`
 }
 
-// cppEthereumGenesisSpecAccount is the prefunded genesis account and/or precompiled
+// cppVaporyGenesisSpecAccount is the prefunded genesis account and/or precompiled
 // contract definition.
-type cppEthereumGenesisSpecAccount struct {
+type cppVaporyGenesisSpecAccount struct {
 	Balance     *hexutil.Big                   `json:"balance"`
 	Nonce       uint64                         `json:"nonce,omitempty"`
-	Precompiled *cppEthereumGenesisSpecBuiltin `json:"precompiled,omitempty"`
+	Precompiled *cppVaporyGenesisSpecBuiltin `json:"precompiled,omitempty"`
 }
 
-// cppEthereumGenesisSpecBuiltin is the precompiled contract definition.
-type cppEthereumGenesisSpecBuiltin struct {
+// cppVaporyGenesisSpecBuiltin is the precompiled contract definition.
+type cppVaporyGenesisSpecBuiltin struct {
 	Name          string                               `json:"name,omitempty"`
 	StartingBlock hexutil.Uint64                       `json:"startingBlock,omitempty"`
-	Linear        *cppEthereumGenesisSpecLinearPricing `json:"linear,omitempty"`
+	Linear        *cppVaporyGenesisSpecLinearPricing `json:"linear,omitempty"`
 }
 
-type cppEthereumGenesisSpecLinearPricing struct {
+type cppVaporyGenesisSpecLinearPricing struct {
 	Base uint64 `json:"base"`
 	Word uint64 `json:"word"`
 }
 
-// newCppEthereumGenesisSpec converts a go-ethereum genesis block into a Parity specific
+// newCppVaporyGenesisSpec converts a go-vapory genesis block into a Parity specific
 // chain specification format.
-func newCppEthereumGenesisSpec(network string, genesis *core.Genesis) (*cppEthereumGenesisSpec, error) {
-	// Only ethash is currently supported between go-ethereum and cpp-ethereum
-	if genesis.Config.Ethash == nil {
+func newCppVaporyGenesisSpec(network string, genesis *core.Genesis) (*cppVaporyGenesisSpec, error) {
+	// Only vapash is currently supported between go-vapory and cpp-vapory
+	if genesis.Config.Vapash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
 	// Reconstruct the chain spec in Parity's format
-	spec := &cppEthereumGenesisSpec{
-		SealEngine: "Ethash",
+	spec := &cppVaporyGenesisSpec{
+		SealEngine: "Vapash",
 	}
 	spec.Params.AccountStartNonce = 0
 	spec.Params.HomesteadForkBlock = (hexutil.Uint64)(genesis.Config.HomesteadBlock.Uint64())
@@ -113,7 +113,7 @@ func newCppEthereumGenesisSpec(network string, genesis *core.Genesis) (*cppEther
 	spec.Params.DifficultyBoundDivisor = (*hexutil.Big)(params.DifficultyBoundDivisor)
 	spec.Params.GasLimitBoundDivisor = (hexutil.Uint64)(params.GasLimitBoundDivisor)
 	spec.Params.DurationLimit = (*hexutil.Big)(params.DurationLimit)
-	spec.Params.BlockReward = (*hexutil.Big)(ethash.FrontierBlockReward)
+	spec.Params.BlockReward = (*hexutil.Big)(vapash.FrontierBlockReward)
 
 	spec.Genesis.Nonce = (hexutil.Bytes)(make([]byte, 8))
 	binary.LittleEndian.PutUint64(spec.Genesis.Nonce[:], genesis.Nonce)
@@ -126,36 +126,36 @@ func newCppEthereumGenesisSpec(network string, genesis *core.Genesis) (*cppEther
 	spec.Genesis.ExtraData = (hexutil.Bytes)(genesis.ExtraData)
 	spec.Genesis.GasLimit = (hexutil.Uint64)(genesis.GasLimit)
 
-	spec.Accounts = make(map[common.Address]*cppEthereumGenesisSpecAccount)
+	spec.Accounts = make(map[common.Address]*cppVaporyGenesisSpecAccount)
 	for address, account := range genesis.Alloc {
-		spec.Accounts[address] = &cppEthereumGenesisSpecAccount{
+		spec.Accounts[address] = &cppVaporyGenesisSpecAccount{
 			Balance: (*hexutil.Big)(account.Balance),
 			Nonce:   account.Nonce,
 		}
 	}
-	spec.Accounts[common.BytesToAddress([]byte{1})].Precompiled = &cppEthereumGenesisSpecBuiltin{
-		Name: "ecrecover", Linear: &cppEthereumGenesisSpecLinearPricing{Base: 3000},
+	spec.Accounts[common.BytesToAddress([]byte{1})].Precompiled = &cppVaporyGenesisSpecBuiltin{
+		Name: "ecrecover", Linear: &cppVaporyGenesisSpecLinearPricing{Base: 3000},
 	}
-	spec.Accounts[common.BytesToAddress([]byte{2})].Precompiled = &cppEthereumGenesisSpecBuiltin{
-		Name: "sha256", Linear: &cppEthereumGenesisSpecLinearPricing{Base: 60, Word: 12},
+	spec.Accounts[common.BytesToAddress([]byte{2})].Precompiled = &cppVaporyGenesisSpecBuiltin{
+		Name: "sha256", Linear: &cppVaporyGenesisSpecLinearPricing{Base: 60, Word: 12},
 	}
-	spec.Accounts[common.BytesToAddress([]byte{3})].Precompiled = &cppEthereumGenesisSpecBuiltin{
-		Name: "ripemd160", Linear: &cppEthereumGenesisSpecLinearPricing{Base: 600, Word: 120},
+	spec.Accounts[common.BytesToAddress([]byte{3})].Precompiled = &cppVaporyGenesisSpecBuiltin{
+		Name: "ripemd160", Linear: &cppVaporyGenesisSpecLinearPricing{Base: 600, Word: 120},
 	}
-	spec.Accounts[common.BytesToAddress([]byte{4})].Precompiled = &cppEthereumGenesisSpecBuiltin{
-		Name: "identity", Linear: &cppEthereumGenesisSpecLinearPricing{Base: 15, Word: 3},
+	spec.Accounts[common.BytesToAddress([]byte{4})].Precompiled = &cppVaporyGenesisSpecBuiltin{
+		Name: "identity", Linear: &cppVaporyGenesisSpecLinearPricing{Base: 15, Word: 3},
 	}
 	if genesis.Config.ByzantiumBlock != nil {
-		spec.Accounts[common.BytesToAddress([]byte{5})].Precompiled = &cppEthereumGenesisSpecBuiltin{
+		spec.Accounts[common.BytesToAddress([]byte{5})].Precompiled = &cppVaporyGenesisSpecBuiltin{
 			Name: "modexp", StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64()),
 		}
-		spec.Accounts[common.BytesToAddress([]byte{6})].Precompiled = &cppEthereumGenesisSpecBuiltin{
-			Name: "alt_bn128_G1_add", StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64()), Linear: &cppEthereumGenesisSpecLinearPricing{Base: 500},
+		spec.Accounts[common.BytesToAddress([]byte{6})].Precompiled = &cppVaporyGenesisSpecBuiltin{
+			Name: "alt_bn128_G1_add", StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64()), Linear: &cppVaporyGenesisSpecLinearPricing{Base: 500},
 		}
-		spec.Accounts[common.BytesToAddress([]byte{7})].Precompiled = &cppEthereumGenesisSpecBuiltin{
-			Name: "alt_bn128_G1_mul", StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64()), Linear: &cppEthereumGenesisSpecLinearPricing{Base: 40000},
+		spec.Accounts[common.BytesToAddress([]byte{7})].Precompiled = &cppVaporyGenesisSpecBuiltin{
+			Name: "alt_bn128_G1_mul", StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64()), Linear: &cppVaporyGenesisSpecLinearPricing{Base: 40000},
 		}
-		spec.Accounts[common.BytesToAddress([]byte{8})].Precompiled = &cppEthereumGenesisSpecBuiltin{
+		spec.Accounts[common.BytesToAddress([]byte{8})].Precompiled = &cppVaporyGenesisSpecBuiltin{
 			Name: "alt_bn128_pairing_product", StartingBlock: (hexutil.Uint64)(genesis.Config.ByzantiumBlock.Uint64()),
 		}
 	}
@@ -166,7 +166,7 @@ func newCppEthereumGenesisSpec(network string, genesis *core.Genesis) (*cppEther
 type parityChainSpec struct {
 	Name   string `json:"name"`
 	Engine struct {
-		Ethash struct {
+		Vapash struct {
 			Params struct {
 				MinimumDifficulty      *hexutil.Big   `json:"minimumDifficulty"`
 				DifficultyBoundDivisor *hexutil.Big   `json:"difficultyBoundDivisor"`
@@ -182,7 +182,7 @@ type parityChainSpec struct {
 				EIP100bTransition      uint64         `json:"eip100bTransition"`
 				EIP649Transition       uint64         `json:"eip649Transition"`
 			} `json:"params"`
-		} `json:"Ethash"`
+		} `json:"Vapash"`
 	} `json:"engine"`
 
 	Params struct {
@@ -201,10 +201,10 @@ type parityChainSpec struct {
 
 	Genesis struct {
 		Seal struct {
-			Ethereum struct {
+			Vapory struct {
 				Nonce   hexutil.Bytes `json:"nonce"`
 				MixHash hexutil.Bytes `json:"mixHash"`
-			} `json:"ethereum"`
+			} `json:"vapory"`
 		} `json:"seal"`
 
 		Difficulty *hexutil.Big   `json:"difficulty"`
@@ -256,11 +256,11 @@ type parityChainSpecAltBnPairingPricing struct {
 	Pair uint64 `json:"pair"`
 }
 
-// newParityChainSpec converts a go-ethereum genesis block into a Parity specific
+// newParityChainSpec converts a go-vapory genesis block into a Parity specific
 // chain specification format.
 func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []string) (*parityChainSpec, error) {
-	// Only ethash is currently supported between go-ethereum and Parity
-	if genesis.Config.Ethash == nil {
+	// Only vapash is currently supported between go-vapory and Parity
+	if genesis.Config.Vapash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
 	// Reconstruct the chain spec in Parity's format
@@ -268,19 +268,19 @@ func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 		Name:  network,
 		Nodes: bootnodes,
 	}
-	spec.Engine.Ethash.Params.MinimumDifficulty = (*hexutil.Big)(params.MinimumDifficulty)
-	spec.Engine.Ethash.Params.DifficultyBoundDivisor = (*hexutil.Big)(params.DifficultyBoundDivisor)
-	spec.Engine.Ethash.Params.GasLimitBoundDivisor = (hexutil.Uint64)(params.GasLimitBoundDivisor)
-	spec.Engine.Ethash.Params.DurationLimit = (*hexutil.Big)(params.DurationLimit)
-	spec.Engine.Ethash.Params.BlockReward = (*hexutil.Big)(ethash.FrontierBlockReward)
-	spec.Engine.Ethash.Params.HomesteadTransition = genesis.Config.HomesteadBlock.Uint64()
-	spec.Engine.Ethash.Params.EIP150Transition = genesis.Config.EIP150Block.Uint64()
-	spec.Engine.Ethash.Params.EIP160Transition = genesis.Config.EIP155Block.Uint64()
-	spec.Engine.Ethash.Params.EIP161abcTransition = genesis.Config.EIP158Block.Uint64()
-	spec.Engine.Ethash.Params.EIP161dTransition = genesis.Config.EIP158Block.Uint64()
-	spec.Engine.Ethash.Params.EIP649Reward = (*hexutil.Big)(ethash.ByzantiumBlockReward)
-	spec.Engine.Ethash.Params.EIP100bTransition = genesis.Config.ByzantiumBlock.Uint64()
-	spec.Engine.Ethash.Params.EIP649Transition = genesis.Config.ByzantiumBlock.Uint64()
+	spec.Engine.Vapash.Params.MinimumDifficulty = (*hexutil.Big)(params.MinimumDifficulty)
+	spec.Engine.Vapash.Params.DifficultyBoundDivisor = (*hexutil.Big)(params.DifficultyBoundDivisor)
+	spec.Engine.Vapash.Params.GasLimitBoundDivisor = (hexutil.Uint64)(params.GasLimitBoundDivisor)
+	spec.Engine.Vapash.Params.DurationLimit = (*hexutil.Big)(params.DurationLimit)
+	spec.Engine.Vapash.Params.BlockReward = (*hexutil.Big)(vapash.FrontierBlockReward)
+	spec.Engine.Vapash.Params.HomesteadTransition = genesis.Config.HomesteadBlock.Uint64()
+	spec.Engine.Vapash.Params.EIP150Transition = genesis.Config.EIP150Block.Uint64()
+	spec.Engine.Vapash.Params.EIP160Transition = genesis.Config.EIP155Block.Uint64()
+	spec.Engine.Vapash.Params.EIP161abcTransition = genesis.Config.EIP158Block.Uint64()
+	spec.Engine.Vapash.Params.EIP161dTransition = genesis.Config.EIP158Block.Uint64()
+	spec.Engine.Vapash.Params.EIP649Reward = (*hexutil.Big)(vapash.ByzantiumBlockReward)
+	spec.Engine.Vapash.Params.EIP100bTransition = genesis.Config.ByzantiumBlock.Uint64()
+	spec.Engine.Vapash.Params.EIP649Transition = genesis.Config.ByzantiumBlock.Uint64()
 
 	spec.Params.MaximumExtraDataSize = (hexutil.Uint64)(params.MaximumExtraDataSize)
 	spec.Params.MinGasLimit = (hexutil.Uint64)(params.MinGasLimit)
@@ -294,10 +294,10 @@ func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	spec.Params.EIP214Transition = genesis.Config.ByzantiumBlock.Uint64()
 	spec.Params.EIP658Transition = genesis.Config.ByzantiumBlock.Uint64()
 
-	spec.Genesis.Seal.Ethereum.Nonce = (hexutil.Bytes)(make([]byte, 8))
-	binary.LittleEndian.PutUint64(spec.Genesis.Seal.Ethereum.Nonce[:], genesis.Nonce)
+	spec.Genesis.Seal.Vapory.Nonce = (hexutil.Bytes)(make([]byte, 8))
+	binary.LittleEndian.PutUint64(spec.Genesis.Seal.Vapory.Nonce[:], genesis.Nonce)
 
-	spec.Genesis.Seal.Ethereum.MixHash = (hexutil.Bytes)(genesis.Mixhash[:])
+	spec.Genesis.Seal.Vapory.MixHash = (hexutil.Bytes)(genesis.Mixhash[:])
 	spec.Genesis.Difficulty = (*hexutil.Big)(genesis.Difficulty)
 	spec.Genesis.Author = genesis.Coinbase
 	spec.Genesis.Timestamp = (hexutil.Uint64)(genesis.Timestamp)
@@ -341,9 +341,9 @@ func newParityChainSpec(network string, genesis *core.Genesis, bootnodes []strin
 	return spec, nil
 }
 
-// pyEthereumGenesisSpec represents the genesis specification format used by the
-// Python Ethereum implementation.
-type pyEthereumGenesisSpec struct {
+// pyVaporyGenesisSpec represents the genesis specification format used by the
+// Python Vapory implementation.
+type pyVaporyGenesisSpec struct {
 	Nonce      hexutil.Bytes     `json:"nonce"`
 	Timestamp  hexutil.Uint64    `json:"timestamp"`
 	ExtraData  hexutil.Bytes     `json:"extraData"`
@@ -355,14 +355,14 @@ type pyEthereumGenesisSpec struct {
 	ParentHash common.Hash       `json:"parentHash"`
 }
 
-// newPyEthereumGenesisSpec converts a go-ethereum genesis block into a Parity specific
+// newPyVaporyGenesisSpec converts a go-vapory genesis block into a Parity specific
 // chain specification format.
-func newPyEthereumGenesisSpec(network string, genesis *core.Genesis) (*pyEthereumGenesisSpec, error) {
-	// Only ethash is currently supported between go-ethereum and pyethereum
-	if genesis.Config.Ethash == nil {
+func newPyVaporyGenesisSpec(network string, genesis *core.Genesis) (*pyVaporyGenesisSpec, error) {
+	// Only vapash is currently supported between go-vapory and pyvapory
+	if genesis.Config.Vapash == nil {
 		return nil, errors.New("unsupported consensus engine")
 	}
-	spec := &pyEthereumGenesisSpec{
+	spec := &pyVaporyGenesisSpec{
 		Timestamp:  (hexutil.Uint64)(genesis.Timestamp),
 		ExtraData:  genesis.ExtraData,
 		GasLimit:   (hexutil.Uint64)(genesis.GasLimit),

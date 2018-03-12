@@ -1,21 +1,21 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 // Package light implements on-demand retrieval capable state and chain objects
-// for the Ethereum Light Client.
+// for the Vapory Light Client.
 package les
 
 import (
@@ -23,15 +23,15 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/core/types"
+	"github.com/vaporyco/go-vapory/crypto"
+	"github.com/vaporyco/go-vapory/vapdb"
+	"github.com/vaporyco/go-vapory/light"
+	"github.com/vaporyco/go-vapory/log"
+	"github.com/vaporyco/go-vapory/rlp"
+	"github.com/vaporyco/go-vapory/trie"
 )
 
 var (
@@ -51,7 +51,7 @@ type LesOdrRequest interface {
 	GetCost(*peer) uint64
 	CanSend(*peer) bool
 	Request(uint64, *peer) error
-	Validate(ethdb.Database, *Msg) error
+	Validate(vapdb.Database, *Msg) error
 }
 
 func LesRequest(req light.OdrRequest) LesOdrRequest {
@@ -96,7 +96,7 @@ func (r *BlockRequest) Request(reqID uint64, peer *peer) error {
 // Valid processes an ODR request reply message from the LES network
 // returns true and stores results in memory if the message was a valid reply
 // to the request (implementation of LesOdrRequest)
-func (r *BlockRequest) Validate(db ethdb.Database, msg *Msg) error {
+func (r *BlockRequest) Validate(db vapdb.Database, msg *Msg) error {
 	log.Debug("Validating block body", "hash", r.Hash)
 
 	// Ensure we have a correct message with a single block body
@@ -152,7 +152,7 @@ func (r *ReceiptsRequest) Request(reqID uint64, peer *peer) error {
 // Valid processes an ODR request reply message from the LES network
 // returns true and stores results in memory if the message was a valid reply
 // to the request (implementation of LesOdrRequest)
-func (r *ReceiptsRequest) Validate(db ethdb.Database, msg *Msg) error {
+func (r *ReceiptsRequest) Validate(db vapdb.Database, msg *Msg) error {
 	log.Debug("Validating block receipts", "hash", r.Hash)
 
 	// Ensure we have a correct message with a single block receipt
@@ -219,7 +219,7 @@ func (r *TrieRequest) Request(reqID uint64, peer *peer) error {
 // Valid processes an ODR request reply message from the LES network
 // returns true and stores results in memory if the message was a valid reply
 // to the request (implementation of LesOdrRequest)
-func (r *TrieRequest) Validate(db ethdb.Database, msg *Msg) error {
+func (r *TrieRequest) Validate(db vapdb.Database, msg *Msg) error {
 	log.Debug("Validating trie proof", "root", r.Id.Root, "key", r.Key)
 
 	switch msg.MsgType {
@@ -288,7 +288,7 @@ func (r *CodeRequest) Request(reqID uint64, peer *peer) error {
 // Valid processes an ODR request reply message from the LES network
 // returns true and stores results in memory if the message was a valid reply
 // to the request (implementation of LesOdrRequest)
-func (r *CodeRequest) Validate(db ethdb.Database, msg *Msg) error {
+func (r *CodeRequest) Validate(db vapdb.Database, msg *Msg) error {
 	log.Debug("Validating code data", "hash", r.Hash)
 
 	// Ensure we have a correct message with a single code element
@@ -385,7 +385,7 @@ func (r *ChtRequest) Request(reqID uint64, peer *peer) error {
 // Valid processes an ODR request reply message from the LES network
 // returns true and stores results in memory if the message was a valid reply
 // to the request (implementation of LesOdrRequest)
-func (r *ChtRequest) Validate(db ethdb.Database, msg *Msg) error {
+func (r *ChtRequest) Validate(db vapdb.Database, msg *Msg) error {
 	log.Debug("Validating CHT", "cht", r.ChtNum, "block", r.BlockNum)
 
 	switch msg.MsgType {
@@ -509,7 +509,7 @@ func (r *BloomRequest) Request(reqID uint64, peer *peer) error {
 // Valid processes an ODR request reply message from the LES network
 // returns true and stores results in memory if the message was a valid reply
 // to the request (implementation of LesOdrRequest)
-func (r *BloomRequest) Validate(db ethdb.Database, msg *Msg) error {
+func (r *BloomRequest) Validate(db vapdb.Database, msg *Msg) error {
 	log.Debug("Validating BloomBits", "bloomTrie", r.BloomTrieNum, "bitIdx", r.BitIdx, "sections", r.SectionIdxList)
 
 	// Ensure we have a correct message with a single proof element

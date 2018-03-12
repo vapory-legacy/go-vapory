@@ -1,18 +1,18 @@
 // Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// This file is part of go-vapory.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-vapory is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-vapory is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-vapory. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/vaporyco/go-vapory/log"
 )
 
 // deployWallet creates a new web wallet based on some user input.
@@ -31,8 +31,8 @@ func (w *wizard) deployWallet() {
 		log.Error("No genesis block configured")
 		return
 	}
-	if w.conf.ethstats == "" {
-		log.Error("No ethstats server configured")
+	if w.conf.vapstats == "" {
+		log.Error("No vapstats server configured")
 		return
 	}
 	// Select the server to interact with
@@ -59,7 +59,7 @@ func (w *wizard) deployWallet() {
 	fmt.Printf("Which port should the wallet listen on? (default = %d)\n", infos.webPort)
 	infos.webPort = w.readDefaultInt(infos.webPort)
 
-	// Figure which virtual-host to deploy ethstats on
+	// Figure which virtual-host to deploy vapstats on
 	if infos.webHost, err = w.ensureVirtualHost(client, infos.webPort, infos.webHost); err != nil {
 		log.Error("Failed to decide on wallet host", "err", err)
 		return
@@ -84,12 +84,12 @@ func (w *wizard) deployWallet() {
 
 	// Set a proper name to report on the stats page
 	fmt.Println()
-	if infos.ethstats == "" {
+	if infos.vapstats == "" {
 		fmt.Printf("What should the wallet be called on the stats page?\n")
-		infos.ethstats = w.readString() + ":" + w.conf.ethstats
+		infos.vapstats = w.readString() + ":" + w.conf.vapstats
 	} else {
-		fmt.Printf("What should the wallet be called on the stats page? (default = %s)\n", infos.ethstats)
-		infos.ethstats = w.readDefaultString(infos.ethstats) + ":" + w.conf.ethstats
+		fmt.Printf("What should the wallet be called on the stats page? (default = %s)\n", infos.vapstats)
+		infos.vapstats = w.readDefaultString(infos.vapstats) + ":" + w.conf.vapstats
 	}
 	// Try to deploy the wallet on the host
 	nocache := false

@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/common/hexutil"
 )
 
 var _ = (*logMarshaling)(nil)

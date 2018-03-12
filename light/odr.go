@@ -1,31 +1,31 @@
 // Copyright 2015 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 // Package light implements on-demand retrieval capable state and chain objects
-// for the Ethereum Light Client.
+// for the Vapory Light Client.
 package light
 
 import (
 	"context"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/core/types"
+	"github.com/vaporyco/go-vapory/vapdb"
 )
 
 // NoOdr is the default context passed to an ODR capable function when the ODR
@@ -34,7 +34,7 @@ var NoOdr = context.Background()
 
 // OdrBackend is an interface to a backend service that handles ODR retrievals type
 type OdrBackend interface {
-	Database() ethdb.Database
+	Database() vapdb.Database
 	ChtIndexer() *core.ChainIndexer
 	BloomTrieIndexer() *core.ChainIndexer
 	BloomIndexer() *core.ChainIndexer
@@ -43,7 +43,7 @@ type OdrBackend interface {
 
 // OdrRequest is an interface for retrieval requests
 type OdrRequest interface {
-	StoreResult(db ethdb.Database)
+	StoreResult(db vapdb.Database)
 }
 
 // TrieID identifies a state or account storage trie
@@ -85,7 +85,7 @@ type TrieRequest struct {
 }
 
 // StoreResult stores the retrieved data in local database
-func (req *TrieRequest) StoreResult(db ethdb.Database) {
+func (req *TrieRequest) StoreResult(db vapdb.Database) {
 	req.Proof.Store(db)
 }
 
@@ -98,7 +98,7 @@ type CodeRequest struct {
 }
 
 // StoreResult stores the retrieved data in local database
-func (req *CodeRequest) StoreResult(db ethdb.Database) {
+func (req *CodeRequest) StoreResult(db vapdb.Database) {
 	db.Put(req.Hash[:], req.Data)
 }
 
@@ -111,7 +111,7 @@ type BlockRequest struct {
 }
 
 // StoreResult stores the retrieved data in local database
-func (req *BlockRequest) StoreResult(db ethdb.Database) {
+func (req *BlockRequest) StoreResult(db vapdb.Database) {
 	core.WriteBodyRLP(db, req.Hash, req.Number, req.Rlp)
 }
 
@@ -124,7 +124,7 @@ type ReceiptsRequest struct {
 }
 
 // StoreResult stores the retrieved data in local database
-func (req *ReceiptsRequest) StoreResult(db ethdb.Database) {
+func (req *ReceiptsRequest) StoreResult(db vapdb.Database) {
 	core.WriteBlockReceipts(db, req.Hash, req.Number, req.Receipts)
 }
 
@@ -139,7 +139,7 @@ type ChtRequest struct {
 }
 
 // StoreResult stores the retrieved data in local database
-func (req *ChtRequest) StoreResult(db ethdb.Database) {
+func (req *ChtRequest) StoreResult(db vapdb.Database) {
 	// if there is a canonical hash, there is a header too
 	core.WriteHeader(db, req.Header)
 	hash, num := req.Header.Hash(), req.Header.Number.Uint64()
@@ -159,7 +159,7 @@ type BloomRequest struct {
 }
 
 // StoreResult stores the retrieved data in local database
-func (req *BloomRequest) StoreResult(db ethdb.Database) {
+func (req *BloomRequest) StoreResult(db vapdb.Database) {
 	for i, sectionIdx := range req.SectionIdxList {
 		sectionHead := core.GetCanonicalHash(db, (sectionIdx+1)*BloomTrieFrequency-1)
 		// if we don't have the canonical hash stored for this section head number, we'll still store it under

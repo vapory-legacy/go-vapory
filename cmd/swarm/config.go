@@ -1,18 +1,18 @@
 // Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// This file is part of go-vapory.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-vapory is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-vapory is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-vapory. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -27,13 +27,13 @@ import (
 
 	cli "gopkg.in/urfave/cli.v1"
 
-	"github.com/ethereum/go-ethereum/cmd/utils"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/node"
+	"github.com/vaporyco/go-vapory/cmd/utils"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/log"
+	"github.com/vaporyco/go-vapory/node"
 	"github.com/naoina/toml"
 
-	bzzapi "github.com/ethereum/go-ethereum/swarm/api"
+	bzzapi "github.com/vaporyco/go-vapory/swarm/api"
 )
 
 var (
@@ -69,7 +69,7 @@ const (
 	SWARM_ENV_ENS_ADDR        = "SWARM_ENS_ADDR"
 	SWARM_ENV_CORS            = "SWARM_CORS"
 	SWARM_ENV_BOOTNODES       = "SWARM_BOOTNODES"
-	GETH_ENV_DATADIR          = "GETH_DATADIR"
+	GVAP_ENV_DATADIR          = "GVAP_DATADIR"
 )
 
 // These settings ensure that TOML keys use the same names as Go struct fields.
@@ -83,7 +83,7 @@ var tomlSettings = toml.Config{
 	MissingField: func(rt reflect.Type, field string) error {
 		link := ""
 		if unicode.IsUpper(rune(rt.Name()[0])) && rt.PkgPath() != "main" {
-			link = fmt.Sprintf(", check github.com/ethereum/go-ethereum/swarm/api/config.go for available fields")
+			link = fmt.Sprintf(", check github.com/vaporyco/go-vapory/swarm/api/config.go for available fields")
 		}
 		return fmt.Errorf("field '%s' is not defined in %s%s", field, rt.String(), link)
 	},
@@ -110,7 +110,7 @@ func initSwarmNode(config *bzzapi.Config, stack *node.Node, ctx *cli.Context) {
 	//at this point, all vars should be set in the Config
 	//get the account for the provided swarm account
 	prvkey := getAccount(config.BzzAccount, ctx, stack)
-	//set the resolved config path (geth --datadir)
+	//set the resolved config path (gvap --datadir)
 	config.Path = stack.InstanceDir()
 	//finally, initialize the configuration
 	config.Init(prvkey)
@@ -233,7 +233,7 @@ func envVarsOverride(currentConfig *bzzapi.Config) (config *bzzapi.Config) {
 		}
 	}
 
-	if datadir := os.Getenv(GETH_ENV_DATADIR); datadir != "" {
+	if datadir := os.Getenv(GVAP_ENV_DATADIR); datadir != "" {
 		currentConfig.Path = datadir
 	}
 

@@ -1,18 +1,18 @@
 // Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// This file is part of go-vapory.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-vapory is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-vapory is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-vapory. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -23,8 +23,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/log"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -36,7 +36,7 @@ func (w *wizard) networkStats() {
 		return
 	}
 	// Clear out some previous configs to refill from current scan
-	w.conf.ethstats = ""
+	w.conf.vapstats = ""
 	w.conf.bootFull = w.conf.bootFull[:0]
 	w.conf.bootLight = w.conf.bootLight[:0]
 
@@ -75,7 +75,7 @@ func (w *wizard) gatherStats(server string, pubkey []byte, client *sshClient) *s
 	// Gather some global stats to feed into the wizard
 	var (
 		genesis   string
-		ethstats  string
+		vapstats  string
 		bootFull  []string
 		bootLight []string
 	)
@@ -105,14 +105,14 @@ func (w *wizard) gatherStats(server string, pubkey []byte, client *sshClient) *s
 	} else {
 		stat.services["nginx"] = infos.Report()
 	}
-	logger.Debug("Checking for ethstats availability")
-	if infos, err := checkEthstats(client, w.network); err != nil {
+	logger.Debug("Checking for vapstats availability")
+	if infos, err := checkVapstats(client, w.network); err != nil {
 		if err != ErrServiceUnknown {
-			stat.services["ethstats"] = map[string]string{"offline": err.Error()}
+			stat.services["vapstats"] = map[string]string{"offline": err.Error()}
 		}
 	} else {
-		stat.services["ethstats"] = infos.Report()
-		ethstats = infos.config
+		stat.services["vapstats"] = infos.Report()
+		vapstats = infos.config
 	}
 	logger.Debug("Checking for bootnode availability")
 	if infos, err := checkNode(client, w.network, true); err != nil {
@@ -181,8 +181,8 @@ func (w *wizard) gatherStats(server string, pubkey []byte, client *sshClient) *s
 			w.conf.Genesis = g
 		}
 	}
-	if ethstats != "" {
-		w.conf.ethstats = ethstats
+	if vapstats != "" {
+		w.conf.vapstats = vapstats
 	}
 	w.conf.bootFull = append(w.conf.bootFull, bootFull...)
 	w.conf.bootLight = append(w.conf.bootLight, bootLight...)
@@ -290,5 +290,5 @@ type protips struct {
 	network   int64
 	bootFull  []string
 	bootLight []string
-	ethstats  string
+	vapstats  string
 }

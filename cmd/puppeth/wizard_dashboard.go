@@ -1,25 +1,25 @@
 // Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// This file is part of go-vapory.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-vapory is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-vapory is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-vapory. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
 import (
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/vaporyco/go-vapory/log"
 )
 
 // deployDashboard queries the user for various input on deploying a web-service
@@ -60,7 +60,7 @@ func (w *wizard) deployDashboard() {
 			available[service] = append(available[service], server)
 		}
 	}
-	for _, service := range []string{"ethstats", "explorer", "wallet", "faucet"} {
+	for _, service := range []string{"vapstats", "explorer", "wallet", "faucet"} {
 		// Gather all the locally hosted pages of this type
 		var pages []string
 		for _, server := range available[service] {
@@ -71,8 +71,8 @@ func (w *wizard) deployDashboard() {
 			// If there's a service running on the machine, retrieve it's port number
 			var port int
 			switch service {
-			case "ethstats":
-				if infos, err := checkEthstats(client, w.network); err == nil {
+			case "vapstats":
+				if infos, err := checkVapstats(client, w.network); err == nil {
 					port = infos.port
 				}
 			case "explorer":
@@ -123,8 +123,8 @@ func (w *wizard) deployDashboard() {
 		}
 		// Save the users choice
 		switch service {
-		case "ethstats":
-			infos.ethstats = page
+		case "vapstats":
+			infos.vapstats = page
 		case "explorer":
 			infos.explorer = page
 		case "wallet":
@@ -133,10 +133,10 @@ func (w *wizard) deployDashboard() {
 			infos.faucet = page
 		}
 	}
-	// If we have ethstats running, ask whether to make the secret public or not
-	if w.conf.ethstats != "" {
+	// If we have vapstats running, ask whether to make the secret public or not
+	if w.conf.vapstats != "" {
 		fmt.Println()
-		fmt.Println("Include ethstats secret on dashboard (y/n)? (default = yes)")
+		fmt.Println("Include vapstats secret on dashboard (y/n)? (default = yes)")
 		infos.trusted = w.readDefaultString("y") == "y"
 	}
 	// Try to deploy the dashboard container on the host

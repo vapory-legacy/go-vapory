@@ -1,18 +1,18 @@
 // Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// This file is part of go-vapory.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-vapory is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-vapory is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-vapory. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -30,9 +30,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/log"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -42,7 +42,7 @@ type config struct {
 	path      string   // File containing the configuration values
 	bootFull  []string // Bootnodes to always connect to by full nodes
 	bootLight []string // Bootnodes to always connect to by light nodes
-	ethstats  string   // Ethstats settings to cache for node deploys
+	vapstats  string   // Vapstats settings to cache for node deploys
 
 	Genesis *core.Genesis     `json:"genesis,omitempty"` // Genesis block to cache for node deploys
 	Servers map[string][]byte `json:"servers,omitempty"`
@@ -74,7 +74,7 @@ type wizard struct {
 	conf    config // Configurations from previous runs
 
 	servers  map[string]*sshClient // SSH connections to servers to administer
-	services map[string][]string   // Ethereum services known to be running on servers
+	services map[string][]string   // Vapory services known to be running on servers
 
 	in   *bufio.Reader // Wrapper around stdin to allow reading user input
 	lock sync.Mutex    // Lock to protect configs during concurrent service discovery
@@ -241,7 +241,7 @@ func (w *wizard) readPassword() string {
 }
 
 // readAddress reads a single line from stdin, trimming if from spaces and converts
-// it to an Ethereum address.
+// it to an Vapory address.
 func (w *wizard) readAddress() *common.Address {
 	for {
 		// Read the address from the user
@@ -265,7 +265,7 @@ func (w *wizard) readAddress() *common.Address {
 }
 
 // readDefaultAddress reads a single line from stdin, trimming if from spaces and
-// converts it to an Ethereum address. If an empty line is entered, the default
+// converts it to an Vapory address. If an empty line is entered, the default
 // value is returned.
 func (w *wizard) readDefaultAddress(def common.Address) common.Address {
 	for {
@@ -305,7 +305,7 @@ func (w *wizard) readJSON() string {
 // readIPAddress reads a single line from stdin, trimming if from spaces and
 // returning it if it's convertible to an IP address. The reason for keeping
 // the user input format instead of returning a Go net.IP is to match with
-// weird formats used by ethstats, which compares IPs textually, not by value.
+// weird formats used by vapstats, which compares IPs textually, not by value.
 func (w *wizard) readIPAddress() string {
 	for {
 		// Read the IP address from the user

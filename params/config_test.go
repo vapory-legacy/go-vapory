@@ -1,18 +1,18 @@
 // Copyright 2017 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package params
 
@@ -29,8 +29,8 @@ func TestCheckCompatible(t *testing.T) {
 		wantErr     *ConfigCompatError
 	}
 	tests := []test{
-		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 0, wantErr: nil},
-		{stored: AllEthashProtocolChanges, new: AllEthashProtocolChanges, head: 100, wantErr: nil},
+		{stored: AllVapashProtocolChanges, new: AllVapashProtocolChanges, head: 0, wantErr: nil},
+		{stored: AllVapashProtocolChanges, new: AllVapashProtocolChanges, head: 100, wantErr: nil},
 		{
 			stored:  &ChainConfig{EIP150Block: big.NewInt(10)},
 			new:     &ChainConfig{EIP150Block: big.NewInt(20)},
@@ -38,7 +38,7 @@ func TestCheckCompatible(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			stored: AllEthashProtocolChanges,
+			stored: AllVapashProtocolChanges,
 			new:    &ChainConfig{HomesteadBlock: nil},
 			head:   3,
 			wantErr: &ConfigCompatError{
@@ -49,7 +49,7 @@ func TestCheckCompatible(t *testing.T) {
 			},
 		},
 		{
-			stored: AllEthashProtocolChanges,
+			stored: AllVapashProtocolChanges,
 			new:    &ChainConfig{HomesteadBlock: big.NewInt(1)},
 			head:   3,
 			wantErr: &ConfigCompatError{

@@ -7,10 +7,10 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/vaporyco/go-vapory/accounts/abi"
+	"github.com/vaporyco/go-vapory/accounts/abi/bind"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/core/types"
 )
 
 // ChequebookABI is the input ABI used to generate the binding from.
@@ -19,7 +19,7 @@ const ChequebookABI = "[{\"constant\":false,\"inputs\":[],\"name\":\"kill\",\"ou
 // ChequebookBin is the compiled bytecode used for deploying new contracts.
 const ChequebookBin = `0x606060405260008054600160a060020a033316600160a060020a03199091161790556102ec806100306000396000f3006060604052600436106100565763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166341c0e1b581146100585780637bf786f81461006b578063fbf788d61461009c575b005b341561006357600080fd5b6100566100ca565b341561007657600080fd5b61008a600160a060020a03600435166100f1565b60405190815260200160405180910390f35b34156100a757600080fd5b610056600160a060020a036004351660243560ff60443516606435608435610103565b60005433600160a060020a03908116911614156100ef57600054600160a060020a0316ff5b565b60016020526000908152604090205481565b600160a060020a0385166000908152600160205260408120548190861161012957600080fd5b3087876040516c01000000000000000000000000600160a060020a03948516810282529290931690910260148301526028820152604801604051809103902091506001828686866040516000815260200160405260006040516020015260405193845260ff90921660208085019190915260408085019290925260608401929092526080909201915160208103908084039060008661646e5a03f115156101cf57600080fd5b505060206040510351600054600160a060020a039081169116146101f257600080fd5b50600160a060020a03808716600090815260016020526040902054860390301631811161026257600160a060020a0387166000818152600160205260409081902088905582156108fc0290839051600060405180830381858888f19350505050151561025d57600080fd5b6102b7565b6000547f2250e2993c15843b32621c89447cc589ee7a9f049c026986e545d3c2c0c6f97890600160a060020a0316604051600160a060020a03909116815260200160405180910390a186600160a060020a0316ff5b505050505050505600a165627a7a7230582014e927522ca5cd8f68529ac4d3b9cdf36d40e09d8a33b70008248d1abebf79680029`
 
-// DeployChequebook deploys a new Ethereum contract, binding an instance of Chequebook to it.
+// DeployChequebook deploys a new Vapory contract, binding an instance of Chequebook to it.
 func DeployChequebook(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *Chequebook, error) {
 	parsed, err := abi.JSON(strings.NewReader(ChequebookABI))
 	if err != nil {
@@ -32,23 +32,23 @@ func DeployChequebook(auth *bind.TransactOpts, backend bind.ContractBackend) (co
 	return address, tx, &Chequebook{ChequebookCaller: ChequebookCaller{contract: contract}, ChequebookTransactor: ChequebookTransactor{contract: contract}}, nil
 }
 
-// Chequebook is an auto generated Go binding around an Ethereum contract.
+// Chequebook is an auto generated Go binding around an Vapory contract.
 type Chequebook struct {
 	ChequebookCaller     // Read-only binding to the contract
 	ChequebookTransactor // Write-only binding to the contract
 }
 
-// ChequebookCaller is an auto generated read-only Go binding around an Ethereum contract.
+// ChequebookCaller is an auto generated read-only Go binding around an Vapory contract.
 type ChequebookCaller struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// ChequebookTransactor is an auto generated write-only Go binding around an Ethereum contract.
+// ChequebookTransactor is an auto generated write-only Go binding around an Vapory contract.
 type ChequebookTransactor struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// ChequebookSession is an auto generated Go binding around an Ethereum contract,
+// ChequebookSession is an auto generated Go binding around an Vapory contract,
 // with pre-set call and transact options.
 type ChequebookSession struct {
 	Contract     *Chequebook       // Generic contract binding to set the session for
@@ -56,31 +56,31 @@ type ChequebookSession struct {
 	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
 }
 
-// ChequebookCallerSession is an auto generated read-only Go binding around an Ethereum contract,
+// ChequebookCallerSession is an auto generated read-only Go binding around an Vapory contract,
 // with pre-set call options.
 type ChequebookCallerSession struct {
 	Contract *ChequebookCaller // Generic contract caller binding to set the session for
 	CallOpts bind.CallOpts     // Call options to use throughout this session
 }
 
-// ChequebookTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
+// ChequebookTransactorSession is an auto generated write-only Go binding around an Vapory contract,
 // with pre-set transact options.
 type ChequebookTransactorSession struct {
 	Contract     *ChequebookTransactor // Generic contract transactor binding to set the session for
 	TransactOpts bind.TransactOpts     // Transaction auth options to use throughout this session
 }
 
-// ChequebookRaw is an auto generated low-level Go binding around an Ethereum contract.
+// ChequebookRaw is an auto generated low-level Go binding around an Vapory contract.
 type ChequebookRaw struct {
 	Contract *Chequebook // Generic contract binding to access the raw methods on
 }
 
-// ChequebookCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
+// ChequebookCallerRaw is an auto generated low-level read-only Go binding around an Vapory contract.
 type ChequebookCallerRaw struct {
 	Contract *ChequebookCaller // Generic read-only contract binding to access the raw methods on
 }
 
-// ChequebookTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
+// ChequebookTransactorRaw is an auto generated low-level write-only Go binding around an Vapory contract.
 type ChequebookTransactorRaw struct {
 	Contract *ChequebookTransactor // Generic write-only contract binding to access the raw methods on
 }

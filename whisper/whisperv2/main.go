@@ -1,18 +1,18 @@
 // Copyright 2014 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 // +build none
 
@@ -27,12 +27,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/logger"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/p2p/nat"
-	"github.com/ethereum/go-ethereum/whisper"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/crypto"
+	"github.com/vaporyco/go-vapory/logger"
+	"github.com/vaporyco/go-vapory/p2p"
+	"github.com/vaporyco/go-vapory/p2p/nat"
+	"github.com/vaporyco/go-vapory/whisper"
 )
 
 func main() {
@@ -47,7 +47,7 @@ func main() {
 	name := common.MakeName("whisper-go", "1.0")
 	shh := whisper.New()
 
-	// Create an Ethereum peer to communicate through
+	// Create an Vapory peer to communicate through
 	server := p2p.Server{
 		PrivateKey: key,
 		MaxPeers:   10,
@@ -56,9 +56,9 @@ func main() {
 		ListenAddr: ":30300",
 		NAT:        nat.Any(),
 	}
-	fmt.Println("Starting Ethereum peer...")
+	fmt.Println("Starting Vapory peer...")
 	if err := server.Start(); err != nil {
-		fmt.Printf("Failed to start Ethereum peer: %v.\n", err)
+		fmt.Printf("Failed to start Vapory peer: %v.\n", err)
 		os.Exit(1)
 	}
 

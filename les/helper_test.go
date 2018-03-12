@@ -1,18 +1,18 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 // This file contains some shares testing functionality, common to  multiple
 // different files and modules being tested.
@@ -25,19 +25,19 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/les/flowcontrol"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/p2p/discover"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/consensus/vapash"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/core/types"
+	"github.com/vaporyco/go-vapory/core/vm"
+	"github.com/vaporyco/go-vapory/crypto"
+	"github.com/vaporyco/go-vapory/vapdb"
+	"github.com/vaporyco/go-vapory/event"
+	"github.com/vaporyco/go-vapory/les/flowcontrol"
+	"github.com/vaporyco/go-vapory/light"
+	"github.com/vaporyco/go-vapory/p2p"
+	"github.com/vaporyco/go-vapory/p2p/discover"
+	"github.com/vaporyco/go-vapory/params"
 )
 
 var (
@@ -78,11 +78,11 @@ func testChainGen(i int, block *core.BlockGen) {
 
 	switch i {
 	case 0:
-		// In block 1, the test bank sends account #1 some ether.
+		// In block 1, the test bank sends account #1 some vapor.
 		tx, _ := types.SignTx(types.NewTransaction(block.TxNonce(testBankAddress), acc1Addr, big.NewInt(10000), params.TxGas, nil, nil), signer, testBankKey)
 		block.AddTx(tx)
 	case 1:
-		// In block 2, the test bank sends some more ether to account #1.
+		// In block 2, the test bank sends some more vapor to account #1.
 		// acc1Addr passes it on to account #2.
 		// acc1Addr creates a test contract.
 		tx1, _ := types.SignTx(types.NewTransaction(block.TxNonce(testBankAddress), acc1Addr, big.NewInt(1000), params.TxGas, nil, nil), signer, testBankKey)
@@ -128,10 +128,10 @@ func testRCL() RequestCostList {
 // newTestProtocolManager creates a new protocol manager for testing purposes,
 // with the given number of blocks already known, and potential notification
 // channels for different events.
-func newTestProtocolManager(lightSync bool, blocks int, generator func(int, *core.BlockGen), peers *peerSet, odr *LesOdr, db ethdb.Database) (*ProtocolManager, error) {
+func newTestProtocolManager(lightSync bool, blocks int, generator func(int, *core.BlockGen), peers *peerSet, odr *LesOdr, db vapdb.Database) (*ProtocolManager, error) {
 	var (
 		evmux  = new(event.TypeMux)
-		engine = ethash.NewFaker()
+		engine = vapash.NewFaker()
 		gspec  = core.Genesis{
 			Config: params.TestChainConfig,
 			Alloc:  core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}},
@@ -147,7 +147,7 @@ func newTestProtocolManager(lightSync bool, blocks int, generator func(int, *cor
 		chain, _ = light.NewLightChain(odr, gspec.Config, engine)
 	} else {
 		blockchain, _ := core.NewBlockChain(db, gspec.Config, engine, vm.Config{})
-		gchain, _ := core.GenerateChain(gspec.Config, genesis, ethash.NewFaker(), db, blocks, generator)
+		gchain, _ := core.GenerateChain(gspec.Config, genesis, vapash.NewFaker(), db, blocks, generator)
 		if _, err := blockchain.InsertChain(gchain); err != nil {
 			panic(err)
 		}
@@ -184,7 +184,7 @@ func newTestProtocolManager(lightSync bool, blocks int, generator func(int, *cor
 // with the given number of blocks already known, and potential notification
 // channels for different events. In case of an error, the constructor force-
 // fails the test.
-func newTestProtocolManagerMust(t *testing.T, lightSync bool, blocks int, generator func(int, *core.BlockGen), peers *peerSet, odr *LesOdr, db ethdb.Database) *ProtocolManager {
+func newTestProtocolManagerMust(t *testing.T, lightSync bool, blocks int, generator func(int, *core.BlockGen), peers *peerSet, odr *LesOdr, db vapdb.Database) *ProtocolManager {
 	pm, err := newTestProtocolManager(lightSync, blocks, generator, peers, odr, db)
 	if err != nil {
 		t.Fatalf("Failed to create protocol manager: %v", err)

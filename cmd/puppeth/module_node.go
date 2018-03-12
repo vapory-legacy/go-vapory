@@ -1,18 +1,18 @@
 // Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// This file is part of go-vapory.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-vapory is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-vapory is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-vapory. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -26,13 +26,13 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/log"
 )
 
-// nodeDockerfile is the Dockerfile required to run an Ethereum node.
+// nodeDockerfile is the Dockerfile required to run an Vapory node.
 var nodeDockerfile = `
-FROM ethereum/client-go:latest
+FROM vapory/client-go:latest
 
 ADD genesis.json /genesis.json
 {{if .Unlock}}
@@ -40,15 +40,15 @@ ADD genesis.json /genesis.json
 	ADD signer.pass /signer.pass
 {{end}}
 RUN \
-  echo 'geth --cache 512 init /genesis.json' > geth.sh && \{{if .Unlock}}
-	echo 'mkdir -p /root/.ethereum/keystore/ && cp /signer.json /root/.ethereum/keystore/' >> geth.sh && \{{end}}
-	echo $'geth --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --maxpeers {{.Peers}} {{.LightFlag}} --ethstats \'{{.Ethstats}}\' {{if .BootV4}}--bootnodesv4 {{.BootV4}}{{end}} {{if .BootV5}}--bootnodesv5 {{.BootV5}}{{end}} {{if .Etherbase}}--etherbase {{.Etherbase}} --mine --minerthreads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --targetgaslimit {{.GasTarget}} --gasprice {{.GasPrice}}' >> geth.sh
+  echo 'gvap --cache 512 init /genesis.json' > gvap.sh && \{{if .Unlock}}
+	echo 'mkdir -p /root/.vapory/keystore/ && cp /signer.json /root/.vapory/keystore/' >> gvap.sh && \{{end}}
+	echo $'gvap --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --maxpeers {{.Peers}} {{.LightFlag}} --vapstats \'{{.Vapstats}}\' {{if .BootV4}}--bootnodesv4 {{.BootV4}}{{end}} {{if .BootV5}}--bootnodesv5 {{.BootV5}}{{end}} {{if .Vaporbase}}--vaporbase {{.Vaporbase}} --mine --minerthreads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --targetgaslimit {{.GasTarget}} --gasprice {{.GasPrice}}' >> gvap.sh
 
-ENTRYPOINT ["/bin/sh", "geth.sh"]
+ENTRYPOINT ["/bin/sh", "gvap.sh"]
 `
 
 // nodeComposefile is the docker-compose.yml file required to deploy and maintain
-// an Ethereum node (bootnode or miner for now).
+// an Vapory node (bootnode or miner for now).
 var nodeComposefile = `
 version: '2'
 services:
@@ -60,15 +60,15 @@ services:
       - "{{.FullPort}}:{{.FullPort}}/udp"{{if .Light}}
       - "{{.LightPort}}:{{.LightPort}}/udp"{{end}}
     volumes:
-      - {{.Datadir}}:/root/.ethereum{{if .Ethashdir}}
-      - {{.Ethashdir}}:/root/.ethash{{end}}
+      - {{.Datadir}}:/root/.vapory{{if .Vapashdir}}
+      - {{.Vapashdir}}:/root/.vapash{{end}}
     environment:
       - FULL_PORT={{.FullPort}}/tcp
       - LIGHT_PORT={{.LightPort}}/udp
       - TOTAL_PEERS={{.TotalPeers}}
       - LIGHT_PEERS={{.LightPeers}}
-      - STATS_NAME={{.Ethstats}}
-      - MINER_NAME={{.Etherbase}}
+      - STATS_NAME={{.Vapstats}}
+      - MINER_NAME={{.Vaporbase}}
       - GAS_TARGET={{.GasTarget}}
       - GAS_PRICE={{.GasPrice}}
     logging:
@@ -79,12 +79,12 @@ services:
     restart: always
 `
 
-// deployNode deploys a new Ethereum node container to a remote machine via SSH,
+// deployNode deploys a new Vapory node container to a remote machine via SSH,
 // docker and docker-compose. If an instance with the specified network name
 // already exists there, it will be overwritten!
 func deployNode(client *sshClient, network string, bootv4, bootv5 []string, config *nodeInfos, nocache bool) ([]byte, error) {
 	kind := "sealnode"
-	if config.keyJSON == "" && config.etherbase == "" {
+	if config.keyJSON == "" && config.vaporbase == "" {
 		kind = "bootnode"
 		bootv4 = make([]string, 0)
 		bootv5 = make([]string, 0)
@@ -105,8 +105,8 @@ func deployNode(client *sshClient, network string, bootv4, bootv5 []string, conf
 		"LightFlag": lightFlag,
 		"BootV4":    strings.Join(bootv4, ","),
 		"BootV5":    strings.Join(bootv5, ","),
-		"Ethstats":  config.ethstats,
-		"Etherbase": config.etherbase,
+		"Vapstats":  config.vapstats,
+		"Vaporbase": config.vaporbase,
 		"GasTarget": uint64(1000000 * config.gasTarget),
 		"GasPrice":  uint64(1000000000 * config.gasPrice),
 		"Unlock":    config.keyJSON != "",
@@ -117,15 +117,15 @@ func deployNode(client *sshClient, network string, bootv4, bootv5 []string, conf
 	template.Must(template.New("").Parse(nodeComposefile)).Execute(composefile, map[string]interface{}{
 		"Type":       kind,
 		"Datadir":    config.datadir,
-		"Ethashdir":  config.ethashdir,
+		"Vapashdir":  config.vapashdir,
 		"Network":    network,
 		"FullPort":   config.portFull,
 		"TotalPeers": config.peersTotal,
 		"Light":      config.peersLight > 0,
 		"LightPort":  config.portFull + 1,
 		"LightPeers": config.peersLight,
-		"Ethstats":   config.ethstats[:strings.Index(config.ethstats, ":")],
-		"Etherbase":  config.etherbase,
+		"Vapstats":   config.vapstats[:strings.Index(config.vapstats, ":")],
+		"Vaporbase":  config.vaporbase,
 		"GasTarget":  config.gasTarget,
 		"GasPrice":   config.gasPrice,
 	})
@@ -155,15 +155,15 @@ type nodeInfos struct {
 	genesis    []byte
 	network    int64
 	datadir    string
-	ethashdir  string
-	ethstats   string
+	vapashdir  string
+	vapstats   string
 	portFull   int
 	portLight  int
 	enodeFull  string
 	enodeLight string
 	peersTotal int
 	peersLight int
-	etherbase  string
+	vaporbase  string
 	keyJSON    string
 	keyPass    string
 	gasTarget  float64
@@ -178,7 +178,7 @@ func (info *nodeInfos) Report() map[string]string {
 		"Listener port (full nodes)": strconv.Itoa(info.portFull),
 		"Peer count (all total)":     strconv.Itoa(info.peersTotal),
 		"Peer count (light nodes)":   strconv.Itoa(info.peersLight),
-		"Ethstats username":          info.ethstats,
+		"Vapstats username":          info.vapstats,
 	}
 	if info.peersLight > 0 {
 		// Light server enabled
@@ -189,10 +189,10 @@ func (info *nodeInfos) Report() map[string]string {
 		report["Gas limit (baseline target)"] = fmt.Sprintf("%0.3f MGas", info.gasTarget)
 		report["Gas price (minimum accepted)"] = fmt.Sprintf("%0.3f GWei", info.gasPrice)
 
-		if info.etherbase != "" {
-			// Ethash proof-of-work miner
-			report["Ethash directory"] = info.ethashdir
-			report["Miner account"] = info.etherbase
+		if info.vaporbase != "" {
+			// Vapash proof-of-work miner
+			report["Vapash directory"] = info.vapashdir
+			report["Miner account"] = info.vaporbase
 		}
 		if info.keyJSON != "" {
 			// Clique proof-of-authority signer
@@ -232,7 +232,7 @@ func checkNode(client *sshClient, network string, boot bool) (*nodeInfos, error)
 
 	// Container available, retrieve its node ID and its genesis json
 	var out []byte
-	if out, err = client.Run(fmt.Sprintf("docker exec %s_%s_1 geth --exec admin.nodeInfo.id attach", network, kind)); err != nil {
+	if out, err = client.Run(fmt.Sprintf("docker exec %s_%s_1 gvap --exec admin.nodeInfo.id attach", network, kind)); err != nil {
 		return nil, ErrServiceUnreachable
 	}
 	id := bytes.Trim(bytes.TrimSpace(out), "\"")
@@ -257,14 +257,14 @@ func checkNode(client *sshClient, network string, boot bool) (*nodeInfos, error)
 	// Assemble and return the useful infos
 	stats := &nodeInfos{
 		genesis:    genesis,
-		datadir:    infos.volumes["/root/.ethereum"],
-		ethashdir:  infos.volumes["/root/.ethash"],
+		datadir:    infos.volumes["/root/.vapory"],
+		vapashdir:  infos.volumes["/root/.vapash"],
 		portFull:   infos.portmap[infos.envvars["FULL_PORT"]],
 		portLight:  infos.portmap[infos.envvars["LIGHT_PORT"]],
 		peersTotal: totalPeers,
 		peersLight: lightPeers,
-		ethstats:   infos.envvars["STATS_NAME"],
-		etherbase:  infos.envvars["MINER_NAME"],
+		vapstats:   infos.envvars["STATS_NAME"],
+		vaporbase:  infos.envvars["MINER_NAME"],
 		keyJSON:    keyJSON,
 		keyPass:    keyPass,
 		gasTarget:  gasTarget,

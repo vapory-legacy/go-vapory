@@ -1,20 +1,20 @@
 // Copyright 2015 The go-ethereum Authors
-// This file is part of go-ethereum.
+// This file is part of go-vapory.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-vapory is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-vapory is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-vapory. If not, see <http://www.gnu.org/licenses/>.
 
-// Package utils contains internal helper functions for go-ethereum commands.
+// Package utils contains internal helper functions for go-vapory commands.
 package utils
 
 import (
@@ -28,34 +28,34 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/fdlimit"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/clique"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/dashboard"
-	"github.com/ethereum/go-ethereum/eth"
-	"github.com/ethereum/go-ethereum/eth/downloader"
-	"github.com/ethereum/go-ethereum/eth/gasprice"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/ethstats"
-	"github.com/ethereum/go-ethereum/les"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/node"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/p2p/discover"
-	"github.com/ethereum/go-ethereum/p2p/discv5"
-	"github.com/ethereum/go-ethereum/p2p/nat"
-	"github.com/ethereum/go-ethereum/p2p/netutil"
-	"github.com/ethereum/go-ethereum/params"
-	whisper "github.com/ethereum/go-ethereum/whisper/whisperv5"
+	"github.com/vaporyco/go-vapory/accounts"
+	"github.com/vaporyco/go-vapory/accounts/keystore"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/common/fdlimit"
+	"github.com/vaporyco/go-vapory/consensus"
+	"github.com/vaporyco/go-vapory/consensus/clique"
+	"github.com/vaporyco/go-vapory/consensus/vapash"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/core/state"
+	"github.com/vaporyco/go-vapory/core/vm"
+	"github.com/vaporyco/go-vapory/crypto"
+	"github.com/vaporyco/go-vapory/dashboard"
+	"github.com/vaporyco/go-vapory/vap"
+	"github.com/vaporyco/go-vapory/vap/downloader"
+	"github.com/vaporyco/go-vapory/vap/gasprice"
+	"github.com/vaporyco/go-vapory/vapdb"
+	"github.com/vaporyco/go-vapory/vapstats"
+	"github.com/vaporyco/go-vapory/les"
+	"github.com/vaporyco/go-vapory/log"
+	"github.com/vaporyco/go-vapory/metrics"
+	"github.com/vaporyco/go-vapory/node"
+	"github.com/vaporyco/go-vapory/p2p"
+	"github.com/vaporyco/go-vapory/p2p/discover"
+	"github.com/vaporyco/go-vapory/p2p/discv5"
+	"github.com/vaporyco/go-vapory/p2p/nat"
+	"github.com/vaporyco/go-vapory/p2p/netutil"
+	"github.com/vaporyco/go-vapory/params"
+	whisper "github.com/vaporyco/go-vapory/whisper/whisperv5"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -129,7 +129,7 @@ var (
 	NetworkIdFlag = cli.Uint64Flag{
 		Name:  "networkid",
 		Usage: "Network identifier (integer, 1=Frontier, 2=Morden (disused), 3=Ropsten, 4=Rinkeby)",
-		Value: eth.DefaultConfig.NetworkId,
+		Value: vap.DefaultConfig.NetworkId,
 	}
 	TestnetFlag = cli.BoolFlag{
 		Name:  "testnet",
@@ -164,7 +164,7 @@ var (
 		Name:  "light",
 		Usage: "Enable light client mode",
 	}
-	defaultSyncMode = eth.DefaultConfig.SyncMode
+	defaultSyncMode = vap.DefaultConfig.SyncMode
 	SyncModeFlag    = TextMarshalerFlag{
 		Name:  "syncmode",
 		Usage: `Blockchain sync mode ("fast", "full", or "light")`,
@@ -210,35 +210,35 @@ var (
 		Usage: "Developer flag to serve the dashboard from the local file system",
 		Value: dashboard.DefaultConfig.Assets,
 	}
-	// Ethash settings
-	EthashCacheDirFlag = DirectoryFlag{
-		Name:  "ethash.cachedir",
-		Usage: "Directory to store the ethash verification caches (default = inside the datadir)",
+	// Vapash settings
+	VapashCacheDirFlag = DirectoryFlag{
+		Name:  "vapash.cachedir",
+		Usage: "Directory to store the vapash verification caches (default = inside the datadir)",
 	}
-	EthashCachesInMemoryFlag = cli.IntFlag{
-		Name:  "ethash.cachesinmem",
-		Usage: "Number of recent ethash caches to keep in memory (16MB each)",
-		Value: eth.DefaultConfig.Ethash.CachesInMem,
+	VapashCachesInMemoryFlag = cli.IntFlag{
+		Name:  "vapash.cachesinmem",
+		Usage: "Number of recent vapash caches to keep in memory (16MB each)",
+		Value: vap.DefaultConfig.Vapash.CachesInMem,
 	}
-	EthashCachesOnDiskFlag = cli.IntFlag{
-		Name:  "ethash.cachesondisk",
-		Usage: "Number of recent ethash caches to keep on disk (16MB each)",
-		Value: eth.DefaultConfig.Ethash.CachesOnDisk,
+	VapashCachesOnDiskFlag = cli.IntFlag{
+		Name:  "vapash.cachesondisk",
+		Usage: "Number of recent vapash caches to keep on disk (16MB each)",
+		Value: vap.DefaultConfig.Vapash.CachesOnDisk,
 	}
-	EthashDatasetDirFlag = DirectoryFlag{
-		Name:  "ethash.dagdir",
-		Usage: "Directory to store the ethash mining DAGs (default = inside home folder)",
-		Value: DirectoryString{eth.DefaultConfig.Ethash.DatasetDir},
+	VapashDatasetDirFlag = DirectoryFlag{
+		Name:  "vapash.dagdir",
+		Usage: "Directory to store the vapash mining DAGs (default = inside home folder)",
+		Value: DirectoryString{vap.DefaultConfig.Vapash.DatasetDir},
 	}
-	EthashDatasetsInMemoryFlag = cli.IntFlag{
-		Name:  "ethash.dagsinmem",
-		Usage: "Number of recent ethash mining DAGs to keep in memory (1+GB each)",
-		Value: eth.DefaultConfig.Ethash.DatasetsInMem,
+	VapashDatasetsInMemoryFlag = cli.IntFlag{
+		Name:  "vapash.dagsinmem",
+		Usage: "Number of recent vapash mining DAGs to keep in memory (1+GB each)",
+		Value: vap.DefaultConfig.Vapash.DatasetsInMem,
 	}
-	EthashDatasetsOnDiskFlag = cli.IntFlag{
-		Name:  "ethash.dagsondisk",
-		Usage: "Number of recent ethash mining DAGs to keep on disk (1+GB each)",
-		Value: eth.DefaultConfig.Ethash.DatasetsOnDisk,
+	VapashDatasetsOnDiskFlag = cli.IntFlag{
+		Name:  "vapash.dagsondisk",
+		Usage: "Number of recent vapash mining DAGs to keep on disk (1+GB each)",
+		Value: vap.DefaultConfig.Vapash.DatasetsOnDisk,
 	}
 	// Transaction pool settings
 	TxPoolNoLocalsFlag = cli.BoolFlag{
@@ -258,37 +258,37 @@ var (
 	TxPoolPriceLimitFlag = cli.Uint64Flag{
 		Name:  "txpool.pricelimit",
 		Usage: "Minimum gas price limit to enforce for acceptance into the pool",
-		Value: eth.DefaultConfig.TxPool.PriceLimit,
+		Value: vap.DefaultConfig.TxPool.PriceLimit,
 	}
 	TxPoolPriceBumpFlag = cli.Uint64Flag{
 		Name:  "txpool.pricebump",
 		Usage: "Price bump percentage to replace an already existing transaction",
-		Value: eth.DefaultConfig.TxPool.PriceBump,
+		Value: vap.DefaultConfig.TxPool.PriceBump,
 	}
 	TxPoolAccountSlotsFlag = cli.Uint64Flag{
 		Name:  "txpool.accountslots",
 		Usage: "Minimum number of executable transaction slots guaranteed per account",
-		Value: eth.DefaultConfig.TxPool.AccountSlots,
+		Value: vap.DefaultConfig.TxPool.AccountSlots,
 	}
 	TxPoolGlobalSlotsFlag = cli.Uint64Flag{
 		Name:  "txpool.globalslots",
 		Usage: "Maximum number of executable transaction slots for all accounts",
-		Value: eth.DefaultConfig.TxPool.GlobalSlots,
+		Value: vap.DefaultConfig.TxPool.GlobalSlots,
 	}
 	TxPoolAccountQueueFlag = cli.Uint64Flag{
 		Name:  "txpool.accountqueue",
 		Usage: "Maximum number of non-executable transaction slots permitted per account",
-		Value: eth.DefaultConfig.TxPool.AccountQueue,
+		Value: vap.DefaultConfig.TxPool.AccountQueue,
 	}
 	TxPoolGlobalQueueFlag = cli.Uint64Flag{
 		Name:  "txpool.globalqueue",
 		Usage: "Maximum number of non-executable transaction slots for all accounts",
-		Value: eth.DefaultConfig.TxPool.GlobalQueue,
+		Value: vap.DefaultConfig.TxPool.GlobalQueue,
 	}
 	TxPoolLifetimeFlag = cli.DurationFlag{
 		Name:  "txpool.lifetime",
 		Usage: "Maximum amount of time non-executable transaction are queued",
-		Value: eth.DefaultConfig.TxPool.Lifetime,
+		Value: vap.DefaultConfig.TxPool.Lifetime,
 	}
 	// Performance tuning settings
 	CacheFlag = cli.IntFlag{
@@ -316,7 +316,7 @@ var (
 		Usage: "Target gas limit sets the artificial target gas floor for the blocks to mine",
 		Value: params.GenesisGasLimit,
 	}
-	EtherbaseFlag = cli.StringFlag{
+	VaporbaseFlag = cli.StringFlag{
 		Name:  "etherbase",
 		Usage: "Public address for block mining rewards (default = first account created)",
 		Value: "0",
@@ -324,7 +324,7 @@ var (
 	GasPriceFlag = BigFlag{
 		Name:  "gasprice",
 		Usage: "Minimal gas price to accept for mining a transactions",
-		Value: eth.DefaultConfig.GasPrice,
+		Value: vap.DefaultConfig.GasPrice,
 	}
 	ExtraDataFlag = cli.StringFlag{
 		Name:  "extradata",
@@ -348,8 +348,8 @@ var (
 	}
 	// Logging and debug settings
 	EthStatsURLFlag = cli.StringFlag{
-		Name:  "ethstats",
-		Usage: "Reporting URL of a ethstats service (nodename:secret@host:port)",
+		Name:  "vapstats",
+		Usage: "Reporting URL of a vapstats service (nodename:secret@host:port)",
 	}
 	MetricsEnabledFlag = cli.BoolFlag{
 		Name:  metrics.MetricsEnabledFlag,
@@ -497,12 +497,12 @@ var (
 	GpoBlocksFlag = cli.IntFlag{
 		Name:  "gpoblocks",
 		Usage: "Number of recent blocks to check for gas prices",
-		Value: eth.DefaultConfig.GPO.Blocks,
+		Value: vap.DefaultConfig.GPO.Blocks,
 	}
 	GpoPercentileFlag = cli.IntFlag{
 		Name:  "gpopercentile",
 		Usage: "Suggested gas price is the given percentile of a set of recent transaction gas prices",
-		Value: eth.DefaultConfig.GPO.Percentile,
+		Value: vap.DefaultConfig.GPO.Percentile,
 	}
 	WhisperEnabledFlag = cli.BoolFlag{
 		Name:  "shh",
@@ -712,7 +712,7 @@ func setIPC(ctx *cli.Context, cfg *node.Config) {
 }
 
 // makeDatabaseHandles raises out the number of allowed file handles per process
-// for Geth and returns half of the allowance to assign to the database.
+// for Gvap and returns half of the allowance to assign to the database.
 func makeDatabaseHandles() int {
 	if err := fdlimit.Raise(2048); err != nil {
 		Fatalf("Failed to raise file descriptor allowance: %v", err)
@@ -742,7 +742,7 @@ func MakeAddress(ks *keystore.KeyStore, account string) (accounts.Account, error
 	log.Warn("-------------------------------------------------------------------")
 	log.Warn("Referring to accounts by order in the keystore folder is dangerous!")
 	log.Warn("This functionality is deprecated and will be removed in the future!")
-	log.Warn("Please use explicit addresses! (can search via `geth account list`)")
+	log.Warn("Please use explicit addresses! (can search via `gvap account list`)")
 	log.Warn("-------------------------------------------------------------------")
 
 	accs := ks.Accounts()
@@ -752,15 +752,15 @@ func MakeAddress(ks *keystore.KeyStore, account string) (accounts.Account, error
 	return accs[index], nil
 }
 
-// setEtherbase retrieves the etherbase either from the directly specified
+// setVaporbase retrieves the etherbase either from the directly specified
 // command line flags or from the keystore if CLI indexed.
-func setEtherbase(ctx *cli.Context, ks *keystore.KeyStore, cfg *eth.Config) {
-	if ctx.GlobalIsSet(EtherbaseFlag.Name) {
-		account, err := MakeAddress(ks, ctx.GlobalString(EtherbaseFlag.Name))
+func setVaporbase(ctx *cli.Context, ks *keystore.KeyStore, cfg *vap.Config) {
+	if ctx.GlobalIsSet(VaporbaseFlag.Name) {
+		account, err := MakeAddress(ks, ctx.GlobalString(VaporbaseFlag.Name))
 		if err != nil {
-			Fatalf("Option %q: %v", EtherbaseFlag.Name, err)
+			Fatalf("Option %q: %v", VaporbaseFlag.Name, err)
 		}
-		cfg.Etherbase = account.Address
+		cfg.Vaporbase = account.Address
 	}
 }
 
@@ -898,24 +898,24 @@ func setTxPool(ctx *cli.Context, cfg *core.TxPoolConfig) {
 	}
 }
 
-func setEthash(ctx *cli.Context, cfg *eth.Config) {
-	if ctx.GlobalIsSet(EthashCacheDirFlag.Name) {
-		cfg.Ethash.CacheDir = ctx.GlobalString(EthashCacheDirFlag.Name)
+func setVapash(ctx *cli.Context, cfg *vap.Config) {
+	if ctx.GlobalIsSet(VapashCacheDirFlag.Name) {
+		cfg.Vapash.CacheDir = ctx.GlobalString(VapashCacheDirFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashDatasetDirFlag.Name) {
-		cfg.Ethash.DatasetDir = ctx.GlobalString(EthashDatasetDirFlag.Name)
+	if ctx.GlobalIsSet(VapashDatasetDirFlag.Name) {
+		cfg.Vapash.DatasetDir = ctx.GlobalString(VapashDatasetDirFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashCachesInMemoryFlag.Name) {
-		cfg.Ethash.CachesInMem = ctx.GlobalInt(EthashCachesInMemoryFlag.Name)
+	if ctx.GlobalIsSet(VapashCachesInMemoryFlag.Name) {
+		cfg.Vapash.CachesInMem = ctx.GlobalInt(VapashCachesInMemoryFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashCachesOnDiskFlag.Name) {
-		cfg.Ethash.CachesOnDisk = ctx.GlobalInt(EthashCachesOnDiskFlag.Name)
+	if ctx.GlobalIsSet(VapashCachesOnDiskFlag.Name) {
+		cfg.Vapash.CachesOnDisk = ctx.GlobalInt(VapashCachesOnDiskFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashDatasetsInMemoryFlag.Name) {
-		cfg.Ethash.DatasetsInMem = ctx.GlobalInt(EthashDatasetsInMemoryFlag.Name)
+	if ctx.GlobalIsSet(VapashDatasetsInMemoryFlag.Name) {
+		cfg.Vapash.DatasetsInMem = ctx.GlobalInt(VapashDatasetsInMemoryFlag.Name)
 	}
-	if ctx.GlobalIsSet(EthashDatasetsOnDiskFlag.Name) {
-		cfg.Ethash.DatasetsOnDisk = ctx.GlobalInt(EthashDatasetsOnDiskFlag.Name)
+	if ctx.GlobalIsSet(VapashDatasetsOnDiskFlag.Name) {
+		cfg.Vapash.DatasetsOnDisk = ctx.GlobalInt(VapashDatasetsOnDiskFlag.Name)
 	}
 }
 
@@ -967,8 +967,8 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node, cfg *whisper.Config) {
 	}
 }
 
-// SetEthConfig applies eth-related command line flags to the config.
-func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
+// SetEthConfig applies vap-related command line flags to the config.
+func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *vap.Config) {
 	// Avoid conflicting network flags
 	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag)
 	checkExclusive(ctx, FastSyncFlag, LightModeFlag, SyncModeFlag)
@@ -976,10 +976,10 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *eth.Config) {
 	checkExclusive(ctx, LightServFlag, SyncModeFlag, "light")
 
 	ks := stack.AccountManager().Backends(keystore.KeyStoreType)[0].(*keystore.KeyStore)
-	setEtherbase(ctx, ks, cfg)
+	setVaporbase(ctx, ks, cfg)
 	setGPO(ctx, &cfg.GPO)
 	setTxPool(ctx, &cfg.TxPool)
-	setEthash(ctx, cfg)
+	setVapash(ctx, cfg)
 
 	switch {
 	case ctx.GlobalIsSet(SyncModeFlag.Name):
@@ -1071,8 +1071,8 @@ func SetDashboardConfig(ctx *cli.Context, cfg *dashboard.Config) {
 	cfg.Assets = ctx.GlobalString(DashboardAssetsFlag.Name)
 }
 
-// RegisterEthService adds an Ethereum client to the stack.
-func RegisterEthService(stack *node.Node, cfg *eth.Config) {
+// RegisterEthService adds an Vapory client to the stack.
+func RegisterEthService(stack *node.Node, cfg *vap.Config) {
 	var err error
 	if cfg.SyncMode == downloader.LightSync {
 		err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
@@ -1080,7 +1080,7 @@ func RegisterEthService(stack *node.Node, cfg *eth.Config) {
 		})
 	} else {
 		err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
-			fullNode, err := eth.New(ctx, cfg)
+			fullNode, err := vap.New(ctx, cfg)
 			if fullNode != nil && cfg.LightServ > 0 {
 				ls, _ := les.NewLesServer(fullNode, cfg)
 				fullNode.AddLesServer(ls)
@@ -1089,7 +1089,7 @@ func RegisterEthService(stack *node.Node, cfg *eth.Config) {
 		})
 	}
 	if err != nil {
-		Fatalf("Failed to register the Ethereum service: %v", err)
+		Fatalf("Failed to register the Vapory service: %v", err)
 	}
 }
 
@@ -1109,20 +1109,20 @@ func RegisterShhService(stack *node.Node, cfg *whisper.Config) {
 	}
 }
 
-// RegisterEthStatsService configures the Ethereum Stats daemon and adds it to
+// RegisterEthStatsService configures the Vapory Stats daemon and adds it to
 // th egiven node.
 func RegisterEthStatsService(stack *node.Node, url string) {
 	if err := stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
-		// Retrieve both eth and les services
-		var ethServ *eth.Ethereum
+		// Retrieve both vap and les services
+		var ethServ *vap.Vapory
 		ctx.Service(&ethServ)
 
-		var lesServ *les.LightEthereum
+		var lesServ *les.LightVapory
 		ctx.Service(&lesServ)
 
-		return ethstats.New(url, ethServ, lesServ)
+		return vapstats.New(url, ethServ, lesServ)
 	}); err != nil {
-		Fatalf("Failed to register the Ethereum Stats service: %v", err)
+		Fatalf("Failed to register the Vapory Stats service: %v", err)
 	}
 }
 
@@ -1133,7 +1133,7 @@ func SetupNetwork(ctx *cli.Context) {
 }
 
 // MakeChainDatabase open an LevelDB using the flags passed to the client and will hard crash if it fails.
-func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
+func MakeChainDatabase(ctx *cli.Context, stack *node.Node) vapdb.Database {
 	var (
 		cache   = ctx.GlobalInt(CacheFlag.Name)
 		handles = makeDatabaseHandles()
@@ -1163,7 +1163,7 @@ func MakeGenesis(ctx *cli.Context) *core.Genesis {
 }
 
 // MakeChain creates a chain manager from set command line flags.
-func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chainDb ethdb.Database) {
+func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chainDb vapdb.Database) {
 	var err error
 	chainDb = MakeChainDatabase(ctx, stack)
 
@@ -1175,15 +1175,15 @@ func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chai
 	if config.Clique != nil {
 		engine = clique.New(config.Clique, chainDb)
 	} else {
-		engine = ethash.NewFaker()
+		engine = vapash.NewFaker()
 		if !ctx.GlobalBool(FakePoWFlag.Name) {
-			engine = ethash.New(ethash.Config{
-				CacheDir:       stack.ResolvePath(eth.DefaultConfig.Ethash.CacheDir),
-				CachesInMem:    eth.DefaultConfig.Ethash.CachesInMem,
-				CachesOnDisk:   eth.DefaultConfig.Ethash.CachesOnDisk,
-				DatasetDir:     stack.ResolvePath(eth.DefaultConfig.Ethash.DatasetDir),
-				DatasetsInMem:  eth.DefaultConfig.Ethash.DatasetsInMem,
-				DatasetsOnDisk: eth.DefaultConfig.Ethash.DatasetsOnDisk,
+			engine = vapash.New(vapash.Config{
+				CacheDir:       stack.ResolvePath(vap.DefaultConfig.Vapash.CacheDir),
+				CachesInMem:    vap.DefaultConfig.Vapash.CachesInMem,
+				CachesOnDisk:   vap.DefaultConfig.Vapash.CachesOnDisk,
+				DatasetDir:     stack.ResolvePath(vap.DefaultConfig.Vapash.DatasetDir),
+				DatasetsInMem:  vap.DefaultConfig.Vapash.DatasetsInMem,
+				DatasetsOnDisk: vap.DefaultConfig.Vapash.DatasetsOnDisk,
 			})
 		}
 	}
@@ -1216,11 +1216,11 @@ func MakeConsolePreloads(ctx *cli.Context) []string {
 // This is a temporary function used for migrating old command/flags to the
 // new format.
 //
-// e.g. geth account new --keystore /tmp/mykeystore --lightkdf
+// e.g. gvap account new --keystore /tmp/mykeystore --lightkdf
 //
 // is equivalent after calling this method with:
 //
-// geth --keystore /tmp/mykeystore --lightkdf account new
+// gvap --keystore /tmp/mykeystore --lightkdf account new
 //
 // This allows the use of the existing configuration functionality.
 // When all flags are migrated this function can be removed and the existing

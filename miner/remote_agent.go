@@ -1,18 +1,18 @@
 // Copyright 2015 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package miner
 
@@ -23,11 +23,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/consensus"
+	"github.com/vaporyco/go-vapory/consensus/vapash"
+	"github.com/vaporyco/go-vapory/core/types"
+	"github.com/vaporyco/go-vapory/log"
 )
 
 type hashrate struct {
@@ -116,7 +116,7 @@ func (a *RemoteAgent) GetWork() ([3]string, error) {
 		block := a.currentWork.Block
 
 		res[0] = block.HashNoNonce().Hex()
-		seedHash := ethash.SeedHash(block.NumberU64())
+		seedHash := vapash.SeedHash(block.NumberU64())
 		res[1] = common.BytesToHash(seedHash).Hex()
 		// Calculate the "target" to be returned to the external miner
 		n := big.NewInt(1)

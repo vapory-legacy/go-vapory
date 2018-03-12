@@ -1,18 +1,18 @@
 // Copyright 2015 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package miner
 
@@ -24,17 +24,17 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/misc"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/consensus"
+	"github.com/vaporyco/go-vapory/consensus/misc"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/core/state"
+	"github.com/vaporyco/go-vapory/core/types"
+	"github.com/vaporyco/go-vapory/core/vm"
+	"github.com/vaporyco/go-vapory/vapdb"
+	"github.com/vaporyco/go-vapory/event"
+	"github.com/vaporyco/go-vapory/log"
+	"github.com/vaporyco/go-vapory/params"
 	"gopkg.in/fatih/set.v0"
 )
 
@@ -106,10 +106,10 @@ type worker struct {
 	agents map[Agent]struct{}
 	recv   chan *Result
 
-	eth     Backend
+	vap     Backend
 	chain   *core.BlockChain
 	proc    core.Validator
-	chainDb ethdb.Database
+	chainDb vapdb.Database
 
 	coinbase common.Address
 	extra    []byte
@@ -127,29 +127,29 @@ type worker struct {
 	atWork int32
 }
 
-func newWorker(config *params.ChainConfig, engine consensus.Engine, coinbase common.Address, eth Backend, mux *event.TypeMux) *worker {
+func newWorker(config *params.ChainConfig, engine consensus.Engine, coinbase common.Address, vap Backend, mux *event.TypeMux) *worker {
 	worker := &worker{
 		config:         config,
 		engine:         engine,
-		eth:            eth,
+		vap:            vap,
 		mux:            mux,
 		txCh:           make(chan core.TxPreEvent, txChanSize),
 		chainHeadCh:    make(chan core.ChainHeadEvent, chainHeadChanSize),
 		chainSideCh:    make(chan core.ChainSideEvent, chainSideChanSize),
-		chainDb:        eth.ChainDb(),
+		chainDb:        vap.ChainDb(),
 		recv:           make(chan *Result, resultQueueSize),
-		chain:          eth.BlockChain(),
-		proc:           eth.BlockChain().Validator(),
+		chain:          vap.BlockChain(),
+		proc:           vap.BlockChain().Validator(),
 		possibleUncles: make(map[common.Hash]*types.Block),
 		coinbase:       coinbase,
 		agents:         make(map[Agent]struct{}),
-		unconfirmed:    newUnconfirmedBlocks(eth.BlockChain(), miningLogAtDepth),
+		unconfirmed:    newUnconfirmedBlocks(vap.BlockChain(), miningLogAtDepth),
 	}
 	// Subscribe TxPreEvent for tx pool
-	worker.txSub = eth.TxPool().SubscribeTxPreEvent(worker.txCh)
+	worker.txSub = vap.TxPool().SubscribeTxPreEvent(worker.txCh)
 	// Subscribe events for blockchain
-	worker.chainHeadSub = eth.BlockChain().SubscribeChainHeadEvent(worker.chainHeadCh)
-	worker.chainSideSub = eth.BlockChain().SubscribeChainSideEvent(worker.chainSideCh)
+	worker.chainHeadSub = vap.BlockChain().SubscribeChainHeadEvent(worker.chainHeadCh)
+	worker.chainSideSub = vap.BlockChain().SubscribeChainSideEvent(worker.chainSideCh)
 	go worker.update()
 
 	go worker.wait()
@@ -158,7 +158,7 @@ func newWorker(config *params.ChainConfig, engine consensus.Engine, coinbase com
 	return worker
 }
 
-func (self *worker) setEtherbase(addr common.Address) {
+func (self *worker) setVaporbase(addr common.Address) {
 	self.mu.Lock()
 	defer self.mu.Unlock()
 	self.coinbase = addr
@@ -448,7 +448,7 @@ func (self *worker) commitNewWork() {
 	if self.config.DAOForkSupport && self.config.DAOForkBlock != nil && self.config.DAOForkBlock.Cmp(header.Number) == 0 {
 		misc.ApplyDAOHardFork(work.state)
 	}
-	pending, err := self.eth.TxPool().Pending()
+	pending, err := self.vap.TxPool().Pending()
 	if err != nil {
 		log.Error("Failed to fetch pending transactions", "err", err)
 		return

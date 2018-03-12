@@ -1,20 +1,20 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package les implements the Light Ethereum Subprotocol.
+// Package les implements the Light Vapory Subprotocol.
 package les
 
 import (
@@ -22,30 +22,30 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/bloombits"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/eth"
-	"github.com/ethereum/go-ethereum/eth/downloader"
-	"github.com/ethereum/go-ethereum/eth/filters"
-	"github.com/ethereum/go-ethereum/eth/gasprice"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/internal/ethapi"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/node"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/p2p/discv5"
-	"github.com/ethereum/go-ethereum/params"
-	rpc "github.com/ethereum/go-ethereum/rpc"
+	"github.com/vaporyco/go-vapory/accounts"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/common/hexutil"
+	"github.com/vaporyco/go-vapory/consensus"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/core/bloombits"
+	"github.com/vaporyco/go-vapory/core/types"
+	"github.com/vaporyco/go-vapory/vap"
+	"github.com/vaporyco/go-vapory/vap/downloader"
+	"github.com/vaporyco/go-vapory/vap/filters"
+	"github.com/vaporyco/go-vapory/vap/gasprice"
+	"github.com/vaporyco/go-vapory/vapdb"
+	"github.com/vaporyco/go-vapory/event"
+	"github.com/vaporyco/go-vapory/internal/ethapi"
+	"github.com/vaporyco/go-vapory/light"
+	"github.com/vaporyco/go-vapory/log"
+	"github.com/vaporyco/go-vapory/node"
+	"github.com/vaporyco/go-vapory/p2p"
+	"github.com/vaporyco/go-vapory/p2p/discv5"
+	"github.com/vaporyco/go-vapory/params"
+	rpc "github.com/vaporyco/go-vapory/rpc"
 )
 
-type LightEthereum struct {
+type LightVapory struct {
 	odr         *LesOdr
 	relay       *LesTxRelay
 	chainConfig *params.ChainConfig
@@ -60,7 +60,7 @@ type LightEthereum struct {
 	reqDist         *requestDistributor
 	retriever       *retrieveManager
 	// DB interfaces
-	chainDb ethdb.Database // Block chain database
+	chainDb vapdb.Database // Block chain database
 
 	bloomRequests                              chan chan *bloombits.Retrieval // Channel receiving bloom data retrieval requests
 	bloomIndexer, chtIndexer, bloomTrieIndexer *core.ChainIndexer
@@ -77,8 +77,8 @@ type LightEthereum struct {
 	wg sync.WaitGroup
 }
 
-func New(ctx *node.ServiceContext, config *eth.Config) (*LightEthereum, error) {
-	chainDb, err := eth.CreateDB(ctx, config, "lightchaindata")
+func New(ctx *node.ServiceContext, config *vap.Config) (*LightVapory, error) {
+	chainDb, err := vap.CreateDB(ctx, config, "lightchaindata")
 	if err != nil {
 		return nil, err
 	}
@@ -91,48 +91,48 @@ func New(ctx *node.ServiceContext, config *eth.Config) (*LightEthereum, error) {
 	peers := newPeerSet()
 	quitSync := make(chan struct{})
 
-	leth := &LightEthereum{
+	lvap := &LightVapory{
 		chainConfig:      chainConfig,
 		chainDb:          chainDb,
 		eventMux:         ctx.EventMux,
 		peers:            peers,
 		reqDist:          newRequestDistributor(peers, quitSync),
 		accountManager:   ctx.AccountManager,
-		engine:           eth.CreateConsensusEngine(ctx, &config.Ethash, chainConfig, chainDb),
+		engine:           vap.CreateConsensusEngine(ctx, &config.Vapash, chainConfig, chainDb),
 		shutdownChan:     make(chan bool),
 		networkId:        config.NetworkId,
 		bloomRequests:    make(chan chan *bloombits.Retrieval),
-		bloomIndexer:     eth.NewBloomIndexer(chainDb, light.BloomTrieFrequency),
+		bloomIndexer:     vap.NewBloomIndexer(chainDb, light.BloomTrieFrequency),
 		chtIndexer:       light.NewChtIndexer(chainDb, true),
 		bloomTrieIndexer: light.NewBloomTrieIndexer(chainDb, true),
 	}
 
-	leth.relay = NewLesTxRelay(peers, leth.reqDist)
-	leth.serverPool = newServerPool(chainDb, quitSync, &leth.wg)
-	leth.retriever = newRetrieveManager(peers, leth.reqDist, leth.serverPool)
-	leth.odr = NewLesOdr(chainDb, leth.chtIndexer, leth.bloomTrieIndexer, leth.bloomIndexer, leth.retriever)
-	if leth.blockchain, err = light.NewLightChain(leth.odr, leth.chainConfig, leth.engine); err != nil {
+	lvap.relay = NewLesTxRelay(peers, lvap.reqDist)
+	lvap.serverPool = newServerPool(chainDb, quitSync, &lvap.wg)
+	lvap.retriever = newRetrieveManager(peers, lvap.reqDist, lvap.serverPool)
+	lvap.odr = NewLesOdr(chainDb, lvap.chtIndexer, lvap.bloomTrieIndexer, lvap.bloomIndexer, lvap.retriever)
+	if lvap.blockchain, err = light.NewLightChain(lvap.odr, lvap.chainConfig, lvap.engine); err != nil {
 		return nil, err
 	}
-	leth.bloomIndexer.Start(leth.blockchain)
+	lvap.bloomIndexer.Start(lvap.blockchain)
 	// Rewind the chain in case of an incompatible config upgrade.
 	if compat, ok := genesisErr.(*params.ConfigCompatError); ok {
 		log.Warn("Rewinding chain to upgrade configuration", "err", compat)
-		leth.blockchain.SetHead(compat.RewindTo)
+		lvap.blockchain.SetHead(compat.RewindTo)
 		core.WriteChainConfig(chainDb, genesisHash, chainConfig)
 	}
 
-	leth.txPool = light.NewTxPool(leth.chainConfig, leth.blockchain, leth.relay)
-	if leth.protocolManager, err = NewProtocolManager(leth.chainConfig, true, ClientProtocolVersions, config.NetworkId, leth.eventMux, leth.engine, leth.peers, leth.blockchain, nil, chainDb, leth.odr, leth.relay, quitSync, &leth.wg); err != nil {
+	lvap.txPool = light.NewTxPool(lvap.chainConfig, lvap.blockchain, lvap.relay)
+	if lvap.protocolManager, err = NewProtocolManager(lvap.chainConfig, true, ClientProtocolVersions, config.NetworkId, lvap.eventMux, lvap.engine, lvap.peers, lvap.blockchain, nil, chainDb, lvap.odr, lvap.relay, quitSync, &lvap.wg); err != nil {
 		return nil, err
 	}
-	leth.ApiBackend = &LesApiBackend{leth, nil}
+	lvap.ApiBackend = &LesApiBackend{lvap, nil}
 	gpoParams := config.GPO
 	if gpoParams.Default == nil {
 		gpoParams.Default = config.GasPrice
 	}
-	leth.ApiBackend.gpo = gasprice.NewOracle(leth.ApiBackend, gpoParams)
-	return leth, nil
+	lvap.ApiBackend.gpo = gasprice.NewOracle(lvap.ApiBackend, gpoParams)
+	return lvap, nil
 }
 
 func lesTopic(genesisHash common.Hash, protocolVersion uint) discv5.Topic {
@@ -150,12 +150,12 @@ func lesTopic(genesisHash common.Hash, protocolVersion uint) discv5.Topic {
 
 type LightDummyAPI struct{}
 
-// Etherbase is the address that mining rewards will be send to
-func (s *LightDummyAPI) Etherbase() (common.Address, error) {
+// Vaporbase is the address that mining rewards will be send to
+func (s *LightDummyAPI) Vaporbase() (common.Address, error) {
 	return common.Address{}, fmt.Errorf("not supported")
 }
 
-// Coinbase is the address that mining rewards will be send to (alias for Etherbase)
+// Coinbase is the address that mining rewards will be send to (alias for Vaporbase)
 func (s *LightDummyAPI) Coinbase() (common.Address, error) {
 	return common.Address{}, fmt.Errorf("not supported")
 }
@@ -170,22 +170,22 @@ func (s *LightDummyAPI) Mining() bool {
 	return false
 }
 
-// APIs returns the collection of RPC services the ethereum package offers.
+// APIs returns the collection of RPC services the vapory package offers.
 // NOTE, some of these services probably need to be moved to somewhere else.
-func (s *LightEthereum) APIs() []rpc.API {
+func (s *LightVapory) APIs() []rpc.API {
 	return append(ethapi.GetAPIs(s.ApiBackend), []rpc.API{
 		{
-			Namespace: "eth",
+			Namespace: "vap",
 			Version:   "1.0",
 			Service:   &LightDummyAPI{},
 			Public:    true,
 		}, {
-			Namespace: "eth",
+			Namespace: "vap",
 			Version:   "1.0",
 			Service:   downloader.NewPublicDownloaderAPI(s.protocolManager.downloader, s.eventMux),
 			Public:    true,
 		}, {
-			Namespace: "eth",
+			Namespace: "vap",
 			Version:   "1.0",
 			Service:   filters.NewPublicFilterAPI(s.ApiBackend, true),
 			Public:    true,
@@ -198,26 +198,26 @@ func (s *LightEthereum) APIs() []rpc.API {
 	}...)
 }
 
-func (s *LightEthereum) ResetWithGenesisBlock(gb *types.Block) {
+func (s *LightVapory) ResetWithGenesisBlock(gb *types.Block) {
 	s.blockchain.ResetWithGenesisBlock(gb)
 }
 
-func (s *LightEthereum) BlockChain() *light.LightChain      { return s.blockchain }
-func (s *LightEthereum) TxPool() *light.TxPool              { return s.txPool }
-func (s *LightEthereum) Engine() consensus.Engine           { return s.engine }
-func (s *LightEthereum) LesVersion() int                    { return int(s.protocolManager.SubProtocols[0].Version) }
-func (s *LightEthereum) Downloader() *downloader.Downloader { return s.protocolManager.downloader }
-func (s *LightEthereum) EventMux() *event.TypeMux           { return s.eventMux }
+func (s *LightVapory) BlockChain() *light.LightChain      { return s.blockchain }
+func (s *LightVapory) TxPool() *light.TxPool              { return s.txPool }
+func (s *LightVapory) Engine() consensus.Engine           { return s.engine }
+func (s *LightVapory) LesVersion() int                    { return int(s.protocolManager.SubProtocols[0].Version) }
+func (s *LightVapory) Downloader() *downloader.Downloader { return s.protocolManager.downloader }
+func (s *LightVapory) EventMux() *event.TypeMux           { return s.eventMux }
 
 // Protocols implements node.Service, returning all the currently configured
 // network protocols to start.
-func (s *LightEthereum) Protocols() []p2p.Protocol {
+func (s *LightVapory) Protocols() []p2p.Protocol {
 	return s.protocolManager.SubProtocols
 }
 
 // Start implements node.Service, starting all internal goroutines needed by the
-// Ethereum protocol implementation.
-func (s *LightEthereum) Start(srvr *p2p.Server) error {
+// Vapory protocol implementation.
+func (s *LightVapory) Start(srvr *p2p.Server) error {
 	s.startBloomHandlers()
 	log.Warn("Light client mode is an experimental feature")
 	s.netRPCService = ethapi.NewPublicNetAPI(srvr, s.networkId)
@@ -229,8 +229,8 @@ func (s *LightEthereum) Start(srvr *p2p.Server) error {
 }
 
 // Stop implements node.Service, terminating all internal goroutines used by the
-// Ethereum protocol.
-func (s *LightEthereum) Stop() error {
+// Vapory protocol.
+func (s *LightVapory) Stop() error {
 	s.odr.Stop()
 	if s.bloomIndexer != nil {
 		s.bloomIndexer.Close()

@@ -1,18 +1,18 @@
 // Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// This file is part of go-vapory.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-vapory is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-vapory is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-vapory. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/vaporyco/go-vapory/log"
 )
 
 // walletDockerfile is the Dockerfile required to run a web wallet.
@@ -36,15 +36,15 @@ ADD genesis.json /genesis.json
 
 RUN \
   echo 'node server.js &'                     > wallet.sh && \
-	echo 'geth --cache 512 init /genesis.json' >> wallet.sh && \
-	echo $'geth --networkid {{.NetworkID}} --port {{.NodePort}} --bootnodes {{.Bootnodes}} --ethstats \'{{.Ethstats}}\' --cache=512 --rpc --rpcaddr=0.0.0.0 --rpccorsdomain "*"' >> wallet.sh
+	echo 'gvap --cache 512 init /genesis.json' >> wallet.sh && \
+	echo $'gvap --networkid {{.NetworkID}} --port {{.NodePort}} --bootnodes {{.Bootnodes}} --vapstats \'{{.Vapstats}}\' --cache=512 --rpc --rpcaddr=0.0.0.0 --rpccorsdomain "*"' >> wallet.sh
 
 RUN \
-	sed -i 's/PuppethNetworkID/{{.NetworkID}}/g' dist/js/etherwallet-master.js && \
-	sed -i 's/PuppethNetwork/{{.Network}}/g'     dist/js/etherwallet-master.js && \
-	sed -i 's/PuppethDenom/{{.Denom}}/g'         dist/js/etherwallet-master.js && \
-	sed -i 's/PuppethHost/{{.Host}}/g'           dist/js/etherwallet-master.js && \
-	sed -i 's/PuppethRPCPort/{{.RPCPort}}/g'     dist/js/etherwallet-master.js
+	sed -i 's/PuppethNetworkID/{{.NetworkID}}/g' dist/js/vaporwallet-master.js && \
+	sed -i 's/PuppethNetwork/{{.Network}}/g'     dist/js/vaporwallet-master.js && \
+	sed -i 's/PuppethDenom/{{.Denom}}/g'         dist/js/vaporwallet-master.js && \
+	sed -i 's/PuppethHost/{{.Host}}/g'           dist/js/vaporwallet-master.js && \
+	sed -i 's/PuppethRPCPort/{{.RPCPort}}/g'     dist/js/vaporwallet-master.js
 
 ENTRYPOINT ["/bin/sh", "wallet.sh"]
 `
@@ -63,10 +63,10 @@ services:
       - "{{.RPCPort}}:8545"{{if not .VHost}}
       - "{{.WebPort}}:80"{{end}}
     volumes:
-      - {{.Datadir}}:/root/.ethereum
+      - {{.Datadir}}:/root/.vapory
     environment:
       - NODE_PORT={{.NodePort}}/tcp
-      - STATS={{.Ethstats}}{{if .VHost}}
+      - STATS={{.Vapstats}}{{if .VHost}}
       - VIRTUAL_HOST={{.VHost}}
       - VIRTUAL_PORT=80{{end}}
     logging:
@@ -93,7 +93,7 @@ func deployWallet(client *sshClient, network string, bootnodes []string, config 
 		"NodePort":  config.nodePort,
 		"RPCPort":   config.rpcPort,
 		"Bootnodes": strings.Join(bootnodes, ","),
-		"Ethstats":  config.ethstats,
+		"Vapstats":  config.vapstats,
 		"Host":      client.address,
 	})
 	files[filepath.Join(workdir, "Dockerfile")] = dockerfile.Bytes()
@@ -106,7 +106,7 @@ func deployWallet(client *sshClient, network string, bootnodes []string, config 
 		"RPCPort":  config.rpcPort,
 		"VHost":    config.webHost,
 		"WebPort":  config.webPort,
-		"Ethstats": config.ethstats[:strings.Index(config.ethstats, ":")],
+		"Vapstats": config.vapstats[:strings.Index(config.vapstats, ":")],
 	})
 	files[filepath.Join(workdir, "docker-compose.yaml")] = composefile.Bytes()
 
@@ -131,7 +131,7 @@ type walletInfos struct {
 	genesis  []byte
 	network  int64
 	datadir  string
-	ethstats string
+	vapstats string
 	nodePort int
 	rpcPort  int
 	webHost  string
@@ -143,7 +143,7 @@ type walletInfos struct {
 func (info *walletInfos) Report() map[string]string {
 	report := map[string]string{
 		"Data directory":         info.datadir,
-		"Ethstats username":      info.ethstats,
+		"Vapstats username":      info.vapstats,
 		"Node listener port ":    strconv.Itoa(info.nodePort),
 		"RPC listener port ":     strconv.Itoa(info.rpcPort),
 		"Website address ":       info.webHost,
@@ -189,12 +189,12 @@ func checkWallet(client *sshClient, network string) (*walletInfos, error) {
 	}
 	// Assemble and return the useful infos
 	stats := &walletInfos{
-		datadir:  infos.volumes["/root/.ethereum"],
+		datadir:  infos.volumes["/root/.vapory"],
 		nodePort: nodePort,
 		rpcPort:  rpcPort,
 		webHost:  host,
 		webPort:  webPort,
-		ethstats: infos.envvars["STATS"],
+		vapstats: infos.envvars["STATS"],
 	}
 	return stats, nil
 }

@@ -1,18 +1,18 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package whisperv6
 
@@ -27,12 +27,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/crypto"
+	"github.com/vaporyco/go-vapory/log"
+	"github.com/vaporyco/go-vapory/p2p"
+	"github.com/vaporyco/go-vapory/rlp"
+	"github.com/vaporyco/go-vapory/rpc"
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/sync/syncmap"
@@ -56,7 +56,7 @@ const (
 	bloomFilterToleranceIdx        // Bloom filter tolerated by the whisper node for a limited time
 )
 
-// Whisper represents a dark communication interface through the Ethereum
+// Whisper represents a dark communication interface through the Vapory
 // network, using its very own P2P communication layer.
 type Whisper struct {
 	protocol p2p.Protocol // Protocol description and parameters
@@ -87,7 +87,7 @@ type Whisper struct {
 	mailServer MailServer // MailServer interface
 }
 
-// New creates a Whisper client ready to communicate through the Ethereum P2P network.
+// New creates a Whisper client ready to communicate through the Vapory P2P network.
 func New(cfg *Config) *Whisper {
 	if cfg == nil {
 		cfg = &DefaultConfig

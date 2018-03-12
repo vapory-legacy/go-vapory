@@ -1,31 +1,31 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 // Contains all the wrappers from the core/types package.
 
-package geth
+package gvap
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/core/types"
+	"github.com/vaporyco/go-vapory/rlp"
 )
 
 // A Nonce is a 64-bit hash which proves (combined with the mix-hash) that
@@ -59,7 +59,7 @@ func (b *Bloom) GetHex() string {
 	return fmt.Sprintf("0x%x", b.bloom[:])
 }
 
-// Header represents a block header in the Ethereum blockchain.
+// Header represents a block header in the Vapory blockchain.
 type Header struct {
 	header *types.Header
 }
@@ -136,7 +136,7 @@ func (h *Headers) Get(index int) (header *Header, _ error) {
 	return &Header{h.headers[index]}, nil
 }
 
-// Block represents an entire block in the Ethereum blockchain.
+// Block represents an entire block in the Vapory blockchain.
 type Block struct {
 	block *types.Block
 }
@@ -206,7 +206,7 @@ func (b *Block) GetTransaction(hash *Hash) *Transaction {
 	return &Transaction{b.block.Transaction(hash.hash)}
 }
 
-// Transaction represents a single Ethereum transaction.
+// Transaction represents a single Vapory transaction.
 type Transaction struct {
 	tx *types.Transaction
 }
@@ -267,7 +267,7 @@ func (tx *Transaction) GetCost() *BigInt { return &BigInt{tx.tx.Cost()} }
 // Deprecated: GetSigHash cannot know which signer to use.
 func (tx *Transaction) GetSigHash() *Hash { return &Hash{types.HomesteadSigner{}.Hash(tx.tx)} }
 
-// Deprecated: use EthereumClient.TransactionSender
+// Deprecated: use VaporyClient.TransactionSender
 func (tx *Transaction) GetFrom(chainID *BigInt) (address *Address, _ error) {
 	var signer types.Signer = types.HomesteadSigner{}
 	if chainID != nil {

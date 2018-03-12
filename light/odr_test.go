@@ -1,18 +1,18 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package light
 
@@ -24,18 +24,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/math"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/common/math"
+	"github.com/vaporyco/go-vapory/consensus/vapash"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/core/state"
+	"github.com/vaporyco/go-vapory/core/types"
+	"github.com/vaporyco/go-vapory/core/vm"
+	"github.com/vaporyco/go-vapory/crypto"
+	"github.com/vaporyco/go-vapory/vapdb"
+	"github.com/vaporyco/go-vapory/params"
+	"github.com/vaporyco/go-vapory/rlp"
+	"github.com/vaporyco/go-vapory/trie"
 )
 
 var (
@@ -54,11 +54,11 @@ var (
 
 type testOdr struct {
 	OdrBackend
-	sdb, ldb ethdb.Database
+	sdb, ldb vapdb.Database
 	disable  bool
 }
 
-func (odr *testOdr) Database() ethdb.Database {
+func (odr *testOdr) Database() vapdb.Database {
 	return odr.ldb
 }
 
@@ -85,11 +85,11 @@ func (odr *testOdr) Retrieve(ctx context.Context, req OdrRequest) error {
 	return nil
 }
 
-type odrTestFn func(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error)
+type odrTestFn func(ctx context.Context, db vapdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error)
 
 func TestOdrGetBlockLes1(t *testing.T) { testChainOdr(t, 1, odrGetBlock) }
 
-func odrGetBlock(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
+func odrGetBlock(ctx context.Context, db vapdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
 	var block *types.Block
 	if bc != nil {
 		block = bc.GetBlockByHash(bhash)
@@ -105,7 +105,7 @@ func odrGetBlock(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc
 
 func TestOdrGetReceiptsLes1(t *testing.T) { testChainOdr(t, 1, odrGetReceipts) }
 
-func odrGetReceipts(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
+func odrGetReceipts(ctx context.Context, db vapdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
 	var receipts types.Receipts
 	if bc != nil {
 		receipts = core.GetBlockReceipts(db, bhash, core.GetBlockNumber(db, bhash))
@@ -121,7 +121,7 @@ func odrGetReceipts(ctx context.Context, db ethdb.Database, bc *core.BlockChain,
 
 func TestOdrAccountsLes1(t *testing.T) { testChainOdr(t, 1, odrAccounts) }
 
-func odrAccounts(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
+func odrAccounts(ctx context.Context, db vapdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
 	dummyAddr := common.HexToAddress("1234567812345678123456781234567812345678")
 	acc := []common.Address{testBankAddress, acc1Addr, acc2Addr, dummyAddr}
 
@@ -151,7 +151,7 @@ type callmsg struct {
 
 func (callmsg) CheckNonce() bool { return false }
 
-func odrContractCall(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
+func odrContractCall(ctx context.Context, db vapdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
 	data := common.Hex2Bytes("60CD26850000000000000000000000000000000000000000000000000000000000000000")
 	config := params.TestChainConfig
 
@@ -193,11 +193,11 @@ func testChainGen(i int, block *core.BlockGen) {
 	signer := types.HomesteadSigner{}
 	switch i {
 	case 0:
-		// In block 1, the test bank sends account #1 some ether.
+		// In block 1, the test bank sends account #1 some vapor.
 		tx, _ := types.SignTx(types.NewTransaction(block.TxNonce(testBankAddress), acc1Addr, big.NewInt(10000), params.TxGas, nil, nil), signer, testBankKey)
 		block.AddTx(tx)
 	case 1:
-		// In block 2, the test bank sends some more ether to account #1.
+		// In block 2, the test bank sends some more vapor to account #1.
 		// acc1Addr passes it on to account #2.
 		// acc1Addr creates a test contract.
 		tx1, _ := types.SignTx(types.NewTransaction(block.TxNonce(testBankAddress), acc1Addr, big.NewInt(1000), params.TxGas, nil, nil), signer, testBankKey)
@@ -232,21 +232,21 @@ func testChainGen(i int, block *core.BlockGen) {
 
 func testChainOdr(t *testing.T, protocol int, fn odrTestFn) {
 	var (
-		sdb, _  = ethdb.NewMemDatabase()
-		ldb, _  = ethdb.NewMemDatabase()
+		sdb, _  = vapdb.NewMemDatabase()
+		ldb, _  = vapdb.NewMemDatabase()
 		gspec   = core.Genesis{Alloc: core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
 		genesis = gspec.MustCommit(sdb)
 	)
 	gspec.MustCommit(ldb)
 	// Assemble the test environment
-	blockchain, _ := core.NewBlockChain(sdb, params.TestChainConfig, ethash.NewFullFaker(), vm.Config{})
-	gchain, _ := core.GenerateChain(params.TestChainConfig, genesis, ethash.NewFaker(), sdb, 4, testChainGen)
+	blockchain, _ := core.NewBlockChain(sdb, params.TestChainConfig, vapash.NewFullFaker(), vm.Config{})
+	gchain, _ := core.GenerateChain(params.TestChainConfig, genesis, vapash.NewFaker(), sdb, 4, testChainGen)
 	if _, err := blockchain.InsertChain(gchain); err != nil {
 		t.Fatal(err)
 	}
 
 	odr := &testOdr{sdb: sdb, ldb: ldb}
-	lightchain, err := NewLightChain(odr, params.TestChainConfig, ethash.NewFullFaker())
+	lightchain, err := NewLightChain(odr, params.TestChainConfig, vapash.NewFullFaker())
 	if err != nil {
 		t.Fatal(err)
 	}

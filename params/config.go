@@ -1,18 +1,18 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package params
 
@@ -20,11 +20,11 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/vaporyco/go-vapory/common"
 )
 
 var (
-	MainnetGenesisHash = common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3") // Mainnet genesis hash to enforce below configs on
+	MainnetGenesisHash = common.HexToHash("0x87621cbb1453a1ca6300e292d0c5921bf2f1db321a5194676c8206877592eeb7") // Mainnet genesis hash to enforce below configs on
 	TestnetGenesisHash = common.HexToHash("0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d") // Testnet genesis hash to enforce below configs on
 )
 
@@ -32,16 +32,16 @@ var (
 	// MainnetChainConfig is the chain parameters to run a node on the main network.
 	MainnetChainConfig = &ChainConfig{
 		ChainId:        big.NewInt(1),
-		HomesteadBlock: big.NewInt(1150000),
-		DAOForkBlock:   big.NewInt(1920000),
+		HomesteadBlock: big.NewInt(0),
+		DAOForkBlock:   big.NewInt(0),
 		DAOForkSupport: true,
-		EIP150Block:    big.NewInt(2463000),
-		EIP150Hash:     common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
-		EIP155Block:    big.NewInt(2675000),
-		EIP158Block:    big.NewInt(2675000),
-		ByzantiumBlock: big.NewInt(4370000),
+		EIP150Block:    big.NewInt(0),
+		EIP150Hash:     common.HexToHash("0x87621cbb1453a1ca6300e292d0c5921bf2f1db321a5194676c8206877592eeb7"),
+		EIP155Block:    big.NewInt(0),
+		EIP158Block:    big.NewInt(0),
+		ByzantiumBlock: big.NewInt(0),
 
-		Ethash: new(EthashConfig),
+		Vapash: new(VapashConfig),
 	}
 
 	// TestnetChainConfig contains the chain parameters to run a node on the Ropsten test network.
@@ -56,7 +56,7 @@ var (
 		EIP158Block:    big.NewInt(10),
 		ByzantiumBlock: big.NewInt(1700000),
 
-		Ethash: new(EthashConfig),
+		Vapash: new(VapashConfig),
 	}
 
 	// RinkebyChainConfig contains the chain parameters to run a node on the Rinkeby test network.
@@ -77,21 +77,21 @@ var (
 		},
 	}
 
-	// AllEthashProtocolChanges contains every protocol change (EIPs) introduced
-	// and accepted by the Ethereum core developers into the Ethash consensus.
+	// AllVapashProtocolChanges contains every protocol change (EIPs) introduced
+	// and accepted by the Vapory core developers into the Vapash consensus.
 	//
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
-	AllEthashProtocolChanges = &ChainConfig{big.NewInt(1337), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), new(EthashConfig), nil}
+	AllVapashProtocolChanges = &ChainConfig{big.NewInt(1337), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), new(VapashConfig), nil}
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced
-	// and accepted by the Ethereum core developers into the Clique consensus.
+	// and accepted by the Vapory core developers into the Clique consensus.
 	//
 	// This configuration is intentionally not using keyed fields to force anyone
 	// adding flags to the config to also have to set these fields.
 	AllCliqueProtocolChanges = &ChainConfig{big.NewInt(1337), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), nil, &CliqueConfig{Period: 0, Epoch: 30000}}
 
-	TestChainConfig = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), new(EthashConfig), nil}
+	TestChainConfig = &ChainConfig{big.NewInt(1), big.NewInt(0), nil, false, big.NewInt(0), common.Hash{}, big.NewInt(0), big.NewInt(0), big.NewInt(0), new(VapashConfig), nil}
 	TestRules       = TestChainConfig.Rules(new(big.Int))
 )
 
@@ -108,7 +108,7 @@ type ChainConfig struct {
 	DAOForkBlock   *big.Int `json:"daoForkBlock,omitempty"`   // TheDAO hard-fork switch block (nil = no fork)
 	DAOForkSupport bool     `json:"daoForkSupport,omitempty"` // Whether the nodes supports or opposes the DAO hard-fork
 
-	// EIP150 implements the Gas price changes (https://github.com/ethereum/EIPs/issues/150)
+	// EIP150 implements the Gas price changes (https://github.com/vaporyco/EIPs/issues/150)
 	EIP150Block *big.Int    `json:"eip150Block,omitempty"` // EIP150 HF block (nil = no fork)
 	EIP150Hash  common.Hash `json:"eip150Hash,omitempty"`  // EIP150 HF hash (needed for header only clients as only gas pricing changed)
 
@@ -118,16 +118,16 @@ type ChainConfig struct {
 	ByzantiumBlock *big.Int `json:"byzantiumBlock,omitempty"` // Byzantium switch block (nil = no fork, 0 = already on byzantium)
 
 	// Various consensus engines
-	Ethash *EthashConfig `json:"ethash,omitempty"`
+	Vapash *VapashConfig `json:"vapash,omitempty"`
 	Clique *CliqueConfig `json:"clique,omitempty"`
 }
 
-// EthashConfig is the consensus engine configs for proof-of-work based sealing.
-type EthashConfig struct{}
+// VapashConfig is the consensus engine configs for proof-of-work based sealing.
+type VapashConfig struct{}
 
 // String implements the stringer interface, returning the consensus engine details.
-func (c *EthashConfig) String() string {
-	return "ethash"
+func (c *VapashConfig) String() string {
+	return "vapash"
 }
 
 // CliqueConfig is the consensus engine configs for proof-of-authority based sealing.
@@ -145,8 +145,8 @@ func (c *CliqueConfig) String() string {
 func (c *ChainConfig) String() string {
 	var engine interface{}
 	switch {
-	case c.Ethash != nil:
-		engine = c.Ethash
+	case c.Vapash != nil:
+		engine = c.Vapash
 	case c.Clique != nil:
 		engine = c.Clique
 	default:

@@ -1,18 +1,18 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package les
 
@@ -23,18 +23,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/eth/downloader"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rlp"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/vaporyco/go-vapory/common"
+	"github.com/vaporyco/go-vapory/consensus/vapash"
+	"github.com/vaporyco/go-vapory/core"
+	"github.com/vaporyco/go-vapory/core/types"
+	"github.com/vaporyco/go-vapory/crypto"
+	"github.com/vaporyco/go-vapory/vap/downloader"
+	"github.com/vaporyco/go-vapory/vapdb"
+	"github.com/vaporyco/go-vapory/light"
+	"github.com/vaporyco/go-vapory/p2p"
+	"github.com/vaporyco/go-vapory/params"
+	"github.com/vaporyco/go-vapory/rlp"
+	"github.com/vaporyco/go-vapory/trie"
 )
 
 func expectResponse(r p2p.MsgReader, msgcode, reqID, bv uint64, data interface{}) error {
@@ -69,7 +69,7 @@ func TestGetBlockHeadersLes1(t *testing.T) { testGetBlockHeaders(t, 1) }
 func TestGetBlockHeadersLes2(t *testing.T) { testGetBlockHeaders(t, 2) }
 
 func testGetBlockHeaders(t *testing.T, protocol int) {
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	pm := newTestProtocolManagerMust(t, false, downloader.MaxHashFetch+15, nil, nil, nil, db)
 	bc := pm.blockchain.(*core.BlockChain)
 	peer, _ := newTestPeer(t, "peer", protocol, pm, true)
@@ -200,7 +200,7 @@ func TestGetBlockBodiesLes1(t *testing.T) { testGetBlockBodies(t, 1) }
 func TestGetBlockBodiesLes2(t *testing.T) { testGetBlockBodies(t, 2) }
 
 func testGetBlockBodies(t *testing.T, protocol int) {
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	pm := newTestProtocolManagerMust(t, false, downloader.MaxBlockFetch+15, nil, nil, nil, db)
 	bc := pm.blockchain.(*core.BlockChain)
 	peer, _ := newTestPeer(t, "peer", protocol, pm, true)
@@ -279,7 +279,7 @@ func TestGetCodeLes2(t *testing.T) { testGetCode(t, 2) }
 
 func testGetCode(t *testing.T, protocol int) {
 	// Assemble the test environment
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	pm := newTestProtocolManagerMust(t, false, 4, testChainGen, nil, nil, db)
 	bc := pm.blockchain.(*core.BlockChain)
 	peer, _ := newTestPeer(t, "peer", protocol, pm, true)
@@ -314,7 +314,7 @@ func TestGetReceiptLes2(t *testing.T) { testGetReceipt(t, 2) }
 
 func testGetReceipt(t *testing.T, protocol int) {
 	// Assemble the test environment
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	pm := newTestProtocolManagerMust(t, false, 4, testChainGen, nil, nil, db)
 	bc := pm.blockchain.(*core.BlockChain)
 	peer, _ := newTestPeer(t, "peer", protocol, pm, true)
@@ -343,7 +343,7 @@ func TestGetProofsLes2(t *testing.T) { testGetProofs(t, 2) }
 
 func testGetProofs(t *testing.T, protocol int) {
 	// Assemble the test environment
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	pm := newTestProtocolManagerMust(t, false, 4, testChainGen, nil, nil, db)
 	bc := pm.blockchain.(*core.BlockChain)
 	peer, _ := newTestPeer(t, "peer", protocol, pm, true)
@@ -414,7 +414,7 @@ func testGetProofs(t *testing.T, protocol int) {
 }
 
 func TestTransactionStatusLes2(t *testing.T) {
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	pm := newTestProtocolManagerMust(t, false, 0, nil, nil, nil, db)
 	chain := pm.blockchain.(*core.BlockChain)
 	config := core.DefaultTxPoolConfig
@@ -460,7 +460,7 @@ func TestTransactionStatusLes2(t *testing.T) {
 	test(tx3, false, txStatus{Status: core.TxStatusPending})
 
 	// generate and add a block with tx1 and tx2 included
-	gchain, _ := core.GenerateChain(params.TestChainConfig, chain.GetBlockByNumber(0), ethash.NewFaker(), db, 1, func(i int, block *core.BlockGen) {
+	gchain, _ := core.GenerateChain(params.TestChainConfig, chain.GetBlockByNumber(0), vapash.NewFaker(), db, 1, func(i int, block *core.BlockGen) {
 		block.AddTx(tx1)
 		block.AddTx(tx2)
 	})
@@ -484,7 +484,7 @@ func TestTransactionStatusLes2(t *testing.T) {
 	test(tx2, false, txStatus{Status: core.TxStatusIncluded, Lookup: &core.TxLookupEntry{BlockHash: block1hash, BlockIndex: 1, Index: 1}})
 
 	// create a reorg that rolls them back
-	gchain, _ = core.GenerateChain(params.TestChainConfig, chain.GetBlockByNumber(0), ethash.NewFaker(), db, 2, func(i int, block *core.BlockGen) {})
+	gchain, _ = core.GenerateChain(params.TestChainConfig, chain.GetBlockByNumber(0), vapash.NewFaker(), db, 2, func(i int, block *core.BlockGen) {})
 	if _, err := chain.InsertChain(gchain); err != nil {
 		panic(err)
 	}

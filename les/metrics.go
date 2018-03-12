@@ -1,63 +1,63 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 package les
 
 import (
-	"github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/vaporyco/go-vapory/metrics"
+	"github.com/vaporyco/go-vapory/p2p"
 )
 
 var (
-	/*	propTxnInPacketsMeter     = metrics.NewMeter("eth/prop/txns/in/packets")
-		propTxnInTrafficMeter     = metrics.NewMeter("eth/prop/txns/in/traffic")
-		propTxnOutPacketsMeter    = metrics.NewMeter("eth/prop/txns/out/packets")
-		propTxnOutTrafficMeter    = metrics.NewMeter("eth/prop/txns/out/traffic")
-		propHashInPacketsMeter    = metrics.NewMeter("eth/prop/hashes/in/packets")
-		propHashInTrafficMeter    = metrics.NewMeter("eth/prop/hashes/in/traffic")
-		propHashOutPacketsMeter   = metrics.NewMeter("eth/prop/hashes/out/packets")
-		propHashOutTrafficMeter   = metrics.NewMeter("eth/prop/hashes/out/traffic")
-		propBlockInPacketsMeter   = metrics.NewMeter("eth/prop/blocks/in/packets")
-		propBlockInTrafficMeter   = metrics.NewMeter("eth/prop/blocks/in/traffic")
-		propBlockOutPacketsMeter  = metrics.NewMeter("eth/prop/blocks/out/packets")
-		propBlockOutTrafficMeter  = metrics.NewMeter("eth/prop/blocks/out/traffic")
-		reqHashInPacketsMeter     = metrics.NewMeter("eth/req/hashes/in/packets")
-		reqHashInTrafficMeter     = metrics.NewMeter("eth/req/hashes/in/traffic")
-		reqHashOutPacketsMeter    = metrics.NewMeter("eth/req/hashes/out/packets")
-		reqHashOutTrafficMeter    = metrics.NewMeter("eth/req/hashes/out/traffic")
-		reqBlockInPacketsMeter    = metrics.NewMeter("eth/req/blocks/in/packets")
-		reqBlockInTrafficMeter    = metrics.NewMeter("eth/req/blocks/in/traffic")
-		reqBlockOutPacketsMeter   = metrics.NewMeter("eth/req/blocks/out/packets")
-		reqBlockOutTrafficMeter   = metrics.NewMeter("eth/req/blocks/out/traffic")
-		reqHeaderInPacketsMeter   = metrics.NewMeter("eth/req/headers/in/packets")
-		reqHeaderInTrafficMeter   = metrics.NewMeter("eth/req/headers/in/traffic")
-		reqHeaderOutPacketsMeter  = metrics.NewMeter("eth/req/headers/out/packets")
-		reqHeaderOutTrafficMeter  = metrics.NewMeter("eth/req/headers/out/traffic")
-		reqBodyInPacketsMeter     = metrics.NewMeter("eth/req/bodies/in/packets")
-		reqBodyInTrafficMeter     = metrics.NewMeter("eth/req/bodies/in/traffic")
-		reqBodyOutPacketsMeter    = metrics.NewMeter("eth/req/bodies/out/packets")
-		reqBodyOutTrafficMeter    = metrics.NewMeter("eth/req/bodies/out/traffic")
-		reqStateInPacketsMeter    = metrics.NewMeter("eth/req/states/in/packets")
-		reqStateInTrafficMeter    = metrics.NewMeter("eth/req/states/in/traffic")
-		reqStateOutPacketsMeter   = metrics.NewMeter("eth/req/states/out/packets")
-		reqStateOutTrafficMeter   = metrics.NewMeter("eth/req/states/out/traffic")
-		reqReceiptInPacketsMeter  = metrics.NewMeter("eth/req/receipts/in/packets")
-		reqReceiptInTrafficMeter  = metrics.NewMeter("eth/req/receipts/in/traffic")
-		reqReceiptOutPacketsMeter = metrics.NewMeter("eth/req/receipts/out/packets")
-		reqReceiptOutTrafficMeter = metrics.NewMeter("eth/req/receipts/out/traffic")*/
+	/*	propTxnInPacketsMeter     = metrics.NewMeter("vap/prop/txns/in/packets")
+		propTxnInTrafficMeter     = metrics.NewMeter("vap/prop/txns/in/traffic")
+		propTxnOutPacketsMeter    = metrics.NewMeter("vap/prop/txns/out/packets")
+		propTxnOutTrafficMeter    = metrics.NewMeter("vap/prop/txns/out/traffic")
+		propHashInPacketsMeter    = metrics.NewMeter("vap/prop/hashes/in/packets")
+		propHashInTrafficMeter    = metrics.NewMeter("vap/prop/hashes/in/traffic")
+		propHashOutPacketsMeter   = metrics.NewMeter("vap/prop/hashes/out/packets")
+		propHashOutTrafficMeter   = metrics.NewMeter("vap/prop/hashes/out/traffic")
+		propBlockInPacketsMeter   = metrics.NewMeter("vap/prop/blocks/in/packets")
+		propBlockInTrafficMeter   = metrics.NewMeter("vap/prop/blocks/in/traffic")
+		propBlockOutPacketsMeter  = metrics.NewMeter("vap/prop/blocks/out/packets")
+		propBlockOutTrafficMeter  = metrics.NewMeter("vap/prop/blocks/out/traffic")
+		reqHashInPacketsMeter     = metrics.NewMeter("vap/req/hashes/in/packets")
+		reqHashInTrafficMeter     = metrics.NewMeter("vap/req/hashes/in/traffic")
+		reqHashOutPacketsMeter    = metrics.NewMeter("vap/req/hashes/out/packets")
+		reqHashOutTrafficMeter    = metrics.NewMeter("vap/req/hashes/out/traffic")
+		reqBlockInPacketsMeter    = metrics.NewMeter("vap/req/blocks/in/packets")
+		reqBlockInTrafficMeter    = metrics.NewMeter("vap/req/blocks/in/traffic")
+		reqBlockOutPacketsMeter   = metrics.NewMeter("vap/req/blocks/out/packets")
+		reqBlockOutTrafficMeter   = metrics.NewMeter("vap/req/blocks/out/traffic")
+		reqHeaderInPacketsMeter   = metrics.NewMeter("vap/req/headers/in/packets")
+		reqHeaderInTrafficMeter   = metrics.NewMeter("vap/req/headers/in/traffic")
+		reqHeaderOutPacketsMeter  = metrics.NewMeter("vap/req/headers/out/packets")
+		reqHeaderOutTrafficMeter  = metrics.NewMeter("vap/req/headers/out/traffic")
+		reqBodyInPacketsMeter     = metrics.NewMeter("vap/req/bodies/in/packets")
+		reqBodyInTrafficMeter     = metrics.NewMeter("vap/req/bodies/in/traffic")
+		reqBodyOutPacketsMeter    = metrics.NewMeter("vap/req/bodies/out/packets")
+		reqBodyOutTrafficMeter    = metrics.NewMeter("vap/req/bodies/out/traffic")
+		reqStateInPacketsMeter    = metrics.NewMeter("vap/req/states/in/packets")
+		reqStateInTrafficMeter    = metrics.NewMeter("vap/req/states/in/traffic")
+		reqStateOutPacketsMeter   = metrics.NewMeter("vap/req/states/out/packets")
+		reqStateOutTrafficMeter   = metrics.NewMeter("vap/req/states/out/traffic")
+		reqReceiptInPacketsMeter  = metrics.NewMeter("vap/req/receipts/in/packets")
+		reqReceiptInTrafficMeter  = metrics.NewMeter("vap/req/receipts/in/traffic")
+		reqReceiptOutPacketsMeter = metrics.NewMeter("vap/req/receipts/out/packets")
+		reqReceiptOutTrafficMeter = metrics.NewMeter("vap/req/receipts/out/traffic")*/
 	miscInPacketsMeter  = metrics.NewMeter("les/misc/in/packets")
 	miscInTrafficMeter  = metrics.NewMeter("les/misc/in/traffic")
 	miscOutPacketsMeter = metrics.NewMeter("les/misc/out/packets")

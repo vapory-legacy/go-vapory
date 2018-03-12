@@ -1,18 +1,18 @@
 // Copyright 2017 The go-ethereum Authors
-// This file is part of go-ethereum.
+// This file is part of go-vapory.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-vapory is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-vapory is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-vapory. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -25,26 +25,26 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/vaporyco/go-vapory/log"
 )
 
 // explorerDockerfile is the Dockerfile required to run a block explorer.
 var explorerDockerfile = `
 FROM puppeth/explorer:latest
 
-ADD ethstats.json /ethstats.json
+ADD vapstats.json /vapstats.json
 ADD chain.json /chain.json
 
 RUN \
-  echo '(cd ../eth-net-intelligence-api && pm2 start /ethstats.json)' >  explorer.sh && \
-	echo '(cd ../etherchain-light && npm start &)'                      >> explorer.sh && \
+  echo '(cd ../vap-net-intelligence-api && pm2 start /vapstats.json)' >  explorer.sh && \
+	echo '(cd ../vaporchain-light && npm start &)'                      >> explorer.sh && \
 	echo '/parity/parity --chain=/chain.json --port={{.NodePort}} --tracing=on --fat-db=on --pruning=archive' >> explorer.sh
 
 ENTRYPOINT ["/bin/sh", "explorer.sh"]
 `
 
-// explorerEthstats is the configuration file for the ethstats javascript client.
-var explorerEthstats = `[
+// explorerVapstats is the configuration file for the vapstats javascript client.
+var explorerVapstats = `[
   {
     "name"              : "node-app",
     "script"            : "app.js",
@@ -82,10 +82,10 @@ services:
       - "{{.NodePort}}:{{.NodePort}}/udp"{{if not .VHost}}
       - "{{.WebPort}}:3000"{{end}}
     volumes:
-      - {{.Datadir}}:/root/.local/share/io.parity.ethereum
+      - {{.Datadir}}:/root/.local/share/io.parity.vapory
     environment:
       - NODE_PORT={{.NodePort}}/tcp
-      - STATS={{.Ethstats}}{{if .VHost}}
+      - STATS={{.Vapstats}}{{if .VHost}}
       - VIRTUAL_HOST={{.VHost}}
       - VIRTUAL_PORT=3000{{end}}
     logging:
@@ -110,14 +110,14 @@ func deployExplorer(client *sshClient, network string, chainspec []byte, config 
 	})
 	files[filepath.Join(workdir, "Dockerfile")] = dockerfile.Bytes()
 
-	ethstats := new(bytes.Buffer)
-	template.Must(template.New("").Parse(explorerEthstats)).Execute(ethstats, map[string]interface{}{
+	vapstats := new(bytes.Buffer)
+	template.Must(template.New("").Parse(explorerVapstats)).Execute(vapstats, map[string]interface{}{
 		"Port":   config.nodePort,
-		"Name":   config.ethstats[:strings.Index(config.ethstats, ":")],
-		"Secret": config.ethstats[strings.Index(config.ethstats, ":")+1 : strings.Index(config.ethstats, "@")],
-		"Host":   config.ethstats[strings.Index(config.ethstats, "@")+1:],
+		"Name":   config.vapstats[:strings.Index(config.vapstats, ":")],
+		"Secret": config.vapstats[strings.Index(config.vapstats, ":")+1 : strings.Index(config.vapstats, "@")],
+		"Host":   config.vapstats[strings.Index(config.vapstats, "@")+1:],
 	})
-	files[filepath.Join(workdir, "ethstats.json")] = ethstats.Bytes()
+	files[filepath.Join(workdir, "vapstats.json")] = vapstats.Bytes()
 
 	composefile := new(bytes.Buffer)
 	template.Must(template.New("").Parse(explorerComposefile)).Execute(composefile, map[string]interface{}{
@@ -126,7 +126,7 @@ func deployExplorer(client *sshClient, network string, chainspec []byte, config 
 		"NodePort": config.nodePort,
 		"VHost":    config.webHost,
 		"WebPort":  config.webPort,
-		"Ethstats": config.ethstats[:strings.Index(config.ethstats, ":")],
+		"Vapstats": config.vapstats[:strings.Index(config.vapstats, ":")],
 	})
 	files[filepath.Join(workdir, "docker-compose.yaml")] = composefile.Bytes()
 
@@ -149,7 +149,7 @@ func deployExplorer(client *sshClient, network string, chainspec []byte, config 
 // various configuration parameters.
 type explorerInfos struct {
 	datadir  string
-	ethstats string
+	vapstats string
 	nodePort int
 	webHost  string
 	webPort  int
@@ -161,7 +161,7 @@ func (info *explorerInfos) Report() map[string]string {
 	report := map[string]string{
 		"Data directory":         info.datadir,
 		"Node listener port ":    strconv.Itoa(info.nodePort),
-		"Ethstats username":      info.ethstats,
+		"Vapstats username":      info.vapstats,
 		"Website address ":       info.webHost,
 		"Website listener port ": strconv.Itoa(info.webPort),
 	}
@@ -201,11 +201,11 @@ func checkExplorer(client *sshClient, network string) (*explorerInfos, error) {
 	}
 	// Assemble and return the useful infos
 	stats := &explorerInfos{
-		datadir:  infos.volumes["/root/.local/share/io.parity.ethereum"],
+		datadir:  infos.volumes["/root/.local/share/io.parity.vapory"],
 		nodePort: nodePort,
 		webHost:  host,
 		webPort:  webPort,
-		ethstats: infos.envvars["STATS"],
+		vapstats: infos.envvars["STATS"],
 	}
 	return stats, nil
 }

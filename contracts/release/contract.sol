@@ -1,28 +1,28 @@
 // Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// This file is part of the go-vapory library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-vapory library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-vapory library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 pragma solidity ^0.4.18;
 
-// ReleaseOracle is an Ethereum contract to store the current and previous
-// versions of the go-ethereum implementation. Its goal is to allow Geth to
+// ReleaseOracle is an Vapory contract to store the current and previous
+// versions of the go-vapory implementation. Its goal is to allow Gvap to
 // check for new releases automatically without the need to consult a central
 // repository.
 //
 // The contract takes a vote based approach on both assigning authorised signers
-// as well as signing off on new Geth releases.
+// as well as signing off on new Gvap releases.
 //
 // Note, when a signer is demoted, the currently pending release is auto-nuked.
 // The reason is to prevent suprises where a demotion actually tilts the votes
@@ -35,7 +35,7 @@ contract ReleaseOracle {
     address[] fail; // List of signers voting to fail a proposal
   }
 
-  // Version is the version details of a particular Geth release
+  // Version is the version details of a particular Gvap release
   struct Version {
     uint32  major;  // Major version component of the release
     uint32  minor;  // Minor version component of the release
@@ -137,7 +137,7 @@ contract ReleaseOracle {
     updateRelease(0, 0, 0, 0, false);
   }
 
-  // updateSigner marks a vote for changing the status of an Ethereum user, either
+  // updateSigner marks a vote for changing the status of an Vapory user, either
   // for or against the user being an authorised signer.
   function updateSigner(address user, bool authorize) internal isSigner {
     // Gather the current votes and ensure we don't double vote
