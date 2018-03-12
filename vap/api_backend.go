@@ -36,7 +36,7 @@ import (
 	"github.com/vaporyco/go-vapory/rpc"
 )
 
-// EthApiBackend implements ethapi.Backend for full nodes
+// EthApiBackend implements vapapi.Backend for full nodes
 type EthApiBackend struct {
 	vap *Vapory
 	gpo *gasprice.Oracle

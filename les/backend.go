@@ -35,7 +35,7 @@ import (
 	"github.com/vaporyco/go-vapory/vap/gasprice"
 	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/event"
-	"github.com/vaporyco/go-vapory/internal/ethapi"
+	"github.com/vaporyco/go-vapory/internal/vapapi"
 	"github.com/vaporyco/go-vapory/light"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/node"
@@ -72,7 +72,7 @@ type LightVapory struct {
 	accountManager *accounts.Manager
 
 	networkId     uint64
-	netRPCService *ethapi.PublicNetAPI
+	netRPCService *vapapi.PublicNetAPI
 
 	wg sync.WaitGroup
 }
@@ -173,7 +173,7 @@ func (s *LightDummyAPI) Mining() bool {
 // APIs returns the collection of RPC services the vapory package offers.
 // NOTE, some of these services probably need to be moved to somewhere else.
 func (s *LightVapory) APIs() []rpc.API {
-	return append(ethapi.GetAPIs(s.ApiBackend), []rpc.API{
+	return append(vapapi.GetAPIs(s.ApiBackend), []rpc.API{
 		{
 			Namespace: "vap",
 			Version:   "1.0",
@@ -220,7 +220,7 @@ func (s *LightVapory) Protocols() []p2p.Protocol {
 func (s *LightVapory) Start(srvr *p2p.Server) error {
 	s.startBloomHandlers()
 	log.Warn("Light client mode is an experimental feature")
-	s.netRPCService = ethapi.NewPublicNetAPI(srvr, s.networkId)
+	s.netRPCService = vapapi.NewPublicNetAPI(srvr, s.networkId)
 	// clients are searching for the first advertised protocol in the list
 	protocolVersion := AdvertiseProtocolVersions[0]
 	s.serverPool.start(srvr, lesTopic(s.blockchain.Genesis().Hash(), protocolVersion))

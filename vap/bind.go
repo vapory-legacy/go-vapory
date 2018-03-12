@@ -24,7 +24,7 @@ import (
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/common/hexutil"
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/internal/ethapi"
+	"github.com/vaporyco/go-vapory/internal/vapapi"
 	"github.com/vaporyco/go-vapory/rlp"
 	"github.com/vaporyco/go-vapory/rpc"
 )
@@ -37,18 +37,18 @@ import (
 // object. These should be rewritten to internal Go method calls when the Go API
 // is refactored to support a clean library use.
 type ContractBackend struct {
-	eapi  *ethapi.PublicVaporyAPI        // Wrapper around the Vapory object to access metadata
-	bcapi *ethapi.PublicBlockChainAPI      // Wrapper around the blockchain to access chain data
-	txapi *ethapi.PublicTransactionPoolAPI // Wrapper around the transaction pool to access transaction data
+	eapi  *vapapi.PublicVaporyAPI        // Wrapper around the Vapory object to access metadata
+	bcapi *vapapi.PublicBlockChainAPI      // Wrapper around the blockchain to access chain data
+	txapi *vapapi.PublicTransactionPoolAPI // Wrapper around the transaction pool to access transaction data
 }
 
 // NewContractBackend creates a new native contract backend using an existing
 // Vapory object.
-func NewContractBackend(apiBackend ethapi.Backend) *ContractBackend {
+func NewContractBackend(apiBackend vapapi.Backend) *ContractBackend {
 	return &ContractBackend{
-		eapi:  ethapi.NewPublicVaporyAPI(apiBackend),
-		bcapi: ethapi.NewPublicBlockChainAPI(apiBackend),
-		txapi: ethapi.NewPublicTransactionPoolAPI(apiBackend, new(ethapi.AddrLocker)),
+		eapi:  vapapi.NewPublicVaporyAPI(apiBackend),
+		bcapi: vapapi.NewPublicBlockChainAPI(apiBackend),
+		txapi: vapapi.NewPublicTransactionPoolAPI(apiBackend, new(vapapi.AddrLocker)),
 	}
 }
 
@@ -78,8 +78,8 @@ func (b *ContractBackend) PendingCallContract(ctx context.Context, msg vapory.Ca
 	return out, err
 }
 
-func toCallArgs(msg vapory.CallMsg) ethapi.CallArgs {
-	args := ethapi.CallArgs{
+func toCallArgs(msg vapory.CallMsg) vapapi.CallArgs {
+	args := vapapi.CallArgs{
 		To:   msg.To,
 		From: msg.From,
 		Data: msg.Data,

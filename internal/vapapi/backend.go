@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package ethapi implements the general Vapory API functions.
-package ethapi
+// Package vapapi implements the general Vapory API functions.
+package vapapi
 
 import (
 	"context"

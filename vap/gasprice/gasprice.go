@@ -24,7 +24,7 @@ import (
 
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/internal/ethapi"
+	"github.com/vaporyco/go-vapory/internal/vapapi"
 	"github.com/vaporyco/go-vapory/params"
 	"github.com/vaporyco/go-vapory/rpc"
 )
@@ -40,7 +40,7 @@ type Config struct {
 // Oracle recommends gas prices based on the content of recent
 // blocks. Suitable for both light and full clients.
 type Oracle struct {
-	backend   ethapi.Backend
+	backend   vapapi.Backend
 	lastHead  common.Hash
 	lastPrice *big.Int
 	cacheLock sync.RWMutex
@@ -51,7 +51,7 @@ type Oracle struct {
 }
 
 // NewOracle returns a new oracle.
-func NewOracle(backend ethapi.Backend, params Config) *Oracle {
+func NewOracle(backend vapapi.Backend, params Config) *Oracle {
 	blocks := params.Blocks
 	if blocks < 1 {
 		blocks = 1

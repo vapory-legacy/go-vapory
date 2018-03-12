@@ -40,7 +40,7 @@ import (
 	"github.com/vaporyco/go-vapory/vap/gasprice"
 	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/event"
-	"github.com/vaporyco/go-vapory/internal/ethapi"
+	"github.com/vaporyco/go-vapory/internal/vapapi"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/miner"
 	"github.com/vaporyco/go-vapory/node"
@@ -89,7 +89,7 @@ type Vapory struct {
 	vaporbase common.Address
 
 	networkId     uint64
-	netRPCService *ethapi.PublicNetAPI
+	netRPCService *vapapi.PublicNetAPI
 
 	lock sync.RWMutex // Protects the variadic fields (e.g. gas price and vaporbase)
 }
@@ -242,7 +242,7 @@ func CreateConsensusEngine(ctx *node.ServiceContext, config *vapash.Config, chai
 // APIs returns the collection of RPC services the vapory package offers.
 // NOTE, some of these services probably need to be moved to somewhere else.
 func (s *Vapory) APIs() []rpc.API {
-	apis := ethapi.GetAPIs(s.ApiBackend)
+	apis := vapapi.GetAPIs(s.ApiBackend)
 
 	// Append any APIs exposed explicitly by the consensus engine
 	apis = append(apis, s.engine.APIs(s.BlockChain())...)
@@ -388,7 +388,7 @@ func (s *Vapory) Start(srvr *p2p.Server) error {
 	s.startBloomHandlers()
 
 	// Start the RPC service
-	s.netRPCService = ethapi.NewPublicNetAPI(srvr, s.NetVersion())
+	s.netRPCService = vapapi.NewPublicNetAPI(srvr, s.NetVersion())
 
 	// Figure out a max peers count based on the server limits
 	maxPeers := srvr.MaxPeers

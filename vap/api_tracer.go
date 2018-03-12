@@ -35,7 +35,7 @@ import (
 	"github.com/vaporyco/go-vapory/core/vm"
 	"github.com/vaporyco/go-vapory/vap/tracers"
 	"github.com/vaporyco/go-vapory/vapdb"
-	"github.com/vaporyco/go-vapory/internal/ethapi"
+	"github.com/vaporyco/go-vapory/internal/vapapi"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/rlp"
 	"github.com/vaporyco/go-vapory/rpc"
@@ -676,11 +676,11 @@ func (api *PrivateDebugAPI) traceTx(ctx context.Context, message core.Message, v
 	// Depending on the tracer type, format and return the output
 	switch tracer := tracer.(type) {
 	case *vm.StructLogger:
-		return &ethapi.ExecutionResult{
+		return &vapapi.ExecutionResult{
 			Gas:         gas,
 			Failed:      failed,
 			ReturnValue: fmt.Sprintf("%x", ret),
-			StructLogs:  ethapi.FormatLogs(tracer.StructLogs()),
+			StructLogs:  vapapi.FormatLogs(tracer.StructLogs()),
 		}, nil
 
 	case *tracers.Tracer:

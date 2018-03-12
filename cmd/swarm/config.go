@@ -305,9 +305,9 @@ func dumpConfig(ctx *cli.Context) error {
 
 //deprecated flags checked here
 func checkDeprecated(ctx *cli.Context) {
-	// exit if the deprecated --ethapi flag is set
+	// exit if the deprecated --vapapi flag is set
 	if ctx.GlobalString(DeprecatedEthAPIFlag.Name) != "" {
-		utils.Fatalf("--ethapi is no longer a valid command line flag, please use --ens-api and/or --swap-api.")
+		utils.Fatalf("--vapapi is no longer a valid command line flag, please use --ens-api and/or --swap-api.")
 	}
 }
 
