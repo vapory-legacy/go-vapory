@@ -76,7 +76,7 @@ type vapstatsConfig struct {
 	URL string `toml:",omitempty"`
 }
 
-type gethConfig struct {
+type gvapConfig struct {
 	Vap       vap.Config
 	Shh       whisper.Config
 	Node      node.Config
@@ -84,7 +84,7 @@ type gethConfig struct {
 	Dashboard dashboard.Config
 }
 
-func loadConfig(file string, cfg *gethConfig) error {
+func loadConfig(file string, cfg *gvapConfig) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return err
@@ -109,9 +109,9 @@ func defaultNodeConfig() node.Config {
 	return cfg
 }
 
-func makeConfigNode(ctx *cli.Context) (*node.Node, gethConfig) {
+func makeConfigNode(ctx *cli.Context) (*node.Node, gvapConfig) {
 	// Load defaults.
-	cfg := gethConfig{
+	cfg := gvapConfig{
 		Vap:       vap.DefaultConfig,
 		Shh:       whisper.DefaultConfig,
 		Node:      defaultNodeConfig(),
@@ -131,9 +131,9 @@ func makeConfigNode(ctx *cli.Context) (*node.Node, gethConfig) {
 	if err != nil {
 		utils.Fatalf("Failed to create the protocol stack: %v", err)
 	}
-	utils.SetEthConfig(ctx, stack, &cfg.Vap)
-	if ctx.GlobalIsSet(utils.EthStatsURLFlag.Name) {
-		cfg.Vapstats.URL = ctx.GlobalString(utils.EthStatsURLFlag.Name)
+	utils.SetVapConfig(ctx, stack, &cfg.Vap)
+	if ctx.GlobalIsSet(utils.VapStatsURLFlag.Name) {
+		cfg.Vapstats.URL = ctx.GlobalString(utils.VapStatsURLFlag.Name)
 	}
 
 	utils.SetShhConfig(ctx, stack, &cfg.Shh)
@@ -155,7 +155,7 @@ func enableWhisper(ctx *cli.Context) bool {
 func makeFullNode(ctx *cli.Context) *node.Node {
 	stack, cfg := makeConfigNode(ctx)
 
-	utils.RegisterEthService(stack, &cfg.Vap)
+	utils.RegisterVapService(stack, &cfg.Vap)
 
 	if ctx.GlobalBool(utils.DashboardEnabledFlag.Name) {
 		utils.RegisterDashboardService(stack, &cfg.Dashboard, gitCommit)
@@ -175,7 +175,7 @@ func makeFullNode(ctx *cli.Context) *node.Node {
 
 	// Add the Vapory Stats daemon if requested.
 	if cfg.Vapstats.URL != "" {
-		utils.RegisterEthStatsService(stack, cfg.Vapstats.URL)
+		utils.RegisterVapStatsService(stack, cfg.Vapstats.URL)
 	}
 
 	// Add the release oracle service so it boots along with node.
