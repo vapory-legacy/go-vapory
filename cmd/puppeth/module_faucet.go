@@ -42,7 +42,7 @@ ADD account.pass /account.pass
 EXPOSE 8080 30303 30303/udp
 
 ENTRYPOINT [ \
-	"faucet", "--genesis", "/genesis.json", "--network", "{{.NetworkID}}", "--bootnodes", "{{.Bootnodes}}", "--vapstats", "{{.Vapstats}}", "--ethport", "{{.EthPort}}",     \
+	"faucet", "--genesis", "/genesis.json", "--network", "{{.NetworkID}}", "--bootnodes", "{{.Bootnodes}}", "--vapstats", "{{.Vapstats}}", "--vapport", "{{.VapPort}}",     \
 	"--faucet.name", "{{.FaucetName}}", "--faucet.amount", "{{.FaucetAmount}}", "--faucet.minutes", "{{.FaucetMinutes}}", "--faucet.tiers", "{{.FaucetTiers}}",             \
 	"--account.json", "/account.json", "--account.pass", "/account.pass"                                                                                                    \
 	{{if .CaptchaToken}}, "--captcha.token", "{{.CaptchaToken}}", "--captcha.secret", "{{.CaptchaSecret}}"{{end}}{{if .NoAuth}}, "--noauth"{{end}}                          \
@@ -57,13 +57,13 @@ services:
     build: .
     image: {{.Network}}/faucet
     ports:
-      - "{{.EthPort}}:{{.EthPort}}"{{if not .VHost}}
+      - "{{.VapPort}}:{{.VapPort}}"{{if not .VHost}}
       - "{{.ApiPort}}:8080"{{end}}
     volumes:
       - {{.Datadir}}:/root/.faucet
     environment:
-      - ETH_PORT={{.EthPort}}
-      - ETH_NAME={{.EthName}}
+      - VAP_PORT={{.VapPort}}
+      - VAP_NAME={{.VapName}}
       - FAUCET_AMOUNT={{.FaucetAmount}}
       - FAUCET_MINUTES={{.FaucetMinutes}}
       - FAUCET_TIERS={{.FaucetTiers}}
@@ -93,7 +93,7 @@ func deployFaucet(client *sshClient, network string, bootnodes []string, config 
 		"NetworkID":     config.node.network,
 		"Bootnodes":     strings.Join(bootnodes, ","),
 		"Vapstats":      config.node.vapstats,
-		"EthPort":       config.node.portFull,
+		"VapPort":       config.node.portFull,
 		"CaptchaToken":  config.captchaToken,
 		"CaptchaSecret": config.captchaSecret,
 		"FaucetName":    strings.Title(network),
@@ -110,8 +110,8 @@ func deployFaucet(client *sshClient, network string, bootnodes []string, config 
 		"Datadir":       config.node.datadir,
 		"VHost":         config.host,
 		"ApiPort":       config.port,
-		"EthPort":       config.node.portFull,
-		"EthName":       config.node.vapstats[:strings.Index(config.node.vapstats, ":")],
+		"VapPort":       config.node.portFull,
+		"VapName":       config.node.vapstats[:strings.Index(config.node.vapstats, ":")],
 		"CaptchaToken":  config.captchaToken,
 		"CaptchaSecret": config.captchaSecret,
 		"FaucetAmount":  config.amount,
@@ -228,8 +228,8 @@ func checkFaucet(client *sshClient, network string) (*faucetInfos, error) {
 	return &faucetInfos{
 		node: &nodeInfos{
 			datadir:  infos.volumes["/root/.faucet"],
-			portFull: infos.portmap[infos.envvars["ETH_PORT"]+"/tcp"],
-			vapstats: infos.envvars["ETH_NAME"],
+			portFull: infos.portmap[infos.envvars["VAP_PORT"]+"/tcp"],
+			vapstats: infos.envvars["VAP_NAME"],
 			keyJSON:  keyJSON,
 			keyPass:  keyPass,
 		},
