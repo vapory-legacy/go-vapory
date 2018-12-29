@@ -317,7 +317,7 @@ var (
 		Value: params.GenesisGasLimit,
 	}
 	VaporbaseFlag = cli.StringFlag{
-		Name:  "etherbase",
+		Name:  "vaporbase",
 		Usage: "Public address for block mining rewards (default = first account created)",
 		Value: "0",
 	}
