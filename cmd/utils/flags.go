@@ -967,8 +967,8 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node, cfg *whisper.Config) {
 	}
 }
 
-// SetEthConfig applies vap-related command line flags to the config.
-func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *vap.Config) {
+// SetVapConfig applies vap-related command line flags to the config.
+func SetVapConfig(ctx *cli.Context, stack *node.Node, cfg *vap.Config) {
 	// Avoid conflicting network flags
 	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag)
 	checkExclusive(ctx, FastSyncFlag, LightModeFlag, SyncModeFlag)
@@ -1071,8 +1071,8 @@ func SetDashboardConfig(ctx *cli.Context, cfg *dashboard.Config) {
 	cfg.Assets = ctx.GlobalString(DashboardAssetsFlag.Name)
 }
 
-// RegisterEthService adds an Vapory client to the stack.
-func RegisterEthService(stack *node.Node, cfg *vap.Config) {
+// RegisterVapService adds an Vapory client to the stack.
+func RegisterVapService(stack *node.Node, cfg *vap.Config) {
 	var err error
 	if cfg.SyncMode == downloader.LightSync {
 		err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
@@ -1109,18 +1109,18 @@ func RegisterShhService(stack *node.Node, cfg *whisper.Config) {
 	}
 }
 
-// RegisterEthStatsService configures the Vapory Stats daemon and adds it to
+// RegisterVapStatsService configures the Vapory Stats daemon and adds it to
 // th egiven node.
-func RegisterEthStatsService(stack *node.Node, url string) {
+func RegisterVapStatsService(stack *node.Node, url string) {
 	if err := stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
 		// Retrieve both vap and les services
-		var ethServ *vap.Vapory
-		ctx.Service(&ethServ)
+		var vapServ *vap.Vapory
+		ctx.Service(&vapServ)
 
 		var lesServ *les.LightVapory
 		ctx.Service(&lesServ)
 
-		return vapstats.New(url, ethServ, lesServ)
+		return vapstats.New(url, vapServ, lesServ)
 	}); err != nil {
 		Fatalf("Failed to register the Vapory Stats service: %v", err)
 	}
