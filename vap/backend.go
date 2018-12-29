@@ -169,7 +169,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Vapory, error) {
 	vap.miner = miner.New(vap, vap.chainConfig, vap.EventMux(), vap.engine)
 	vap.miner.SetExtra(makeExtraData(config.ExtraData))
 
-	vap.ApiBackend = &EthApiBackend{vap, nil}
+	vap.ApiBackend = &VapApiBackend{vap, nil}
 	gpoParams := config.GPO
 	if gpoParams.Default == nil {
 		gpoParams.Default = config.GasPrice
@@ -368,7 +368,7 @@ func (s *Vapory) EventMux() *event.TypeMux           { return s.eventMux }
 func (s *Vapory) Engine() consensus.Engine           { return s.engine }
 func (s *Vapory) ChainDb() vapdb.Database            { return s.chainDb }
 func (s *Vapory) IsListening() bool                  { return true } // Always listening
-func (s *Vapory) EthVersion() int                    { return int(s.protocolManager.SubProtocols[0].Version) }
+func (s *Vapory) VapVersion() int                    { return int(s.protocolManager.SubProtocols[0].Version) }
 func (s *Vapory) NetVersion() uint64                 { return s.networkId }
 func (s *Vapory) Downloader() *downloader.Downloader { return s.protocolManager.downloader }
 
