@@ -144,13 +144,13 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 	}
 	// Register the Vapory protocol if requested
 	if config.VaporyEnabled {
-		ethConf := vap.DefaultConfig
-		ethConf.Genesis = genesis
-		ethConf.SyncMode = downloader.LightSync
-		ethConf.NetworkId = uint64(config.VaporyNetworkID)
-		ethConf.DatabaseCache = config.VaporyDatabaseCache
+		vapConf := vap.DefaultConfig
+		vapConf.Genesis = genesis
+		vapConf.SyncMode = downloader.LightSync
+		vapConf.NetworkId = uint64(config.VaporyNetworkID)
+		vapConf.DatabaseCache = config.VaporyDatabaseCache
 		if err := rawStack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
-			return les.New(ctx, &ethConf)
+			return les.New(ctx, &vapConf)
 		}); err != nil {
 			return nil, fmt.Errorf("vapory init: %v", err)
 		}
