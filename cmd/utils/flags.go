@@ -347,7 +347,7 @@ var (
 		Usage: "Record information useful for VM and contract debugging",
 	}
 	// Logging and debug settings
-	EthStatsURLFlag = cli.StringFlag{
+	VapStatsURLFlag = cli.StringFlag{
 		Name:  "vapstats",
 		Usage: "Reporting URL of a vapstats service (nodename:secret@host:port)",
 	}
@@ -752,7 +752,7 @@ func MakeAddress(ks *keystore.KeyStore, account string) (accounts.Account, error
 	return accs[index], nil
 }
 
-// setVaporbase retrieves the etherbase either from the directly specified
+// setVaporbase retrieves the vaporbase either from the directly specified
 // command line flags or from the keystore if CLI indexed.
 func setVaporbase(ctx *cli.Context, ks *keystore.KeyStore, cfg *vap.Config) {
 	if ctx.GlobalIsSet(VaporbaseFlag.Name) {
