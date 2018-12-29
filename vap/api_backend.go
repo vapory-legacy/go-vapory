@@ -36,26 +36,26 @@ import (
 	"github.com/vaporyco/go-vapory/rpc"
 )
 
-// EthApiBackend implements vapapi.Backend for full nodes
-type EthApiBackend struct {
+// VapApiBackend implements vapapi.Backend for full nodes
+type VapApiBackend struct {
 	vap *Vapory
 	gpo *gasprice.Oracle
 }
 
-func (b *EthApiBackend) ChainConfig() *params.ChainConfig {
+func (b *VapApiBackend) ChainConfig() *params.ChainConfig {
 	return b.vap.chainConfig
 }
 
-func (b *EthApiBackend) CurrentBlock() *types.Block {
+func (b *VapApiBackend) CurrentBlock() *types.Block {
 	return b.vap.blockchain.CurrentBlock()
 }
 
-func (b *EthApiBackend) SetHead(number uint64) {
+func (b *VapApiBackend) SetHead(number uint64) {
 	b.vap.protocolManager.downloader.Cancel()
 	b.vap.blockchain.SetHead(number)
 }
 
-func (b *EthApiBackend) HeaderByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*types.Header, error) {
+func (b *VapApiBackend) HeaderByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*types.Header, error) {
 	// Pending block is only known by the miner
 	if blockNr == rpc.PendingBlockNumber {
 		block := b.vap.miner.PendingBlock()
@@ -68,7 +68,7 @@ func (b *EthApiBackend) HeaderByNumber(ctx context.Context, blockNr rpc.BlockNum
 	return b.vap.blockchain.GetHeaderByNumber(uint64(blockNr)), nil
 }
 
-func (b *EthApiBackend) BlockByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*types.Block, error) {
+func (b *VapApiBackend) BlockByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*types.Block, error) {
 	// Pending block is only known by the miner
 	if blockNr == rpc.PendingBlockNumber {
 		block := b.vap.miner.PendingBlock()
@@ -81,7 +81,7 @@ func (b *EthApiBackend) BlockByNumber(ctx context.Context, blockNr rpc.BlockNumb
 	return b.vap.blockchain.GetBlockByNumber(uint64(blockNr)), nil
 }
 
-func (b *EthApiBackend) StateAndHeaderByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*state.StateDB, *types.Header, error) {
+func (b *VapApiBackend) StateAndHeaderByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*state.StateDB, *types.Header, error) {
 	// Pending state is only known by the miner
 	if blockNr == rpc.PendingBlockNumber {
 		block, state := b.vap.miner.Pending()
@@ -96,19 +96,19 @@ func (b *EthApiBackend) StateAndHeaderByNumber(ctx context.Context, blockNr rpc.
 	return stateDb, header, err
 }
 
-func (b *EthApiBackend) GetBlock(ctx context.Context, blockHash common.Hash) (*types.Block, error) {
+func (b *VapApiBackend) GetBlock(ctx context.Context, blockHash common.Hash) (*types.Block, error) {
 	return b.vap.blockchain.GetBlockByHash(blockHash), nil
 }
 
-func (b *EthApiBackend) GetReceipts(ctx context.Context, blockHash common.Hash) (types.Receipts, error) {
+func (b *VapApiBackend) GetReceipts(ctx context.Context, blockHash common.Hash) (types.Receipts, error) {
 	return core.GetBlockReceipts(b.vap.chainDb, blockHash, core.GetBlockNumber(b.vap.chainDb, blockHash)), nil
 }
 
-func (b *EthApiBackend) GetTd(blockHash common.Hash) *big.Int {
+func (b *VapApiBackend) GetTd(blockHash common.Hash) *big.Int {
 	return b.vap.blockchain.GetTdByHash(blockHash)
 }
 
-func (b *EthApiBackend) GetEVM(ctx context.Context, msg core.Message, state *state.StateDB, header *types.Header, vmCfg vm.Config) (*vm.EVM, func() error, error) {
+func (b *VapApiBackend) GetEVM(ctx context.Context, msg core.Message, state *state.StateDB, header *types.Header, vmCfg vm.Config) (*vm.EVM, func() error, error) {
 	state.SetBalance(msg.From(), math.MaxBig256)
 	vmError := func() error { return nil }
 
@@ -116,31 +116,31 @@ func (b *EthApiBackend) GetEVM(ctx context.Context, msg core.Message, state *sta
 	return vm.NewEVM(context, state, b.vap.chainConfig, vmCfg), vmError, nil
 }
 
-func (b *EthApiBackend) SubscribeRemovedLogsEvent(ch chan<- core.RemovedLogsEvent) event.Subscription {
+func (b *VapApiBackend) SubscribeRemovedLogsEvent(ch chan<- core.RemovedLogsEvent) event.Subscription {
 	return b.vap.BlockChain().SubscribeRemovedLogsEvent(ch)
 }
 
-func (b *EthApiBackend) SubscribeChainEvent(ch chan<- core.ChainEvent) event.Subscription {
+func (b *VapApiBackend) SubscribeChainEvent(ch chan<- core.ChainEvent) event.Subscription {
 	return b.vap.BlockChain().SubscribeChainEvent(ch)
 }
 
-func (b *EthApiBackend) SubscribeChainHeadEvent(ch chan<- core.ChainHeadEvent) event.Subscription {
+func (b *VapApiBackend) SubscribeChainHeadEvent(ch chan<- core.ChainHeadEvent) event.Subscription {
 	return b.vap.BlockChain().SubscribeChainHeadEvent(ch)
 }
 
-func (b *EthApiBackend) SubscribeChainSideEvent(ch chan<- core.ChainSideEvent) event.Subscription {
+func (b *VapApiBackend) SubscribeChainSideEvent(ch chan<- core.ChainSideEvent) event.Subscription {
 	return b.vap.BlockChain().SubscribeChainSideEvent(ch)
 }
 
-func (b *EthApiBackend) SubscribeLogsEvent(ch chan<- []*types.Log) event.Subscription {
+func (b *VapApiBackend) SubscribeLogsEvent(ch chan<- []*types.Log) event.Subscription {
 	return b.vap.BlockChain().SubscribeLogsEvent(ch)
 }
 
-func (b *EthApiBackend) SendTx(ctx context.Context, signedTx *types.Transaction) error {
+func (b *VapApiBackend) SendTx(ctx context.Context, signedTx *types.Transaction) error {
 	return b.vap.txPool.AddLocal(signedTx)
 }
 
-func (b *EthApiBackend) GetPoolTransactions() (types.Transactions, error) {
+func (b *VapApiBackend) GetPoolTransactions() (types.Transactions, error) {
 	pending, err := b.vap.txPool.Pending()
 	if err != nil {
 		return nil, err
@@ -152,56 +152,56 @@ func (b *EthApiBackend) GetPoolTransactions() (types.Transactions, error) {
 	return txs, nil
 }
 
-func (b *EthApiBackend) GetPoolTransaction(hash common.Hash) *types.Transaction {
+func (b *VapApiBackend) GetPoolTransaction(hash common.Hash) *types.Transaction {
 	return b.vap.txPool.Get(hash)
 }
 
-func (b *EthApiBackend) GetPoolNonce(ctx context.Context, addr common.Address) (uint64, error) {
+func (b *VapApiBackend) GetPoolNonce(ctx context.Context, addr common.Address) (uint64, error) {
 	return b.vap.txPool.State().GetNonce(addr), nil
 }
 
-func (b *EthApiBackend) Stats() (pending int, queued int) {
+func (b *VapApiBackend) Stats() (pending int, queued int) {
 	return b.vap.txPool.Stats()
 }
 
-func (b *EthApiBackend) TxPoolContent() (map[common.Address]types.Transactions, map[common.Address]types.Transactions) {
+func (b *VapApiBackend) TxPoolContent() (map[common.Address]types.Transactions, map[common.Address]types.Transactions) {
 	return b.vap.TxPool().Content()
 }
 
-func (b *EthApiBackend) SubscribeTxPreEvent(ch chan<- core.TxPreEvent) event.Subscription {
+func (b *VapApiBackend) SubscribeTxPreEvent(ch chan<- core.TxPreEvent) event.Subscription {
 	return b.vap.TxPool().SubscribeTxPreEvent(ch)
 }
 
-func (b *EthApiBackend) Downloader() *downloader.Downloader {
+func (b *VapApiBackend) Downloader() *downloader.Downloader {
 	return b.vap.Downloader()
 }
 
-func (b *EthApiBackend) ProtocolVersion() int {
-	return b.vap.EthVersion()
+func (b *VapApiBackend) ProtocolVersion() int {
+	return b.vap.VapVersion()
 }
 
-func (b *EthApiBackend) SuggestPrice(ctx context.Context) (*big.Int, error) {
+func (b *VapApiBackend) SuggestPrice(ctx context.Context) (*big.Int, error) {
 	return b.gpo.SuggestPrice(ctx)
 }
 
-func (b *EthApiBackend) ChainDb() vapdb.Database {
+func (b *VapApiBackend) ChainDb() vapdb.Database {
 	return b.vap.ChainDb()
 }
 
-func (b *EthApiBackend) EventMux() *event.TypeMux {
+func (b *VapApiBackend) EventMux() *event.TypeMux {
 	return b.vap.EventMux()
 }
 
-func (b *EthApiBackend) AccountManager() *accounts.Manager {
+func (b *VapApiBackend) AccountManager() *accounts.Manager {
 	return b.vap.AccountManager()
 }
 
-func (b *EthApiBackend) BloomStatus() (uint64, uint64) {
+func (b *VapApiBackend) BloomStatus() (uint64, uint64) {
 	sections, _, _ := b.vap.bloomIndexer.Sections()
 	return params.BloomBitsBlocks, sections
 }
 
-func (b *EthApiBackend) ServiceFilter(ctx context.Context, session *bloombits.MatcherSession) {
+func (b *VapApiBackend) ServiceFilter(ctx context.Context, session *bloombits.MatcherSession) {
 	for i := 0; i < bloomFilterThreads; i++ {
 		go session.Multiplex(bloomRetrievalBatch, bloomRetrievalWait, b.vap.bloomRequests)
 	}
