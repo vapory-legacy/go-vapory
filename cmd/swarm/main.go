@@ -152,7 +152,7 @@ var (
 	}
 
 	// the following flags are deprecated and should be removed in the future
-	DeprecatedEthAPIFlag = cli.StringFlag{
+	DeprecatedVapAPIFlag = cli.StringFlag{
 		Name:  "vapapi",
 		Usage: "DEPRECATED: please use --ens-api and --swap-api",
 	}
@@ -362,7 +362,7 @@ DEPRECATED: use 'swarm db clean'.
 		SwarmUpFromStdinFlag,
 		SwarmUploadMimeType,
 		//deprecated flags
-		DeprecatedEthAPIFlag,
+		DeprecatedVapAPIFlag,
 	}
 	app.Flags = append(app.Flags, debug.Flags...)
 	app.Before = func(ctx *cli.Context) error {
