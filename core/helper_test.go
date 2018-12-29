@@ -25,7 +25,7 @@ import (
 	"github.com/vaporyco/go-vapory/event"
 )
 
-// Implement our EthTest Manager
+// Implement our VapTest Manager
 type TestManager struct {
 	// stateManager *StateManager
 	eventMux *event.TypeMux
