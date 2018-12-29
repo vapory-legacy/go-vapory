@@ -82,7 +82,7 @@ type Vapory struct {
 	bloomRequests chan chan *bloombits.Retrieval // Channel receiving bloom data retrieval requests
 	bloomIndexer  *core.ChainIndexer             // Bloom indexer operating during block imports
 
-	ApiBackend *EthApiBackend
+	ApiBackend *VapApiBackend
 
 	miner     *miner.Miner
 	gasPrice  *big.Int
