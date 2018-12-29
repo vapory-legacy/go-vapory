@@ -1210,7 +1210,7 @@ func (d *downloaderPeerNotify) registerPeer(p *peer) {
 		manager: pm,
 		peer:    p,
 	}
-	pm.downloader.RegisterLightPeer(p.id, ethVersion, pc)
+	pm.downloader.RegisterLightPeer(p.id, vapVersion, pc)
 }
 
 func (d *downloaderPeerNotify) unregisterPeer(p *peer) {
