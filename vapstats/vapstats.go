@@ -83,7 +83,7 @@ type Service struct {
 }
 
 // New returns a monitoring service ready for stats reporting.
-func New(url string, ethServ *vap.Vapory, lesServ *les.LightVapory) (*Service, error) {
+func New(url string, vapServ *vap.Vapory, lesServ *les.LightVapory) (*Service, error) {
 	// Parse the netstats connection url
 	re := regexp.MustCompile("([^:@]*)(:([^@]*))?@(.+)")
 	parts := re.FindStringSubmatch(url)
@@ -92,13 +92,13 @@ func New(url string, ethServ *vap.Vapory, lesServ *les.LightVapory) (*Service, e
 	}
 	// Assemble and return the stats service
 	var engine consensus.Engine
-	if ethServ != nil {
-		engine = ethServ.Engine()
+	if vapServ != nil {
+		engine = vapServ.Engine()
 	} else {
 		engine = lesServ.Engine()
 	}
 	return &Service{
-		vap:    ethServ,
+		vap:    vapServ,
 		les:    lesServ,
 		engine: engine,
 		node:   parts[1],
