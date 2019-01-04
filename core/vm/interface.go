@@ -23,7 +23,7 @@ import (
 	"github.com/vaporyco/go-vapory/core/types"
 )
 
-// StateDB is an EVM database for full state querying.
+// StateDB is an VVM database for full state querying.
 type StateDB interface {
 	CreateAccount(common.Address)
 
@@ -64,15 +64,15 @@ type StateDB interface {
 	ForEachStorage(common.Address, func(common.Hash, common.Hash) bool)
 }
 
-// CallContext provides a basic interface for the EVM calling conventions. The EVM EVM
-// depends on this context being implemented for doing subcalls and initialising new EVM contracts.
+// CallContext provides a basic interface for the VVM calling conventions. The VVM VVM
+// depends on this context being implemented for doing subcalls and initialising new VVM contracts.
 type CallContext interface {
 	// Call another contract
-	Call(env *EVM, me ContractRef, addr common.Address, data []byte, gas, value *big.Int) ([]byte, error)
+	Call(env *VVM, me ContractRef, addr common.Address, data []byte, gas, value *big.Int) ([]byte, error)
 	// Take another's contract code and execute within our own context
-	CallCode(env *EVM, me ContractRef, addr common.Address, data []byte, gas, value *big.Int) ([]byte, error)
+	CallCode(env *VVM, me ContractRef, addr common.Address, data []byte, gas, value *big.Int) ([]byte, error)
 	// Same as CallCode except sender and value is propagated from parent to child scope
-	DelegateCall(env *EVM, me ContractRef, addr common.Address, data []byte, gas *big.Int) ([]byte, error)
+	DelegateCall(env *VVM, me ContractRef, addr common.Address, data []byte, gas *big.Int) ([]byte, error)
 	// Create a new contract
-	Create(env *EVM, me ContractRef, data []byte, gas, value *big.Int) ([]byte, common.Address, error)
+	Create(env *VVM, me ContractRef, data []byte, gas, value *big.Int) ([]byte, common.Address, error)
 }

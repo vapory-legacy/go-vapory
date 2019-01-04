@@ -15,9 +15,9 @@
 // along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
 // opcountTracer is a sample tracer that just counts the number of instructions
-// executed by the EVM before the transaction terminated.
+// executed by the VVM before the transaction terminated.
 {
-	// count tracks the number of EVM instructions executed.
+	// count tracks the number of VVM instructions executed.
 	count: 0,
 
 	// step is invoked for every opcode that the VM executes.

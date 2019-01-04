@@ -108,12 +108,12 @@ func (b *VapApiBackend) GetTd(blockHash common.Hash) *big.Int {
 	return b.vap.blockchain.GetTdByHash(blockHash)
 }
 
-func (b *VapApiBackend) GetEVM(ctx context.Context, msg core.Message, state *state.StateDB, header *types.Header, vmCfg vm.Config) (*vm.EVM, func() error, error) {
+func (b *VapApiBackend) GetVVM(ctx context.Context, msg core.Message, state *state.StateDB, header *types.Header, vmCfg vm.Config) (*vm.VVM, func() error, error) {
 	state.SetBalance(msg.From(), math.MaxBig256)
 	vmError := func() error { return nil }
 
-	context := core.NewEVMContext(msg, header, b.vap.BlockChain(), nil)
-	return vm.NewEVM(context, state, b.vap.chainConfig, vmCfg), vmError, nil
+	context := core.NewVVMContext(msg, header, b.vap.BlockChain(), nil)
+	return vm.NewVVM(context, state, b.vap.chainConfig, vmCfg), vmError, nil
 }
 
 func (b *VapApiBackend) SubscribeRemovedLogsEvent(ch chan<- core.RemovedLogsEvent) event.Subscription {

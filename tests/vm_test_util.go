@@ -33,7 +33,7 @@ import (
 	"github.com/vaporyco/go-vapory/params"
 )
 
-// VMTest checks EVM execution without block or transaction context.
+// VMTest checks VVM execution without block or transaction context.
 // See https://github.com/vaporyco/tests/wiki/VM-Tests for the test format specification.
 type VMTest struct {
 	json vmJSON
@@ -116,12 +116,12 @@ func (t *VMTest) Run(vmconfig vm.Config) error {
 }
 
 func (t *VMTest) exec(statedb *state.StateDB, vmconfig vm.Config) ([]byte, uint64, error) {
-	evm := t.newEVM(statedb, vmconfig)
+	vvm := t.newVVM(statedb, vmconfig)
 	e := t.json.Exec
-	return evm.Call(vm.AccountRef(e.Caller), e.Address, e.Data, e.GasLimit, e.Value)
+	return vvm.Call(vm.AccountRef(e.Caller), e.Address, e.Data, e.GasLimit, e.Value)
 }
 
-func (t *VMTest) newEVM(statedb *state.StateDB, vmconfig vm.Config) *vm.EVM {
+func (t *VMTest) newVVM(statedb *state.StateDB, vmconfig vm.Config) *vm.VVM {
 	initialCall := true
 	canTransfer := func(db vm.StateDB, address common.Address, amount *big.Int) bool {
 		if initialCall {
@@ -144,7 +144,7 @@ func (t *VMTest) newEVM(statedb *state.StateDB, vmconfig vm.Config) *vm.EVM {
 		GasPrice:    t.json.Exec.GasPrice,
 	}
 	vmconfig.NoRecursion = true
-	return vm.NewEVM(context, statedb, params.MainnetChainConfig, vmconfig)
+	return vm.NewVVM(context, statedb, params.MainnetChainConfig, vmconfig)
 }
 
 func vmTestBlockHash(n uint64) common.Hash {

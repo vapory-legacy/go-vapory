@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/vaporyco/go-vapory/cmd/evm/internal/compiler"
+	"github.com/vaporyco/go-vapory/cmd/vvm/internal/compiler"
 
 	cli "gopkg.in/urfave/cli.v1"
 )
@@ -29,7 +29,7 @@ import (
 var compileCommand = cli.Command{
 	Action:    compileCmd,
 	Name:      "compile",
-	Usage:     "compiles easm source to evm binary",
+	Usage:     "compiles easm source to vvm binary",
 	ArgsUsage: "<file>",
 }
 

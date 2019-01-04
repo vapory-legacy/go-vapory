@@ -27,7 +27,7 @@ import (
 
 	goruntime "runtime"
 
-	"github.com/vaporyco/go-vapory/cmd/evm/internal/compiler"
+	"github.com/vaporyco/go-vapory/cmd/vvm/internal/compiler"
 	"github.com/vaporyco/go-vapory/cmd/utils"
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/core"
@@ -43,9 +43,9 @@ import (
 var runCommand = cli.Command{
 	Action:      runCmd,
 	Name:        "run",
-	Usage:       "run arbitrary evm binary",
+	Usage:       "run arbitrary vvm binary",
 	ArgsUsage:   "<code>",
-	Description: `The run command runs arbitrary EVM code.`,
+	Description: `The run command runs arbitrary VVM code.`,
 }
 
 // readGenesis will read the given JSON format genesis file and return
@@ -158,7 +158,7 @@ func runCmd(ctx *cli.Context) error {
 		GasLimit: initialGas,
 		GasPrice: utils.GlobalBig(ctx, PriceFlag.Name),
 		Value:    utils.GlobalBig(ctx, ValueFlag.Name),
-		EVMConfig: vm.Config{
+		VVMConfig: vm.Config{
 			Tracer:             tracer,
 			Debug:              ctx.GlobalBool(DebugFlag.Name) || ctx.GlobalBool(MachineFlag.Name),
 			DisableGasMetering: ctx.GlobalBool(DisableGasMeteringFlag.Name),
@@ -224,7 +224,7 @@ func runCmd(ctx *cli.Context) error {
 	if ctx.GlobalBool(StatDumpFlag.Name) {
 		var mem goruntime.MemStats
 		goruntime.ReadMemStats(&mem)
-		fmt.Fprintf(os.Stderr, `evm execution time: %v
+		fmt.Fprintf(os.Stderr, `vvm execution time: %v
 heap objects:       %d
 allocations:        %d
 total allocations:  %d
