@@ -159,7 +159,7 @@ func dial(server string, pubkey []byte) (*sshClient, error) {
 }
 
 // init runs some initialization commands on the remote server to ensure it's
-// capable of acting as puppeth target.
+// capable of acting as puppvap target.
 func (client *sshClient) init() error {
 	client.logger.Debug("Verifying if docker is available")
 	if out, err := client.Run("docker version"); err != nil {

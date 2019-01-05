@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with go-vapory. If not, see <http://www.gnu.org/licenses/>.
 
-// puppeth is a command to assemble and maintain private networks.
+// puppvap is a command to assemble and maintain private networks.
 package main
 
 import (
@@ -29,7 +29,7 @@ import (
 // main is just a boring entry point to set up the CLI app.
 func main() {
 	app := cli.NewApp()
-	app.Name = "puppeth"
+	app.Name = "puppvap"
 	app.Usage = "assemble and maintain private Vapory networks"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{

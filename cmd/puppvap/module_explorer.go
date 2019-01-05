@@ -30,7 +30,7 @@ import (
 
 // explorerDockerfile is the Dockerfile required to run a block explorer.
 var explorerDockerfile = `
-FROM puppeth/explorer:latest
+FROM puppvap/explorer:latest
 
 ADD vapstats.json /vapstats.json
 ADD chain.json /chain.json

@@ -46,7 +46,7 @@ var (
 )
 
 // containerInfos is a heavily reduced version of the huge inspection dataset
-// returned from docker inspect, parsed into a form easily usable by puppeth.
+// returned from docker inspect, parsed into a form easily usable by puppvap.
 type containerInfos struct {
 	running bool              // Flag whether the container is running currently
 	envvars map[string]string // Collection of environmental variables set on the container

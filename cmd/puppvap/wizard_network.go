@@ -76,7 +76,7 @@ func (w *wizard) makeServer() string {
 
 	client, err := dial(input, nil)
 	if err != nil {
-		log.Error("Server not ready for puppeth", "err", err)
+		log.Error("Server not ready for puppvap", "err", err)
 		return ""
 	}
 	// All checks passed, start tracking the server

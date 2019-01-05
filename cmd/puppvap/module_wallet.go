@@ -30,7 +30,7 @@ import (
 
 // walletDockerfile is the Dockerfile required to run a web wallet.
 var walletDockerfile = `
-FROM puppeth/wallet:latest
+FROM puppvap/wallet:latest
 
 ADD genesis.json /genesis.json
 
@@ -40,11 +40,11 @@ RUN \
 	echo $'gvap --networkid {{.NetworkID}} --port {{.NodePort}} --bootnodes {{.Bootnodes}} --vapstats \'{{.Vapstats}}\' --cache=512 --rpc --rpcaddr=0.0.0.0 --rpccorsdomain "*"' >> wallet.sh
 
 RUN \
-	sed -i 's/PuppethNetworkID/{{.NetworkID}}/g' dist/js/vaporwallet-master.js && \
-	sed -i 's/PuppethNetwork/{{.Network}}/g'     dist/js/vaporwallet-master.js && \
-	sed -i 's/PuppethDenom/{{.Denom}}/g'         dist/js/vaporwallet-master.js && \
-	sed -i 's/PuppethHost/{{.Host}}/g'           dist/js/vaporwallet-master.js && \
-	sed -i 's/PuppethRPCPort/{{.RPCPort}}/g'     dist/js/vaporwallet-master.js
+	sed -i 's/PuppvapNetworkID/{{.NetworkID}}/g' dist/js/vaporwallet-master.js && \
+	sed -i 's/PuppvapNetwork/{{.Network}}/g'     dist/js/vaporwallet-master.js && \
+	sed -i 's/PuppvapDenom/{{.Denom}}/g'         dist/js/vaporwallet-master.js && \
+	sed -i 's/PuppvapHost/{{.Host}}/g'           dist/js/vaporwallet-master.js && \
+	sed -i 's/PuppvapRPCPort/{{.RPCPort}}/g'     dist/js/vaporwallet-master.js
 
 ENTRYPOINT ["/bin/sh", "wallet.sh"]
 `
