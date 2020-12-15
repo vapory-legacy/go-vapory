@@ -75,7 +75,7 @@ var (
 		executablePath("bootnode"),
 		executablePath("vvm"),
 		executablePath("gvap"),
-		executablePath("puppeth"),
+		executablePath("vappupp"),
 		executablePath("rlpdump"),
 		executablePath("swarm"),
 		executablePath("wnode"),
@@ -100,7 +100,7 @@ var (
 			Description: "Vapory CLI client.",
 		},
 		{
-			Name:        "puppeth",
+			Name:        "vappupp",
 			Description: "Vapory private network manager.",
 		},
 		{

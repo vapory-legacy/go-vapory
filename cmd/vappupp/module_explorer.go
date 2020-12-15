@@ -28,47 +28,66 @@ import (
 	"github.com/vaporyco/go-vapory/log"
 )
 
-// walletDockerfile is the Dockerfile required to run a web wallet.
-var walletDockerfile = `
-FROM puppeth/wallet:latest
+// explorerDockerfile is the Dockerfile required to run a block explorer.
+var explorerDockerfile = `
+FROM vappupp/explorer:latest
 
-ADD genesis.json /genesis.json
-
-RUN \
-  echo 'node server.js &'                     > wallet.sh && \
-	echo 'gvap --cache 512 init /genesis.json' >> wallet.sh && \
-	echo $'gvap --networkid {{.NetworkID}} --port {{.NodePort}} --bootnodes {{.Bootnodes}} --vapstats \'{{.Vapstats}}\' --cache=512 --rpc --rpcaddr=0.0.0.0 --rpccorsdomain "*"' >> wallet.sh
+ADD vapstats.json /vapstats.json
+ADD chain.json /chain.json
 
 RUN \
-	sed -i 's/PuppethNetworkID/{{.NetworkID}}/g' dist/js/vaporwallet-master.js && \
-	sed -i 's/PuppethNetwork/{{.Network}}/g'     dist/js/vaporwallet-master.js && \
-	sed -i 's/PuppethDenom/{{.Denom}}/g'         dist/js/vaporwallet-master.js && \
-	sed -i 's/PuppethHost/{{.Host}}/g'           dist/js/vaporwallet-master.js && \
-	sed -i 's/PuppethRPCPort/{{.RPCPort}}/g'     dist/js/vaporwallet-master.js
+  echo '(cd ../eth-net-intelligence-api && pm2 start /vapstats.json)' >  explorer.sh && \
+	echo '(cd ../vaporchain-light && npm start &)'                      >> explorer.sh && \
+	echo '/parity/parity --chain=/chain.json --port={{.NodePort}} --tracing=on --fat-db=on --pruning=archive' >> explorer.sh
 
-ENTRYPOINT ["/bin/sh", "wallet.sh"]
+ENTRYPOINT ["/bin/sh", "explorer.sh"]
 `
 
-// walletComposefile is the docker-compose.yml file required to deploy and
-// maintain a web wallet.
-var walletComposefile = `
+// explorerVapstats is the configuration file for the vapstats javascript client.
+var explorerVapstats = `[
+  {
+    "name"              : "node-app",
+    "script"            : "app.js",
+    "log_date_format"   : "YYYY-MM-DD HH:mm Z",
+    "merge_logs"        : false,
+    "watch"             : false,
+    "max_restarts"      : 10,
+    "exec_interpreter"  : "node",
+    "exec_mode"         : "fork_mode",
+    "env":
+    {
+      "NODE_ENV"        : "production",
+      "RPC_HOST"        : "localhost",
+      "RPC_PORT"        : "8545",
+      "LISTENING_PORT"  : "{{.Port}}",
+      "INSTANCE_NAME"   : "{{.Name}}",
+      "CONTACT_DETAILS" : "",
+      "WS_SERVER"       : "{{.Host}}",
+      "WS_SECRET"       : "{{.Secret}}",
+      "VERBOSITY"       : 2
+    }
+  }
+]`
+
+// explorerComposefile is the docker-compose.yml file required to deploy and
+// maintain a block explorer.
+var explorerComposefile = `
 version: '2'
 services:
-  wallet:
+  explorer:
     build: .
-    image: {{.Network}}/wallet
+    image: {{.Network}}/explorer
     ports:
       - "{{.NodePort}}:{{.NodePort}}"
-      - "{{.NodePort}}:{{.NodePort}}/udp"
-      - "{{.RPCPort}}:8545"{{if not .VHost}}
-      - "{{.WebPort}}:80"{{end}}
+      - "{{.NodePort}}:{{.NodePort}}/udp"{{if not .VHost}}
+      - "{{.WebPort}}:3000"{{end}}
     volumes:
-      - {{.Datadir}}:/root/.vapory
+      - {{.Datadir}}:/root/.local/share/io.parity.vapory
     environment:
       - NODE_PORT={{.NodePort}}/tcp
       - STATS={{.Vapstats}}{{if .VHost}}
       - VIRTUAL_HOST={{.VHost}}
-      - VIRTUAL_PORT=80{{end}}
+      - VIRTUAL_PORT=3000{{end}}
     logging:
       driver: "json-file"
       options:
@@ -77,40 +96,41 @@ services:
     restart: always
 `
 
-// deployWallet deploys a new web wallet container to a remote machine via SSH,
-// docker and docker-compose. If an instance with the specified network name
+// deployExplorer deploys a new block explorer container to a remote machine via
+// SSH, docker and docker-compose. If an instance with the specified network name
 // already exists there, it will be overwritten!
-func deployWallet(client *sshClient, network string, bootnodes []string, config *walletInfos, nocache bool) ([]byte, error) {
+func deployExplorer(client *sshClient, network string, chainspec []byte, config *explorerInfos, nocache bool) ([]byte, error) {
 	// Generate the content to upload to the server
 	workdir := fmt.Sprintf("%d", rand.Int63())
 	files := make(map[string][]byte)
 
 	dockerfile := new(bytes.Buffer)
-	template.Must(template.New("").Parse(walletDockerfile)).Execute(dockerfile, map[string]interface{}{
-		"Network":   strings.ToTitle(network),
-		"Denom":     strings.ToUpper(network),
-		"NetworkID": config.network,
-		"NodePort":  config.nodePort,
-		"RPCPort":   config.rpcPort,
-		"Bootnodes": strings.Join(bootnodes, ","),
-		"Vapstats":  config.vapstats,
-		"Host":      client.address,
+	template.Must(template.New("").Parse(explorerDockerfile)).Execute(dockerfile, map[string]interface{}{
+		"NodePort": config.nodePort,
 	})
 	files[filepath.Join(workdir, "Dockerfile")] = dockerfile.Bytes()
 
+	vapstats := new(bytes.Buffer)
+	template.Must(template.New("").Parse(explorerVapstats)).Execute(vapstats, map[string]interface{}{
+		"Port":   config.nodePort,
+		"Name":   config.vapstats[:strings.Index(config.vapstats, ":")],
+		"Secret": config.vapstats[strings.Index(config.vapstats, ":")+1 : strings.Index(config.vapstats, "@")],
+		"Host":   config.vapstats[strings.Index(config.vapstats, "@")+1:],
+	})
+	files[filepath.Join(workdir, "vapstats.json")] = vapstats.Bytes()
+
 	composefile := new(bytes.Buffer)
-	template.Must(template.New("").Parse(walletComposefile)).Execute(composefile, map[string]interface{}{
+	template.Must(template.New("").Parse(explorerComposefile)).Execute(composefile, map[string]interface{}{
 		"Datadir":  config.datadir,
 		"Network":  network,
 		"NodePort": config.nodePort,
-		"RPCPort":  config.rpcPort,
 		"VHost":    config.webHost,
 		"WebPort":  config.webPort,
 		"Vapstats": config.vapstats[:strings.Index(config.vapstats, ":")],
 	})
 	files[filepath.Join(workdir, "docker-compose.yaml")] = composefile.Bytes()
 
-	files[filepath.Join(workdir, "genesis.json")] = config.genesis
+	files[filepath.Join(workdir, "chain.json")] = chainspec
 
 	// Upload the deployment files to the remote server (and clean up afterwards)
 	if out, err := client.Upload(files); err != nil {
@@ -125,38 +145,34 @@ func deployWallet(client *sshClient, network string, bootnodes []string, config 
 	return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s up -d --build --force-recreate", workdir, network))
 }
 
-// walletInfos is returned from a web wallet status check to allow reporting
+// explorerInfos is returned from a block explorer status check to allow reporting
 // various configuration parameters.
-type walletInfos struct {
-	genesis  []byte
-	network  int64
+type explorerInfos struct {
 	datadir  string
 	vapstats string
 	nodePort int
-	rpcPort  int
 	webHost  string
 	webPort  int
 }
 
 // Report converts the typed struct into a plain string->string map, containing
 // most - but not all - fields for reporting to the user.
-func (info *walletInfos) Report() map[string]string {
+func (info *explorerInfos) Report() map[string]string {
 	report := map[string]string{
 		"Data directory":         info.datadir,
-		"Vapstats username":      info.vapstats,
 		"Node listener port ":    strconv.Itoa(info.nodePort),
-		"RPC listener port ":     strconv.Itoa(info.rpcPort),
+		"Vapstats username":      info.vapstats,
 		"Website address ":       info.webHost,
 		"Website listener port ": strconv.Itoa(info.webPort),
 	}
 	return report
 }
 
-// checkWallet does a health-check against web wallet server to verify whether
-// it's running, and if yes, whether it's responsive.
-func checkWallet(client *sshClient, network string) (*walletInfos, error) {
-	// Inspect a possible web wallet container on the host
-	infos, err := inspectContainer(client, fmt.Sprintf("%s_wallet_1", network))
+// checkExplorer does a health-check against an block explorer server to verify
+// whether it's running, and if yes, whether it's responsive.
+func checkExplorer(client *sshClient, network string) (*explorerInfos, error) {
+	// Inspect a possible block explorer container on the host
+	infos, err := inspectContainer(client, fmt.Sprintf("%s_explorer_1", network))
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +180,7 @@ func checkWallet(client *sshClient, network string) (*walletInfos, error) {
 		return nil, ErrServiceOffline
 	}
 	// Resolve the port from the host, or the reverse proxy
-	webPort := infos.portmap["80/tcp"]
+	webPort := infos.portmap["3000/tcp"]
 	if webPort == 0 {
 		if proxy, _ := checkNginx(client, network); proxy != nil {
 			webPort = proxy.port
@@ -178,20 +194,15 @@ func checkWallet(client *sshClient, network string) (*walletInfos, error) {
 	if host == "" {
 		host = client.server
 	}
-	// Run a sanity check to see if the devp2p and RPC ports are reachable
+	// Run a sanity check to see if the devp2p is reachable
 	nodePort := infos.portmap[infos.envvars["NODE_PORT"]]
 	if err = checkPort(client.server, nodePort); err != nil {
-		log.Warn(fmt.Sprintf("Wallet devp2p port seems unreachable"), "server", client.server, "port", nodePort, "err", err)
-	}
-	rpcPort := infos.portmap["8545/tcp"]
-	if err = checkPort(client.server, rpcPort); err != nil {
-		log.Warn(fmt.Sprintf("Wallet RPC port seems unreachable"), "server", client.server, "port", rpcPort, "err", err)
+		log.Warn(fmt.Sprintf("Explorer devp2p port seems unreachable"), "server", client.server, "port", nodePort, "err", err)
 	}
 	// Assemble and return the useful infos
-	stats := &walletInfos{
-		datadir:  infos.volumes["/root/.vapory"],
+	stats := &explorerInfos{
+		datadir:  infos.volumes["/root/.local/share/io.parity.vapory"],
 		nodePort: nodePort,
-		rpcPort:  rpcPort,
 		webHost:  host,
 		webPort:  webPort,
 		vapstats: infos.envvars["STATS"],

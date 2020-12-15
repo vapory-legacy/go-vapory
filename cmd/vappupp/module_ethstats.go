@@ -31,7 +31,7 @@ import (
 // vapstatsDockerfile is the Dockerfile required to build an vapstats backend
 // and associated monitoring site.
 var vapstatsDockerfile = `
-FROM puppeth/vapstats:latest
+FROM vappupp/vapstats:latest
 
 RUN echo 'module.exports = {trusted: [{{.Trusted}}], banned: [{{.Banned}}], reserved: ["yournode"]};' > lib/utils/config.js
 `

@@ -36,7 +36,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-// config contains all the configurations needed by puppeth that should be saved
+// config contains all the configurations needed by vappupp that should be saved
 // between sessions.
 type config struct {
 	path      string   // File containing the configuration values
@@ -65,7 +65,7 @@ func (c config) flush() {
 
 	out, _ := json.MarshalIndent(c, "", "  ")
 	if err := ioutil.WriteFile(c.path, out, 0644); err != nil {
-		log.Warn("Failed to save puppeth configs", "file", c.path, "err", err)
+		log.Warn("Failed to save vappupp configs", "file", c.path, "err", err)
 	}
 }
 

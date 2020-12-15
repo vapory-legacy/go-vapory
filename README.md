@@ -39,7 +39,7 @@ The go-vapory project comes with several wrappers/executables found in the `cmd`
 | `gvaprpctest` | Developer utility tool to support our [vapory/rpc-test](https://github.com/vaporyco/rpc-tests) test suite which validates baseline conformity to the [Vapory JSON RPC](https://github.com/vaporyco/wiki/wiki/JSON-RPC) specs. Please see the [test suite's readme](https://github.com/vaporyco/rpc-tests/blob/master/README.md) for details. |
 | `rlpdump` | Developer utility tool to convert binary RLP ([Recursive Length Prefix](https://github.com/vaporyco/wiki/wiki/RLP)) dumps (data encoding used by the Vapory protocol both network as well as consensus wise) to user friendlier hierarchical representation (e.g. `rlpdump --hex CE0183FFFFFFC4C304050583616263`). |
 | `swarm`    | swarm daemon and tools. This is the entrypoint for the swarm network. `swarm --help` for command line options and subcommands. See https://swarm-guide.readthedocs.io for swarm documentation. |
-| `puppeth`    | a CLI wizard that aids in creating a new Vapory network. |
+| `vappupp`    | a CLI wizard that aids in creating a new Vapory network. |
 
 ## Running gvap
 
