@@ -200,10 +200,10 @@ func TestClientSubscribeInvalidArg(t *testing.T) {
 		defer func() {
 			err := recover()
 			if shouldPanic && err == nil {
-				t.Errorf("EthSubscribe should've panicked for %#v", arg)
+				t.Errorf("VapSubscribe should've panicked for %#v", arg)
 			}
 			if !shouldPanic && err != nil {
-				t.Errorf("EthSubscribe shouldn't have panicked for %#v", arg)
+				t.Errorf("VapSubscribe shouldn't have panicked for %#v", arg)
 				buf := make([]byte, 1024*1024)
 				buf = buf[:runtime.Stack(buf, false)]
 				t.Error(err)
@@ -283,7 +283,7 @@ func TestClientSubscribeCustomNamespace(t *testing.T) {
 	}
 }
 
-// In this test, the connection drops while EthSubscribe is
+// In this test, the connection drops while VapSubscribe is
 // waiting for a response.
 func TestClientSubscribeClose(t *testing.T) {
 	service := &NotificationTestService{
@@ -313,13 +313,13 @@ func TestClientSubscribeClose(t *testing.T) {
 	select {
 	case err := <-errc:
 		if err == nil {
-			t.Errorf("EthSubscribe returned nil error after Close")
+			t.Errorf("VapSubscribe returned nil error after Close")
 		}
 		if sub != nil {
-			t.Error("EthSubscribe returned non-nil subscription after Close")
+			t.Error("VapSubscribe returned non-nil subscription after Close")
 		}
 	case <-time.After(1 * time.Second):
-		t.Fatalf("EthSubscribe did not return within 1s after Close")
+		t.Fatalf("VapSubscribe did not return within 1s after Close")
 	}
 }
 

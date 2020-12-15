@@ -95,7 +95,7 @@ func newTester(t *testing.T, confOverride func(*vap.Config)) *tester {
 	if err != nil {
 		t.Fatalf("failed to create node: %v", err)
 	}
-	ethConf := &vap.Config{
+	vapConf := &vap.Config{
 		Genesis:   core.DeveloperGenesisBlock(15, common.Address{}),
 		Vapbase: common.HexToAddress(testAddress),
 		Vapash: vapash.Config{
@@ -105,7 +105,7 @@ func newTester(t *testing.T, confOverride func(*vap.Config)) *tester {
 	if confOverride != nil {
 		confOverride(vapConf)
 	}
-	if err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) { return vap.New(ctx, ethConf) }); err != nil {
+	if err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) { return vap.New(ctx, vapConf) }); err != nil {
 		t.Fatalf("failed to register Vapory protocol: %v", err)
 	}
 	// Start the node and assemble the JavaScript console around it
