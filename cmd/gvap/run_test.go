@@ -39,7 +39,7 @@ type testgvap struct {
 
 	// template variables for expect
 	Datadir   string
-	Etherbase string
+	Vapbase string
 }
 
 func init() {
@@ -74,7 +74,7 @@ func runGvap(t *testing.T, args ...string) *testgvap {
 			}
 		case arg == "-vaporbase" || arg == "--vaporbase":
 			if i < len(args)-1 {
-				tt.Etherbase = args[i+1]
+				tt.Vapbase = args[i+1]
 			}
 		}
 	}

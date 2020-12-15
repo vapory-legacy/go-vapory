@@ -59,7 +59,7 @@ func TestConsoleWelcome(t *testing.T) {
 Welcome to the Gvap JavaScript console!
 
 instance: Gvap/v{{gvapver}}/{{goos}}-{{goarch}}/{{gover}}
-coinbase: {{.Etherbase}}
+coinbase: {{.Vapbase}}
 at block: 0 ({{niltime}})
  datadir: {{.Datadir}}
  modules: {{apis}}
@@ -134,7 +134,7 @@ func testAttachWelcome(t *testing.T, gvap *testgvap, endpoint, apis string) {
 	attach.SetTemplateFunc("goarch", func() string { return runtime.GOARCH })
 	attach.SetTemplateFunc("gover", runtime.Version)
 	attach.SetTemplateFunc("gvapver", func() string { return params.Version })
-	attach.SetTemplateFunc("vaporbase", func() string { return gvap.Etherbase })
+	attach.SetTemplateFunc("vaporbase", func() string { return gvap.Vapbase })
 	attach.SetTemplateFunc("niltime", func() string { return time.Unix(0, 0).Format(time.RFC1123) })
 	attach.SetTemplateFunc("ipc", func() bool { return strings.HasPrefix(endpoint, "ipc") })
 	attach.SetTemplateFunc("datadir", func() string { return gvap.Datadir })

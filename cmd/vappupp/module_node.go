@@ -42,7 +42,7 @@ ADD genesis.json /genesis.json
 RUN \
   echo 'gvap --cache 512 init /genesis.json' > gvap.sh && \{{if .Unlock}}
 	echo 'mkdir -p /root/.vapory/keystore/ && cp /signer.json /root/.vapory/keystore/' >> gvap.sh && \{{end}}
-	echo $'gvap --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --maxpeers {{.Peers}} {{.LightFlag}} --vapstats \'{{.Vapstats}}\' {{if .BootV4}}--bootnodesv4 {{.BootV4}}{{end}} {{if .BootV5}}--bootnodesv5 {{.BootV5}}{{end}} {{if .Etherbase}}--vaporbase {{.Etherbase}} --mine --minerthreads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --targetgaslimit {{.GasTarget}} --gasprice {{.GasPrice}}' >> gvap.sh
+	echo $'gvap --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --maxpeers {{.Peers}} {{.LightFlag}} --vapstats \'{{.Vapstats}}\' {{if .BootV4}}--bootnodesv4 {{.BootV4}}{{end}} {{if .BootV5}}--bootnodesv5 {{.BootV5}}{{end}} {{if .Vapbase}}--vaporbase {{.Vapbase}} --mine --minerthreads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --targetgaslimit {{.GasTarget}} --gasprice {{.GasPrice}}' >> gvap.sh
 
 ENTRYPOINT ["/bin/sh", "gvap.sh"]
 `
@@ -68,7 +68,7 @@ services:
       - TOTAL_PEERS={{.TotalPeers}}
       - LIGHT_PEERS={{.LightPeers}}
       - STATS_NAME={{.Vapstats}}
-      - MINER_NAME={{.Etherbase}}
+      - MINER_NAME={{.Vapbase}}
       - GAS_TARGET={{.GasTarget}}
       - GAS_PRICE={{.GasPrice}}
     logging:
@@ -106,7 +106,7 @@ func deployNode(client *sshClient, network string, bootv4, bootv5 []string, conf
 		"BootV4":    strings.Join(bootv4, ","),
 		"BootV5":    strings.Join(bootv5, ","),
 		"Vapstats":  config.vapstats,
-		"Etherbase": config.vaporbase,
+		"Vapbase": config.vaporbase,
 		"GasTarget": uint64(1000000 * config.gasTarget),
 		"GasPrice":  uint64(1000000000 * config.gasPrice),
 		"Unlock":    config.keyJSON != "",
@@ -125,7 +125,7 @@ func deployNode(client *sshClient, network string, bootv4, bootv5 []string, conf
 		"LightPort":  config.portFull + 1,
 		"LightPeers": config.peersLight,
 		"Vapstats":   config.vapstats[:strings.Index(config.vapstats, ":")],
-		"Etherbase":  config.vaporbase,
+		"Vapbase":  config.vaporbase,
 		"GasTarget":  config.gasTarget,
 		"GasPrice":   config.gasPrice,
 	})

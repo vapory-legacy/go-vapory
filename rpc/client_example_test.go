@@ -66,7 +66,7 @@ func subscribeBlocks(client *rpc.Client, subch chan Block) {
 	defer cancel()
 
 	// Subscribe to new blocks.
-	sub, err := client.EthSubscribe(ctx, subch, "newBlocks")
+	sub, err := client.VapSubscribe(ctx, subch, "newBlocks")
 	if err != nil {
 		fmt.Println("subscribe error:", err)
 		return

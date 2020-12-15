@@ -43,48 +43,48 @@ type VapApiBackend struct {
 }
 
 func (b *VapApiBackend) ChainConfig() *params.ChainConfig {
-	return b.eth.chainConfig
+	return b.vap.chainConfig
 }
 
 func (b *VapApiBackend) CurrentBlock() *types.Block {
-	return b.eth.blockchain.CurrentBlock()
+	return b.vap.blockchain.CurrentBlock()
 }
 
 func (b *VapApiBackend) SetHead(number uint64) {
-	b.eth.protocolManager.downloader.Cancel()
-	b.eth.blockchain.SetHead(number)
+	b.vap.protocolManager.downloader.Cancel()
+	b.vap.blockchain.SetHead(number)
 }
 
 func (b *VapApiBackend) HeaderByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*types.Header, error) {
 	// Pending block is only known by the miner
 	if blockNr == rpc.PendingBlockNumber {
-		block := b.eth.miner.PendingBlock()
+		block := b.vap.miner.PendingBlock()
 		return block.Header(), nil
 	}
 	// Otherwise resolve and return the block
 	if blockNr == rpc.LatestBlockNumber {
-		return b.eth.blockchain.CurrentBlock().Header(), nil
+		return b.vap.blockchain.CurrentBlock().Header(), nil
 	}
-	return b.eth.blockchain.GetHeaderByNumber(uint64(blockNr)), nil
+	return b.vap.blockchain.GetHeaderByNumber(uint64(blockNr)), nil
 }
 
 func (b *VapApiBackend) BlockByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*types.Block, error) {
 	// Pending block is only known by the miner
 	if blockNr == rpc.PendingBlockNumber {
-		block := b.eth.miner.PendingBlock()
+		block := b.vap.miner.PendingBlock()
 		return block, nil
 	}
 	// Otherwise resolve and return the block
 	if blockNr == rpc.LatestBlockNumber {
-		return b.eth.blockchain.CurrentBlock(), nil
+		return b.vap.blockchain.CurrentBlock(), nil
 	}
-	return b.eth.blockchain.GetBlockByNumber(uint64(blockNr)), nil
+	return b.vap.blockchain.GetBlockByNumber(uint64(blockNr)), nil
 }
 
 func (b *VapApiBackend) StateAndHeaderByNumber(ctx context.Context, blockNr rpc.BlockNumber) (*state.StateDB, *types.Header, error) {
 	// Pending state is only known by the miner
 	if blockNr == rpc.PendingBlockNumber {
-		block, state := b.eth.miner.Pending()
+		block, state := b.vap.miner.Pending()
 		return state, block.Header(), nil
 	}
 	// Otherwise resolve the block number and return its state
@@ -92,56 +92,56 @@ func (b *VapApiBackend) StateAndHeaderByNumber(ctx context.Context, blockNr rpc.
 	if header == nil || err != nil {
 		return nil, nil, err
 	}
-	stateDb, err := b.eth.BlockChain().StateAt(header.Root)
+	stateDb, err := b.vap.BlockChain().StateAt(header.Root)
 	return stateDb, header, err
 }
 
 func (b *VapApiBackend) GetBlock(ctx context.Context, blockHash common.Hash) (*types.Block, error) {
-	return b.eth.blockchain.GetBlockByHash(blockHash), nil
+	return b.vap.blockchain.GetBlockByHash(blockHash), nil
 }
 
 func (b *VapApiBackend) GetReceipts(ctx context.Context, blockHash common.Hash) (types.Receipts, error) {
-	return core.GetBlockReceipts(b.eth.chainDb, blockHash, core.GetBlockNumber(b.eth.chainDb, blockHash)), nil
+	return core.GetBlockReceipts(b.vap.chainDb, blockHash, core.GetBlockNumber(b.vap.chainDb, blockHash)), nil
 }
 
 func (b *VapApiBackend) GetTd(blockHash common.Hash) *big.Int {
-	return b.eth.blockchain.GetTdByHash(blockHash)
+	return b.vap.blockchain.GetTdByHash(blockHash)
 }
 
 func (b *VapApiBackend) GetVVM(ctx context.Context, msg core.Message, state *state.StateDB, header *types.Header, vmCfg vm.Config) (*vm.VVM, func() error, error) {
 	state.SetBalance(msg.From(), math.MaxBig256)
 	vmError := func() error { return nil }
 
-	context := core.NewVVMContext(msg, header, b.eth.BlockChain(), nil)
-	return vm.NewVVM(context, state, b.eth.chainConfig, vmCfg), vmError, nil
+	context := core.NewVVMContext(msg, header, b.vap.BlockChain(), nil)
+	return vm.NewVVM(context, state, b.vap.chainConfig, vmCfg), vmError, nil
 }
 
 func (b *VapApiBackend) SubscribeRemovedLogsEvent(ch chan<- core.RemovedLogsEvent) event.Subscription {
-	return b.eth.BlockChain().SubscribeRemovedLogsEvent(ch)
+	return b.vap.BlockChain().SubscribeRemovedLogsEvent(ch)
 }
 
 func (b *VapApiBackend) SubscribeChainEvent(ch chan<- core.ChainEvent) event.Subscription {
-	return b.eth.BlockChain().SubscribeChainEvent(ch)
+	return b.vap.BlockChain().SubscribeChainEvent(ch)
 }
 
 func (b *VapApiBackend) SubscribeChainHeadEvent(ch chan<- core.ChainHeadEvent) event.Subscription {
-	return b.eth.BlockChain().SubscribeChainHeadEvent(ch)
+	return b.vap.BlockChain().SubscribeChainHeadEvent(ch)
 }
 
 func (b *VapApiBackend) SubscribeChainSideEvent(ch chan<- core.ChainSideEvent) event.Subscription {
-	return b.eth.BlockChain().SubscribeChainSideEvent(ch)
+	return b.vap.BlockChain().SubscribeChainSideEvent(ch)
 }
 
 func (b *VapApiBackend) SubscribeLogsEvent(ch chan<- []*types.Log) event.Subscription {
-	return b.eth.BlockChain().SubscribeLogsEvent(ch)
+	return b.vap.BlockChain().SubscribeLogsEvent(ch)
 }
 
 func (b *VapApiBackend) SendTx(ctx context.Context, signedTx *types.Transaction) error {
-	return b.eth.txPool.AddLocal(signedTx)
+	return b.vap.txPool.AddLocal(signedTx)
 }
 
 func (b *VapApiBackend) GetPoolTransactions() (types.Transactions, error) {
-	pending, err := b.eth.txPool.Pending()
+	pending, err := b.vap.txPool.Pending()
 	if err != nil {
 		return nil, err
 	}
@@ -153,31 +153,31 @@ func (b *VapApiBackend) GetPoolTransactions() (types.Transactions, error) {
 }
 
 func (b *VapApiBackend) GetPoolTransaction(hash common.Hash) *types.Transaction {
-	return b.eth.txPool.Get(hash)
+	return b.vap.txPool.Get(hash)
 }
 
 func (b *VapApiBackend) GetPoolNonce(ctx context.Context, addr common.Address) (uint64, error) {
-	return b.eth.txPool.State().GetNonce(addr), nil
+	return b.vap.txPool.State().GetNonce(addr), nil
 }
 
 func (b *VapApiBackend) Stats() (pending int, queued int) {
-	return b.eth.txPool.Stats()
+	return b.vap.txPool.Stats()
 }
 
 func (b *VapApiBackend) TxPoolContent() (map[common.Address]types.Transactions, map[common.Address]types.Transactions) {
-	return b.eth.TxPool().Content()
+	return b.vap.TxPool().Content()
 }
 
 func (b *VapApiBackend) SubscribeTxPreEvent(ch chan<- core.TxPreEvent) event.Subscription {
-	return b.eth.TxPool().SubscribeTxPreEvent(ch)
+	return b.vap.TxPool().SubscribeTxPreEvent(ch)
 }
 
 func (b *VapApiBackend) Downloader() *downloader.Downloader {
-	return b.eth.Downloader()
+	return b.vap.Downloader()
 }
 
 func (b *VapApiBackend) ProtocolVersion() int {
-	return b.eth.EthVersion()
+	return b.vap.VapVersion()
 }
 
 func (b *VapApiBackend) SuggestPrice(ctx context.Context) (*big.Int, error) {
@@ -185,24 +185,24 @@ func (b *VapApiBackend) SuggestPrice(ctx context.Context) (*big.Int, error) {
 }
 
 func (b *VapApiBackend) ChainDb() vapdb.Database {
-	return b.eth.ChainDb()
+	return b.vap.ChainDb()
 }
 
 func (b *VapApiBackend) EventMux() *event.TypeMux {
-	return b.eth.EventMux()
+	return b.vap.EventMux()
 }
 
 func (b *VapApiBackend) AccountManager() *accounts.Manager {
-	return b.eth.AccountManager()
+	return b.vap.AccountManager()
 }
 
 func (b *VapApiBackend) BloomStatus() (uint64, uint64) {
-	sections, _, _ := b.eth.bloomIndexer.Sections()
+	sections, _, _ := b.vap.bloomIndexer.Sections()
 	return params.BloomBitsBlocks, sections
 }
 
 func (b *VapApiBackend) ServiceFilter(ctx context.Context, session *bloombits.MatcherSession) {
 	for i := 0; i < bloomFilterThreads; i++ {
-		go session.Multiplex(bloomRetrievalBatch, bloomRetrievalWait, b.eth.bloomRequests)
+		go session.Multiplex(bloomRetrievalBatch, bloomRetrievalWait, b.vap.bloomRequests)
 	}
 }

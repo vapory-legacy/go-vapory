@@ -103,7 +103,7 @@ func (s *Vapory) AddLesServer(ls LesServer) {
 // initialisation of the common Vapory object)
 func New(ctx *node.ServiceContext, config *Config) (*Vapory, error) {
 	if config.SyncMode == downloader.LightSync {
-		return nil, errors.New("can't run eth.Vapory in light sync mode, use les.LightVapory")
+		return nil, errors.New("can't run vap.Vapory in light sync mode, use les.LightVapory")
 	}
 	if !config.SyncMode.IsValid() {
 		return nil, fmt.Errorf("invalid sync mode %d", config.SyncMode)
@@ -130,7 +130,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Vapory, error) {
 		stopDbUpgrade:  stopDbUpgrade,
 		networkId:      config.NetworkId,
 		gasPrice:       config.GasPrice,
-		vaporbase:      config.Etherbase,
+		vaporbase:      config.Vapbase,
 		bloomRequests:  make(chan chan *bloombits.Retrieval),
 		bloomIndexer:   NewBloomIndexer(chainDb, params.BloomBitsBlocks),
 	}
@@ -146,35 +146,35 @@ func New(ctx *node.ServiceContext, config *Config) (*Vapory, error) {
 	}
 
 	vmConfig := vm.Config{EnablePreimageRecording: config.EnablePreimageRecording}
-	eth.blockchain, err = core.NewBlockChain(chainDb, eth.chainConfig, eth.engine, vmConfig)
+	vap.blockchain, err = core.NewBlockChain(chainDb, vap.chainConfig, vap.engine, vmConfig)
 	if err != nil {
 		return nil, err
 	}
 	// Rewind the chain in case of an incompatible config upgrade.
 	if compat, ok := genesisErr.(*params.ConfigCompatError); ok {
 		log.Warn("Rewinding chain to upgrade configuration", "err", compat)
-		eth.blockchain.SetHead(compat.RewindTo)
+		vap.blockchain.SetHead(compat.RewindTo)
 		core.WriteChainConfig(chainDb, genesisHash, chainConfig)
 	}
-	eth.bloomIndexer.Start(eth.blockchain)
+	vap.bloomIndexer.Start(vap.blockchain)
 
 	if config.TxPool.Journal != "" {
 		config.TxPool.Journal = ctx.ResolvePath(config.TxPool.Journal)
 	}
-	eth.txPool = core.NewTxPool(config.TxPool, eth.chainConfig, eth.blockchain)
+	vap.txPool = core.NewTxPool(config.TxPool, vap.chainConfig, vap.blockchain)
 
-	if eth.protocolManager, err = NewProtocolManager(eth.chainConfig, config.SyncMode, config.NetworkId, eth.eventMux, eth.txPool, eth.engine, eth.blockchain, chainDb); err != nil {
+	if vap.protocolManager, err = NewProtocolManager(vap.chainConfig, config.SyncMode, config.NetworkId, vap.eventMux, vap.txPool, vap.engine, vap.blockchain, chainDb); err != nil {
 		return nil, err
 	}
-	eth.miner = miner.New(eth, eth.chainConfig, eth.EventMux(), eth.engine)
-	eth.miner.SetExtra(makeExtraData(config.ExtraData))
+	vap.miner = miner.New(vap, vap.chainConfig, vap.EventMux(), vap.engine)
+	vap.miner.SetExtra(makeExtraData(config.ExtraData))
 
-	eth.ApiBackend = &VapApiBackend{eth, nil}
+	vap.ApiBackend = &VapApiBackend{eth, nil}
 	gpoParams := config.GPO
 	if gpoParams.Default == nil {
 		gpoParams.Default = config.GasPrice
 	}
-	eth.ApiBackend.gpo = gasprice.NewOracle(eth.ApiBackend, gpoParams)
+	vap.ApiBackend.gpo = gasprice.NewOracle(vap.ApiBackend, gpoParams)
 
 	return eth, nil
 }
@@ -300,7 +300,7 @@ func (s *Vapory) ResetWithGenesisBlock(gb *types.Block) {
 	s.blockchain.ResetWithGenesisBlock(gb)
 }
 
-func (s *Vapory) Etherbase() (eb common.Address, err error) {
+func (s *Vapory) Vapbase() (eb common.Address, err error) {
 	s.lock.RLock()
 	vaporbase := s.vaporbase
 	s.lock.RUnlock()
@@ -316,7 +316,7 @@ func (s *Vapory) Etherbase() (eb common.Address, err error) {
 			s.vaporbase = vaporbase
 			s.lock.Unlock()
 
-			log.Info("Etherbase automatically configured", "address", vaporbase)
+			log.Info("Vapbase automatically configured", "address", vaporbase)
 			return vaporbase, nil
 		}
 	}
@@ -324,16 +324,16 @@ func (s *Vapory) Etherbase() (eb common.Address, err error) {
 }
 
 // set in js console via admin interface or wrapper from cli flags
-func (self *Vapory) SetEtherbase(vaporbase common.Address) {
+func (self *Vapory) SetVapbase(vaporbase common.Address) {
 	self.lock.Lock()
 	self.vaporbase = vaporbase
 	self.lock.Unlock()
 
-	self.miner.SetEtherbase(vaporbase)
+	self.miner.SetVapbase(vaporbase)
 }
 
 func (s *Vapory) StartMining(local bool) error {
-	eb, err := s.Etherbase()
+	eb, err := s.Vapbase()
 	if err != nil {
 		log.Error("Cannot start mining without vaporbase", "err", err)
 		return fmt.Errorf("vaporbase missing: %v", err)
@@ -341,7 +341,7 @@ func (s *Vapory) StartMining(local bool) error {
 	if clique, ok := s.engine.(*clique.Clique); ok {
 		wallet, err := s.accountManager.Find(accounts.Account{Address: eb})
 		if wallet == nil || err != nil {
-			log.Error("Etherbase account unavailable locally", "err", err)
+			log.Error("Vapbase account unavailable locally", "err", err)
 			return fmt.Errorf("signer missing: %v", err)
 		}
 		clique.Authorize(eb, wallet.SignHash)

@@ -62,7 +62,7 @@ type ReleaseService struct {
 func NewReleaseService(ctx *node.ServiceContext, config Config) (node.Service, error) {
 	// Retrieve the Vapory service dependency to access the blockchain
 	var apiBackend vapapi.Backend
-	var vapory *eth.Vapory
+	var vapory *vap.Vapory
 	if err := ctx.Service(&vapory); err == nil {
 		apiBackend = vapory.ApiBackend
 	} else {
@@ -74,7 +74,7 @@ func NewReleaseService(ctx *node.ServiceContext, config Config) (node.Service, e
 		}
 	}
 	// Construct the release service
-	contract, err := NewReleaseOracle(config.Oracle, eth.NewContractBackend(apiBackend))
+	contract, err := NewReleaseOracle(config.Oracle, vap.NewContractBackend(apiBackend))
 	if err != nil {
 		return nil, err
 	}

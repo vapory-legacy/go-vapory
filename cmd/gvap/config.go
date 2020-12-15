@@ -77,7 +77,7 @@ type vapstatsConfig struct {
 }
 
 type gvapConfig struct {
-	Eth       eth.Config
+	Eth       vap.Config
 	Shh       whisper.Config
 	Node      node.Config
 	Vapstats  vapstatsConfig
@@ -112,7 +112,7 @@ func defaultNodeConfig() node.Config {
 func makeConfigNode(ctx *cli.Context) (*node.Node, gvapConfig) {
 	// Load defaults.
 	cfg := gvapConfig{
-		Eth:       eth.DefaultConfig,
+		Eth:       vap.DefaultConfig,
 		Shh:       whisper.DefaultConfig,
 		Node:      defaultNodeConfig(),
 		Dashboard: dashboard.DefaultConfig,
@@ -131,7 +131,7 @@ func makeConfigNode(ctx *cli.Context) (*node.Node, gvapConfig) {
 	if err != nil {
 		utils.Fatalf("Failed to create the protocol stack: %v", err)
 	}
-	utils.SetEthConfig(ctx, stack, &cfg.Eth)
+	utils.SetEthConfig(ctx, stack, &cfg.Vap)
 	if ctx.GlobalIsSet(utils.VapStatsURLFlag.Name) {
 		cfg.Vapstats.URL = ctx.GlobalString(utils.VapStatsURLFlag.Name)
 	}
@@ -155,7 +155,7 @@ func enableWhisper(ctx *cli.Context) bool {
 func makeFullNode(ctx *cli.Context) *node.Node {
 	stack, cfg := makeConfigNode(ctx)
 
-	utils.RegisterEthService(stack, &cfg.Eth)
+	utils.RegisterEthService(stack, &cfg.Vap)
 
 	if ctx.GlobalBool(utils.DashboardEnabledFlag.Name) {
 		utils.RegisterDashboardService(stack, &cfg.Dashboard, gitCommit)
@@ -200,8 +200,8 @@ func dumpConfig(ctx *cli.Context) error {
 	_, cfg := makeConfigNode(ctx)
 	comment := ""
 
-	if cfg.Eth.Genesis != nil {
-		cfg.Eth.Genesis = nil
+	if cfg.Vap.Genesis != nil {
+		cfg.Vap.Genesis = nil
 		comment += "# Note: this config doesn't contain the genesis block.\n\n"
 	}
 

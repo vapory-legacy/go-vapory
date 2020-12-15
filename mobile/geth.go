@@ -144,7 +144,7 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 	}
 	// Register the Vapory protocol if requested
 	if config.VaporyEnabled {
-		ethConf := eth.DefaultConfig
+		ethConf := vap.DefaultConfig
 		ethConf.Genesis = genesis
 		ethConf.SyncMode = downloader.LightSync
 		ethConf.NetworkId = uint64(config.VaporyNetworkID)
