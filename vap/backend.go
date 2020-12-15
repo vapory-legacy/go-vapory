@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package eth implements the Vapory protocol.
-package eth
+// Package vap implements the Vapory protocol.
+package vap
 
 import (
 	"errors"
@@ -119,7 +119,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Vapory, error) {
 	}
 	log.Info("Initialised chain configuration", "config", chainConfig)
 
-	eth := &Vapory{
+	vap := &Vapory{
 		config:         config,
 		chainDb:        chainDb,
 		chainConfig:    chainConfig,
@@ -169,14 +169,14 @@ func New(ctx *node.ServiceContext, config *Config) (*Vapory, error) {
 	vap.miner = miner.New(vap, vap.chainConfig, vap.EventMux(), vap.engine)
 	vap.miner.SetExtra(makeExtraData(config.ExtraData))
 
-	vap.ApiBackend = &VapApiBackend{eth, nil}
+	vap.ApiBackend = &VapApiBackend{vap, nil}
 	gpoParams := config.GPO
 	if gpoParams.Default == nil {
 		gpoParams.Default = config.GasPrice
 	}
 	vap.ApiBackend.gpo = gasprice.NewOracle(vap.ApiBackend, gpoParams)
 
-	return eth, nil
+	return vap, nil
 }
 
 func makeExtraData(extra []byte) []byte {
@@ -203,7 +203,7 @@ func CreateDB(ctx *node.ServiceContext, config *Config, name string) (vapdb.Data
 		return nil, err
 	}
 	if db, ok := db.(*vapdb.LDBDatabase); ok {
-		db.Meter("eth/db/chaindata/")
+		db.Meter("vap/db/chaindata/")
 	}
 	return db, nil
 }
@@ -250,17 +250,17 @@ func (s *Vapory) APIs() []rpc.API {
 	// Append all the local APIs and return
 	return append(apis, []rpc.API{
 		{
-			Namespace: "eth",
+			Namespace: "vap",
 			Version:   "1.0",
 			Service:   NewPublicVaporyAPI(s),
 			Public:    true,
 		}, {
-			Namespace: "eth",
+			Namespace: "vap",
 			Version:   "1.0",
 			Service:   NewPublicMinerAPI(s),
 			Public:    true,
 		}, {
-			Namespace: "eth",
+			Namespace: "vap",
 			Version:   "1.0",
 			Service:   downloader.NewPublicDownloaderAPI(s.protocolManager.downloader, s.eventMux),
 			Public:    true,
@@ -270,7 +270,7 @@ func (s *Vapory) APIs() []rpc.API {
 			Service:   NewPrivateMinerAPI(s),
 			Public:    false,
 		}, {
-			Namespace: "eth",
+			Namespace: "vap",
 			Version:   "1.0",
 			Service:   filters.NewPublicFilterAPI(s.ApiBackend, false),
 			Public:    true,
@@ -368,7 +368,7 @@ func (s *Vapory) EventMux() *event.TypeMux           { return s.eventMux }
 func (s *Vapory) Engine() consensus.Engine           { return s.engine }
 func (s *Vapory) ChainDb() vapdb.Database            { return s.chainDb }
 func (s *Vapory) IsListening() bool                  { return true } // Always listening
-func (s *Vapory) EthVersion() int                    { return int(s.protocolManager.SubProtocols[0].Version) }
+func (s *Vapory) VapVersion() int                    { return int(s.protocolManager.SubProtocols[0].Version) }
 func (s *Vapory) NetVersion() uint64                 { return s.networkId }
 func (s *Vapory) Downloader() *downloader.Downloader { return s.protocolManager.downloader }
 

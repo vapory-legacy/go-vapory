@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
-package eth
+package vap
 
 import (
 	"compress/gzip"
@@ -201,13 +201,13 @@ func (api *PrivateMinerAPI) GetHashrate() uint64 {
 // PrivateAdminAPI is the collection of Vapory full node-related APIs
 // exposed over the private admin endpoint.
 type PrivateAdminAPI struct {
-	eth *Vapory
+	vap *Vapory
 }
 
 // NewPrivateAdminAPI creates a new API definition for the full node private
 // admin methods of the Vapory service.
 func NewPrivateAdminAPI(vap *Vapory) *PrivateAdminAPI {
-	return &PrivateAdminAPI{eth: eth}
+	return &PrivateAdminAPI{vap: vap}
 }
 
 // ExportChain exports the current blockchain into a local file.
@@ -294,13 +294,13 @@ func (api *PrivateAdminAPI) ImportChain(file string) (bool, error) {
 // PublicDebugAPI is the collection of Vapory full node APIs exposed
 // over the public debugging endpoint.
 type PublicDebugAPI struct {
-	eth *Vapory
+	vap *Vapory
 }
 
 // NewPublicDebugAPI creates a new API definition for the full node-
 // related public debug methods of the Vapory service.
 func NewPublicDebugAPI(vap *Vapory) *PublicDebugAPI {
-	return &PublicDebugAPI{eth: eth}
+	return &PublicDebugAPI{vap: vap}
 }
 
 // DumpBlock retrieves the entire state of the database at a given block.
@@ -332,13 +332,13 @@ func (api *PublicDebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error
 // the private debugging endpoint.
 type PrivateDebugAPI struct {
 	config *params.ChainConfig
-	eth    *Vapory
+	vap    *Vapory
 }
 
 // NewPrivateDebugAPI creates a new API definition for the full node-related
 // private debug methods of the Vapory service.
-func NewPrivateDebugAPI(config *params.ChainConfig, eth *Vapory) *PrivateDebugAPI {
-	return &PrivateDebugAPI{config: config, eth: eth}
+func NewPrivateDebugAPI(config *params.ChainConfig, vap *Vapory) *PrivateDebugAPI {
+	return &PrivateDebugAPI{config: config, vap: vap}
 }
 
 // Preimage is a debug API function that returns the preimage for a sha3 hash, if known.

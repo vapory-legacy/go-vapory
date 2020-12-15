@@ -50,7 +50,7 @@ type Miner struct {
 
 	coinbase common.Address
 	mining   int32
-	eth      Backend
+	vap      Backend
 	engine   consensus.Engine
 
 	canStart    int32 // can start indicates whether we can start the mining operation
@@ -62,7 +62,7 @@ func New(vap Backend, config *params.ChainConfig, mux *event.TypeMux, engine con
 		vap:      vap,
 		mux:      mux,
 		engine:   engine,
-		worker:   newWorker(config, engine, common.Address{}, eth, mux),
+		worker:   newWorker(config, engine, common.Address{}, vap, mux),
 		canStart: 1,
 	}
 	miner.Register(NewCpuAgent(vap.BlockChain(), engine))

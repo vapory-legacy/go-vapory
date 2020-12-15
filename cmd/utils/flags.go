@@ -967,8 +967,8 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node, cfg *whisper.Config) {
 	}
 }
 
-// SetEthConfig applies eth-related command line flags to the config.
-func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *vap.Config) {
+// SetVapConfig applies eth-related command line flags to the config.
+func SetVapConfig(ctx *cli.Context, stack *node.Node, cfg *vap.Config) {
 	// Avoid conflicting network flags
 	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag)
 	checkExclusive(ctx, FastSyncFlag, LightModeFlag, SyncModeFlag)
@@ -1071,8 +1071,8 @@ func SetDashboardConfig(ctx *cli.Context, cfg *dashboard.Config) {
 	cfg.Assets = ctx.GlobalString(DashboardAssetsFlag.Name)
 }
 
-// RegisterEthService adds an Vapory client to the stack.
-func RegisterEthService(stack *node.Node, cfg *vap.Config) {
+// RegisterVapService adds an Vapory client to the stack.
+func RegisterVapService(stack *node.Node, cfg *vap.Config) {
 	var err error
 	if cfg.SyncMode == downloader.LightSync {
 		err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {

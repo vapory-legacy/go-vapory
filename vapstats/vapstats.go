@@ -70,7 +70,7 @@ type blockChain interface {
 // chain statistics up to a monitoring server.
 type Service struct {
 	server *p2p.Server        // Peer-to-peer server to retrieve networking infos
-	eth    *vap.Vapory      // Full Vapory service if monitoring a full node
+	vap    *vap.Vapory      // Full Vapory service if monitoring a full node
 	les    *les.LightVapory // Light Vapory service if monitoring a light node
 	engine consensus.Engine   // Consensus engine to retrieve variadic block fields
 
@@ -83,7 +83,7 @@ type Service struct {
 }
 
 // New returns a monitoring service ready for stats reporting.
-func New(url string, ethServ *vap.Vapory, lesServ *les.LightVapory) (*Service, error) {
+func New(url string, vapServ *vap.Vapory, lesServ *les.LightVapory) (*Service, error) {
 	// Parse the netstats connection url
 	re := regexp.MustCompile("([^:@]*)(:([^@]*))?@(.+)")
 	parts := re.FindStringSubmatch(url)
@@ -92,13 +92,13 @@ func New(url string, ethServ *vap.Vapory, lesServ *les.LightVapory) (*Service, e
 	}
 	// Assemble and return the stats service
 	var engine consensus.Engine
-	if ethServ != nil {
-		engine = ethServ.Engine()
+	if vapServ != nil {
+		engine = vapServ.Engine()
 	} else {
 		engine = lesServ.Engine()
 	}
 	return &Service{
-		eth:    ethServ,
+		vap:    vapServ,
 		les:    lesServ,
 		engine: engine,
 		node:   parts[1],
@@ -373,9 +373,9 @@ func (s *Service) login(conn *websocket.Conn) error {
 	infos := s.server.NodeInfo()
 
 	var network, protocol string
-	if info := infos.Protocols["eth"]; info != nil {
+	if info := infos.Protocols["vap"]; info != nil {
 		network = fmt.Sprintf("%d", info.(*vap.NodeInfo).Network)
-		protocol = fmt.Sprintf("eth/%d", vap.ProtocolVersions[0])
+		protocol = fmt.Sprintf("vap/%d", vap.ProtocolVersions[0])
 	} else {
 		network = fmt.Sprintf("%d", infos.Protocols["les"].(*les.NodeInfo).Network)
 		protocol = fmt.Sprintf("les/%d", les.ClientProtocolVersions[0])

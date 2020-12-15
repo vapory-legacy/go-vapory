@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package eth implements the Vapory protocol.
-package eth
+// Package vap implements the Vapory protocol.
+package vap
 
 import (
 	"bytes"

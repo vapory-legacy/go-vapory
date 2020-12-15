@@ -91,7 +91,7 @@ func New(ctx *node.ServiceContext, config *vap.Config) (*LightVapory, error) {
 	peers := newPeerSet()
 	quitSync := make(chan struct{})
 
-	leth := &LightVapory{
+	lvap := &LightVapory{
 		chainConfig:      chainConfig,
 		chainDb:          chainDb,
 		eventMux:         ctx.EventMux,
@@ -126,13 +126,13 @@ func New(ctx *node.ServiceContext, config *vap.Config) (*LightVapory, error) {
 	if lvap.protocolManager, err = NewProtocolManager(lvap.chainConfig, true, ClientProtocolVersions, config.NetworkId, lvap.eventMux, lvap.engine, lvap.peers, lvap.blockchain, nil, chainDb, lvap.odr, lvap.relay, quitSync, &lvap.wg); err != nil {
 		return nil, err
 	}
-	lvap.ApiBackend = &LesApiBackend{leth, nil}
+	lvap.ApiBackend = &LesApiBackend{lvap, nil}
 	gpoParams := config.GPO
 	if gpoParams.Default == nil {
 		gpoParams.Default = config.GasPrice
 	}
 	lvap.ApiBackend.gpo = gasprice.NewOracle(lvap.ApiBackend, gpoParams)
-	return leth, nil
+	return lvap, nil
 }
 
 func lesTopic(genesisHash common.Hash, protocolVersion uint) discv5.Topic {
@@ -175,17 +175,17 @@ func (s *LightDummyAPI) Mining() bool {
 func (s *LightVapory) APIs() []rpc.API {
 	return append(vapapi.GetAPIs(s.ApiBackend), []rpc.API{
 		{
-			Namespace: "eth",
+			Namespace: "vap",
 			Version:   "1.0",
 			Service:   &LightDummyAPI{},
 			Public:    true,
 		}, {
-			Namespace: "eth",
+			Namespace: "vap",
 			Version:   "1.0",
 			Service:   downloader.NewPublicDownloaderAPI(s.protocolManager.downloader, s.eventMux),
 			Public:    true,
 		}, {
-			Namespace: "eth",
+			Namespace: "vap",
 			Version:   "1.0",
 			Service:   filters.NewPublicFilterAPI(s.ApiBackend, true),
 			Public:    true,

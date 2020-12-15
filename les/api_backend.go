@@ -38,7 +38,7 @@ import (
 )
 
 type LesApiBackend struct {
-	eth *LightVapory
+	vap *LightVapory
 	gpo *gasprice.Oracle
 }
 
