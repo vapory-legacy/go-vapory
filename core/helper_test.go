@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/event"
 )
 
@@ -30,7 +30,7 @@ type TestManager struct {
 	// stateManager *StateManager
 	eventMux *event.TypeMux
 
-	db         ethdb.Database
+	db         vapdb.Database
 	txPool     *TxPool
 	blockChain *BlockChain
 	Blocks     []*types.Block
@@ -72,12 +72,12 @@ func (tm *TestManager) EventMux() *event.TypeMux {
 // 	return nil
 // }
 
-func (tm *TestManager) Db() ethdb.Database {
+func (tm *TestManager) Db() vapdb.Database {
 	return tm.db
 }
 
 func NewTestManager() *TestManager {
-	db, err := ethdb.NewMemDatabase()
+	db, err := vapdb.NewMemDatabase()
 	if err != nil {
 		fmt.Println("Could not create mem-db, failing")
 		return nil

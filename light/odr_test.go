@@ -32,7 +32,7 @@ import (
 	"github.com/vaporyco/go-vapory/core/types"
 	"github.com/vaporyco/go-vapory/core/vm"
 	"github.com/vaporyco/go-vapory/crypto"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/params"
 	"github.com/vaporyco/go-vapory/rlp"
 	"github.com/vaporyco/go-vapory/trie"
@@ -54,11 +54,11 @@ var (
 
 type testOdr struct {
 	OdrBackend
-	sdb, ldb ethdb.Database
+	sdb, ldb vapdb.Database
 	disable  bool
 }
 
-func (odr *testOdr) Database() ethdb.Database {
+func (odr *testOdr) Database() vapdb.Database {
 	return odr.ldb
 }
 
@@ -85,11 +85,11 @@ func (odr *testOdr) Retrieve(ctx context.Context, req OdrRequest) error {
 	return nil
 }
 
-type odrTestFn func(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error)
+type odrTestFn func(ctx context.Context, db vapdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error)
 
 func TestOdrGetBlockLes1(t *testing.T) { testChainOdr(t, 1, odrGetBlock) }
 
-func odrGetBlock(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
+func odrGetBlock(ctx context.Context, db vapdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
 	var block *types.Block
 	if bc != nil {
 		block = bc.GetBlockByHash(bhash)
@@ -105,7 +105,7 @@ func odrGetBlock(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc
 
 func TestOdrGetReceiptsLes1(t *testing.T) { testChainOdr(t, 1, odrGetReceipts) }
 
-func odrGetReceipts(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
+func odrGetReceipts(ctx context.Context, db vapdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
 	var receipts types.Receipts
 	if bc != nil {
 		receipts = core.GetBlockReceipts(db, bhash, core.GetBlockNumber(db, bhash))
@@ -121,7 +121,7 @@ func odrGetReceipts(ctx context.Context, db ethdb.Database, bc *core.BlockChain,
 
 func TestOdrAccountsLes1(t *testing.T) { testChainOdr(t, 1, odrAccounts) }
 
-func odrAccounts(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
+func odrAccounts(ctx context.Context, db vapdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
 	dummyAddr := common.HexToAddress("1234567812345678123456781234567812345678")
 	acc := []common.Address{testBankAddress, acc1Addr, acc2Addr, dummyAddr}
 
@@ -151,7 +151,7 @@ type callmsg struct {
 
 func (callmsg) CheckNonce() bool { return false }
 
-func odrContractCall(ctx context.Context, db ethdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
+func odrContractCall(ctx context.Context, db vapdb.Database, bc *core.BlockChain, lc *LightChain, bhash common.Hash) ([]byte, error) {
 	data := common.Hex2Bytes("60CD26850000000000000000000000000000000000000000000000000000000000000000")
 	config := params.TestChainConfig
 
@@ -177,8 +177,8 @@ func odrContractCall(ctx context.Context, db ethdb.Database, bc *core.BlockChain
 		// Perform read-only call.
 		st.SetBalance(testBankAddress, math.MaxBig256)
 		msg := callmsg{types.NewMessage(testBankAddress, &testContractAddr, 0, new(big.Int), 1000000, new(big.Int), data, false)}
-		context := core.NewEVMContext(msg, header, chain, nil)
-		vmenv := vm.NewEVM(context, st, config, vm.Config{})
+		context := core.NewVVMContext(msg, header, chain, nil)
+		vmenv := vm.NewVVM(context, st, config, vm.Config{})
 		gp := new(core.GasPool).AddGas(math.MaxUint64)
 		ret, _, _, _ := core.ApplyMessage(vmenv, msg, gp)
 		res = append(res, ret...)
@@ -232,8 +232,8 @@ func testChainGen(i int, block *core.BlockGen) {
 
 func testChainOdr(t *testing.T, protocol int, fn odrTestFn) {
 	var (
-		sdb, _  = ethdb.NewMemDatabase()
-		ldb, _  = ethdb.NewMemDatabase()
+		sdb, _  = vapdb.NewMemDatabase()
+		ldb, _  = vapdb.NewMemDatabase()
 		gspec   = core.Genesis{Alloc: core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
 		genesis = gspec.MustCommit(sdb)
 	)

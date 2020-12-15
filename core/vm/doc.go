@@ -17,7 +17,7 @@
 /*
 Package vm implements the Vapory Virtual Machine.
 
-The vm package implements two EVMs, a byte code VM and a JIT VM. The BC
+The vm package implements two VVMs, a byte code VM and a JIT VM. The BC
 (Byte Code) VM loops over a set of bytes and executes them according to the set
 of rules defined in the Vapory yellow paper. When the BC VM is invoked it
 invokes the JIT VM in a separate goroutine and compiles the byte code in JIT

@@ -26,7 +26,7 @@ import (
 	"github.com/vaporyco/go-vapory/core"
 	"github.com/vaporyco/go-vapory/core/state"
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/event"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/params"
@@ -58,7 +58,7 @@ type TxPool struct {
 	mu           sync.RWMutex
 	chain        *LightChain
 	odr          OdrBackend
-	chainDb      ethdb.Database
+	chainDb      vapdb.Database
 	relay        TxRelayBackend
 	head         common.Hash
 	nonce        map[common.Address]uint64            // "pending" nonce

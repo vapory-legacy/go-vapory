@@ -25,7 +25,7 @@ import (
 	"github.com/vaporyco/go-vapory/consensus/vapash"
 	"github.com/vaporyco/go-vapory/core"
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/params"
 )
 
@@ -36,7 +36,7 @@ var (
 )
 
 // makeHeaderChain creates a deterministic chain of headers rooted at parent.
-func makeHeaderChain(parent *types.Header, n int, db ethdb.Database, seed int) []*types.Header {
+func makeHeaderChain(parent *types.Header, n int, db vapdb.Database, seed int) []*types.Header {
 	blocks, _ := core.GenerateChain(params.TestChainConfig, types.NewBlockWithHeader(parent), vapash.NewFaker(), db, n, func(i int, b *core.BlockGen) {
 		b.SetCoinbase(common.Address{0: byte(seed), 19: byte(i)})
 	})
@@ -50,8 +50,8 @@ func makeHeaderChain(parent *types.Header, n int, db ethdb.Database, seed int) [
 // newCanonical creates a chain database, and injects a deterministic canonical
 // chain. Depending on the full flag, if creates either a full block chain or a
 // header only chain.
-func newCanonical(n int) (ethdb.Database, *LightChain, error) {
-	db, _ := ethdb.NewMemDatabase()
+func newCanonical(n int) (vapdb.Database, *LightChain, error) {
+	db, _ := vapdb.NewMemDatabase()
 	gspec := core.Genesis{Config: params.TestChainConfig}
 	genesis := gspec.MustCommit(db)
 	blockchain, _ := NewLightChain(&dummyOdr{db: db}, gspec.Config, vapash.NewFaker())
@@ -68,7 +68,7 @@ func newCanonical(n int) (ethdb.Database, *LightChain, error) {
 
 // newTestLightChain creates a LightChain that doesn't validate anything.
 func newTestLightChain() *LightChain {
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	gspec := &core.Genesis{
 		Difficulty: big.NewInt(1),
 		Config:     params.TestChainConfig,
@@ -264,10 +264,10 @@ func makeHeaderChainWithDiff(genesis *types.Block, d []int, seed byte) []*types.
 
 type dummyOdr struct {
 	OdrBackend
-	db ethdb.Database
+	db vapdb.Database
 }
 
-func (odr *dummyOdr) Database() ethdb.Database {
+func (odr *dummyOdr) Database() vapdb.Database {
 	return odr.db
 }
 

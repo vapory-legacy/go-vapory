@@ -36,7 +36,7 @@ func (w *wizard) networkStats() {
 		return
 	}
 	// Clear out some previous configs to refill from current scan
-	w.conf.ethstats = ""
+	w.conf.vapstats = ""
 	w.conf.bootFull = w.conf.bootFull[:0]
 	w.conf.bootLight = w.conf.bootLight[:0]
 
@@ -75,7 +75,7 @@ func (w *wizard) gatherStats(server string, pubkey []byte, client *sshClient) *s
 	// Gather some global stats to feed into the wizard
 	var (
 		genesis   string
-		ethstats  string
+		vapstats  string
 		bootFull  []string
 		bootLight []string
 	)
@@ -105,14 +105,14 @@ func (w *wizard) gatherStats(server string, pubkey []byte, client *sshClient) *s
 	} else {
 		stat.services["nginx"] = infos.Report()
 	}
-	logger.Debug("Checking for ethstats availability")
-	if infos, err := checkEthstats(client, w.network); err != nil {
+	logger.Debug("Checking for vapstats availability")
+	if infos, err := checkVapstats(client, w.network); err != nil {
 		if err != ErrServiceUnknown {
-			stat.services["ethstats"] = map[string]string{"offline": err.Error()}
+			stat.services["vapstats"] = map[string]string{"offline": err.Error()}
 		}
 	} else {
-		stat.services["ethstats"] = infos.Report()
-		ethstats = infos.config
+		stat.services["vapstats"] = infos.Report()
+		vapstats = infos.config
 	}
 	logger.Debug("Checking for bootnode availability")
 	if infos, err := checkNode(client, w.network, true); err != nil {
@@ -181,8 +181,8 @@ func (w *wizard) gatherStats(server string, pubkey []byte, client *sshClient) *s
 			w.conf.Genesis = g
 		}
 	}
-	if ethstats != "" {
-		w.conf.ethstats = ethstats
+	if vapstats != "" {
+		w.conf.vapstats = vapstats
 	}
 	w.conf.bootFull = append(w.conf.bootFull, bootFull...)
 	w.conf.bootLight = append(w.conf.bootLight, bootLight...)
@@ -290,5 +290,5 @@ type protips struct {
 	network   int64
 	bootFull  []string
 	bootLight []string
-	ethstats  string
+	vapstats  string
 }

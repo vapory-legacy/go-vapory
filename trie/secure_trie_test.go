@@ -24,19 +24,19 @@ import (
 
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/crypto"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 )
 
 func newEmptySecure() *SecureTrie {
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	trie, _ := NewSecure(common.Hash{}, db, 0)
 	return trie
 }
 
 // makeTestSecureTrie creates a large enough secure trie for testing.
-func makeTestSecureTrie() (ethdb.Database, *SecureTrie, map[string][]byte) {
+func makeTestSecureTrie() (vapdb.Database, *SecureTrie, map[string][]byte) {
 	// Create an empty trie
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	trie, _ := NewSecure(common.Hash{}, db, 0)
 
 	// Fill it with some arbitrary data

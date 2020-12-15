@@ -27,7 +27,7 @@ import (
 	"github.com/vaporyco/go-vapory/consensus"
 	"github.com/vaporyco/go-vapory/core"
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/event"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/params"
@@ -45,7 +45,7 @@ var (
 // interface. It only does header validation during chain insertion.
 type LightChain struct {
 	hc            *core.HeaderChain
-	chainDb       ethdb.Database
+	chainDb       vapdb.Database
 	odr           OdrBackend
 	chainFeed     event.Feed
 	chainSideFeed event.Feed

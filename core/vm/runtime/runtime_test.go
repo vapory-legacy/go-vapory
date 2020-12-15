@@ -25,7 +25,7 @@ import (
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/core/state"
 	"github.com/vaporyco/go-vapory/core/vm"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 )
 
 func TestDefaults(t *testing.T) {
@@ -56,7 +56,7 @@ func TestDefaults(t *testing.T) {
 	}
 }
 
-func TestEVM(t *testing.T) {
+func TestVVM(t *testing.T) {
 	defer func() {
 		if r := recover(); r != nil {
 			t.Fatalf("crashed with: %v", r)
@@ -94,7 +94,7 @@ func TestExecute(t *testing.T) {
 }
 
 func TestCall(t *testing.T) {
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	state, _ := state.New(common.Hash{}, state.NewDatabase(db))
 	address := common.HexToAddress("0x0a")
 	state.SetCode(address, []byte{

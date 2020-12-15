@@ -28,7 +28,7 @@ import (
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/consensus"
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/params"
 	"github.com/hashicorp/golang-lru"
@@ -48,7 +48,7 @@ const (
 type HeaderChain struct {
 	config *params.ChainConfig
 
-	chainDb       ethdb.Database
+	chainDb       vapdb.Database
 	genesisHeader *types.Header
 
 	currentHeader     *types.Header // Current head of the header chain (may be above the block chain!)
@@ -68,7 +68,7 @@ type HeaderChain struct {
 //  getValidator should return the parent's validator
 //  procInterrupt points to the parent's interrupt semaphore
 //  wg points to the parent's shutdown wait group
-func NewHeaderChain(chainDb ethdb.Database, config *params.ChainConfig, engine consensus.Engine, procInterrupt func() bool) (*HeaderChain, error) {
+func NewHeaderChain(chainDb vapdb.Database, config *params.ChainConfig, engine consensus.Engine, procInterrupt func() bool) (*HeaderChain, error) {
 	headerCache, _ := lru.New(headerCacheLimit)
 	tdCache, _ := lru.New(tdCacheLimit)
 	numberCache, _ := lru.New(numberCacheLimit)

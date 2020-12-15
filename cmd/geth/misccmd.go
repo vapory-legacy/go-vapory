@@ -25,7 +25,7 @@ import (
 
 	"github.com/vaporyco/go-vapory/cmd/utils"
 	"github.com/vaporyco/go-vapory/consensus/vapash"
-	"github.com/vaporyco/go-vapory/eth"
+	"github.com/vaporyco/go-vapory/vap"
 	"github.com/vaporyco/go-vapory/params"
 	"gopkg.in/urfave/cli.v1"
 )

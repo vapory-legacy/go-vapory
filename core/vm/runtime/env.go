@@ -22,7 +22,7 @@ import (
 	"github.com/vaporyco/go-vapory/core/vm"
 )
 
-func NewEnv(cfg *Config) *vm.EVM {
+func NewEnv(cfg *Config) *vm.VVM {
 	context := vm.Context{
 		CanTransfer: core.CanTransfer,
 		Transfer:    core.Transfer,
@@ -37,5 +37,5 @@ func NewEnv(cfg *Config) *vm.EVM {
 		GasPrice:    cfg.GasPrice,
 	}
 
-	return vm.NewEVM(context, cfg.State, cfg.ChainConfig, cfg.EVMConfig)
+	return vm.NewVVM(context, cfg.State, cfg.ChainConfig, cfg.VVMConfig)
 }

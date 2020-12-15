@@ -55,7 +55,7 @@ func stateTestCmd(ctx *cli.Context) error {
 	glogger.Verbosity(log.Lvl(ctx.GlobalInt(VerbosityFlag.Name)))
 	log.Root().SetHandler(glogger)
 
-	// Configure the EVM logger
+	// Configure the VVM logger
 	config := &vm.LogConfig{
 		DisableMemory: ctx.GlobalBool(DisableMemoryFlag.Name),
 		DisableStack:  ctx.GlobalBool(DisableStackFlag.Name),
@@ -103,7 +103,7 @@ func stateTestCmd(ctx *cli.Context) error {
 					result.State = &dump
 				}
 			}
-			// print state root for evmlab tracing (already committed above, so no need to delete objects again
+			// print state root for vvmlab tracing (already committed above, so no need to delete objects again
 			if ctx.GlobalBool(MachineFlag.Name) && state != nil {
 				fmt.Fprintf(os.Stderr, "{\"stateRoot\": \"%x\"}\n", state.IntermediateRoot(false))
 			}

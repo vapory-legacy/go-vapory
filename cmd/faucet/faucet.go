@@ -46,10 +46,10 @@ import (
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/core"
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/eth"
-	"github.com/vaporyco/go-vapory/eth/downloader"
-	"github.com/vaporyco/go-vapory/ethclient"
-	"github.com/vaporyco/go-vapory/ethstats"
+	"github.com/vaporyco/go-vapory/vap"
+	"github.com/vaporyco/go-vapory/vap/downloader"
+	"github.com/vaporyco/go-vapory/vapclient"
+	"github.com/vaporyco/go-vapory/vapstats"
 	"github.com/vaporyco/go-vapory/les"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/node"
@@ -67,7 +67,7 @@ var (
 	ethPortFlag = flag.Int("ethport", 30303, "Listener port for the devp2p connection")
 	bootFlag    = flag.String("bootnodes", "", "Comma separated bootnode enode URLs to seed with")
 	netFlag     = flag.Uint64("network", 0, "Network ID to use for the Vapory protocol")
-	statsFlag   = flag.String("ethstats", "", "Ethstats network monitoring auth string")
+	statsFlag   = flag.String("vapstats", "", "Vapstats network monitoring auth string")
 
 	netnameFlag = flag.String("faucet.name", "", "Network name to assign to the faucet")
 	payoutFlag  = flag.Int("faucet.amount", 1, "Number of Ethers to pay out per user request")
@@ -196,7 +196,7 @@ type request struct {
 type faucet struct {
 	config *params.ChainConfig // Chain configurations for signing
 	stack  *node.Node          // Vapory protocol stack
-	client *ethclient.Client   // Client connection to the Vapory chain
+	client *vapclient.Client   // Client connection to the Vapory chain
 	index  []byte              // Index page to serve up on the web
 
 	keystore *keystore.KeyStore // Keystore containing the single signer
@@ -240,12 +240,12 @@ func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network u
 	}); err != nil {
 		return nil, err
 	}
-	// Assemble the ethstats monitoring and reporting service'
+	// Assemble the vapstats monitoring and reporting service'
 	if stats != "" {
 		if err := stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
 			var serv *les.LightVapory
 			ctx.Service(&serv)
-			return ethstats.New(stats, nil, serv)
+			return vapstats.New(stats, nil, serv)
 		}); err != nil {
 			return nil, err
 		}
@@ -264,7 +264,7 @@ func newFaucet(genesis *core.Genesis, port int, enodes []*discv5.Node, network u
 		stack.Stop()
 		return nil, err
 	}
-	client := ethclient.NewClient(api)
+	client := vapclient.NewClient(api)
 
 	return &faucet{
 		config:   genesis.Config,

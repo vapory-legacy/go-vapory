@@ -22,17 +22,17 @@ import (
 	"math/big"
 
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/ethclient"
+	"github.com/vaporyco/go-vapory/vapclient"
 )
 
 // VaporyClient provides access to the Vapory APIs.
 type VaporyClient struct {
-	client *ethclient.Client
+	client *vapclient.Client
 }
 
 // NewVaporyClient connects a client to the given URL.
 func NewVaporyClient(rawurl string) (client *VaporyClient, _ error) {
-	rawClient, err := ethclient.Dial(rawurl)
+	rawClient, err := vapclient.Dial(rawurl)
 	return &VaporyClient{rawClient}, err
 }
 
@@ -281,7 +281,7 @@ func (ec *VaporyClient) CallContract(ctx *Context, msg *CallMsg, number int64) (
 	return ec.client.CallContract(ctx.context, msg.msg, big.NewInt(number))
 }
 
-// PendingCallContract executes a message call transaction using the EVM.
+// PendingCallContract executes a message call transaction using the VVM.
 // The state seen by the contract call is the pending state.
 func (ec *VaporyClient) PendingCallContract(ctx *Context, msg *CallMsg) (output []byte, _ error) {
 	return ec.client.PendingCallContract(ctx.context, msg.msg)

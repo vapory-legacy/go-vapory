@@ -40,11 +40,11 @@ import (
 	"github.com/vaporyco/go-vapory/core/vm"
 	"github.com/vaporyco/go-vapory/crypto"
 	"github.com/vaporyco/go-vapory/dashboard"
-	"github.com/vaporyco/go-vapory/eth"
-	"github.com/vaporyco/go-vapory/eth/downloader"
-	"github.com/vaporyco/go-vapory/eth/gasprice"
-	"github.com/vaporyco/go-vapory/ethdb"
-	"github.com/vaporyco/go-vapory/ethstats"
+	"github.com/vaporyco/go-vapory/vap"
+	"github.com/vaporyco/go-vapory/vap/downloader"
+	"github.com/vaporyco/go-vapory/vap/gasprice"
+	"github.com/vaporyco/go-vapory/vapdb"
+	"github.com/vaporyco/go-vapory/vapstats"
 	"github.com/vaporyco/go-vapory/les"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/metrics"
@@ -347,9 +347,9 @@ var (
 		Usage: "Record information useful for VM and contract debugging",
 	}
 	// Logging and debug settings
-	EthStatsURLFlag = cli.StringFlag{
-		Name:  "ethstats",
-		Usage: "Reporting URL of a ethstats service (nodename:secret@host:port)",
+	VapStatsURLFlag = cli.StringFlag{
+		Name:  "vapstats",
+		Usage: "Reporting URL of a vapstats service (nodename:secret@host:port)",
 	}
 	MetricsEnabledFlag = cli.BoolFlag{
 		Name:  metrics.MetricsEnabledFlag,
@@ -1109,9 +1109,9 @@ func RegisterShhService(stack *node.Node, cfg *whisper.Config) {
 	}
 }
 
-// RegisterEthStatsService configures the Vapory Stats daemon and adds it to
+// RegisterVapStatsService configures the Vapory Stats daemon and adds it to
 // th egiven node.
-func RegisterEthStatsService(stack *node.Node, url string) {
+func RegisterVapStatsService(stack *node.Node, url string) {
 	if err := stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
 		// Retrieve both eth and les services
 		var ethServ *eth.Vapory
@@ -1120,7 +1120,7 @@ func RegisterEthStatsService(stack *node.Node, url string) {
 		var lesServ *les.LightVapory
 		ctx.Service(&lesServ)
 
-		return ethstats.New(url, ethServ, lesServ)
+		return vapstats.New(url, ethServ, lesServ)
 	}); err != nil {
 		Fatalf("Failed to register the Vapory Stats service: %v", err)
 	}
@@ -1133,7 +1133,7 @@ func SetupNetwork(ctx *cli.Context) {
 }
 
 // MakeChainDatabase open an LevelDB using the flags passed to the client and will hard crash if it fails.
-func MakeChainDatabase(ctx *cli.Context, stack *node.Node) ethdb.Database {
+func MakeChainDatabase(ctx *cli.Context, stack *node.Node) vapdb.Database {
 	var (
 		cache   = ctx.GlobalInt(CacheFlag.Name)
 		handles = makeDatabaseHandles()
@@ -1163,7 +1163,7 @@ func MakeGenesis(ctx *cli.Context) *core.Genesis {
 }
 
 // MakeChain creates a chain manager from set command line flags.
-func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chainDb ethdb.Database) {
+func MakeChain(ctx *cli.Context, stack *node.Node) (chain *core.BlockChain, chainDb vapdb.Database) {
 	var err error
 	chainDb = MakeChainDatabase(ctx, stack)
 

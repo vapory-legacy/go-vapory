@@ -25,10 +25,10 @@ import (
 	"path/filepath"
 
 	"github.com/vaporyco/go-vapory/core"
-	"github.com/vaporyco/go-vapory/eth"
-	"github.com/vaporyco/go-vapory/eth/downloader"
-	"github.com/vaporyco/go-vapory/ethclient"
-	"github.com/vaporyco/go-vapory/ethstats"
+	"github.com/vaporyco/go-vapory/vap"
+	"github.com/vaporyco/go-vapory/vap/downloader"
+	"github.com/vaporyco/go-vapory/vapclient"
+	"github.com/vaporyco/go-vapory/vapstats"
 	"github.com/vaporyco/go-vapory/les"
 	"github.com/vaporyco/go-vapory/node"
 	"github.com/vaporyco/go-vapory/p2p"
@@ -160,7 +160,7 @@ func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 				var lesServ *les.LightVapory
 				ctx.Service(&lesServ)
 
-				return ethstats.New(config.VaporyNetStats, nil, lesServ)
+				return vapstats.New(config.VaporyNetStats, nil, lesServ)
 			}); err != nil {
 				return nil, fmt.Errorf("netstats init: %v", err)
 			}
@@ -194,7 +194,7 @@ func (n *Node) GetVaporyClient() (client *VaporyClient, _ error) {
 	if err != nil {
 		return nil, err
 	}
-	return &VaporyClient{ethclient.NewClient(rpc)}, nil
+	return &VaporyClient{vapclient.NewClient(rpc)}, nil
 }
 
 // GetNodeInfo gathers and returns a collection of metadata known about the host.

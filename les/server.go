@@ -27,8 +27,8 @@ import (
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/core"
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/eth"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vap"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/les/flowcontrol"
 	"github.com/vaporyco/go-vapory/light"
 	"github.com/vaporyco/go-vapory/log"
@@ -222,7 +222,7 @@ func linRegFromBytes(data []byte) *linReg {
 
 type requestCostStats struct {
 	lock  sync.RWMutex
-	db    ethdb.Database
+	db    vapdb.Database
 	stats map[uint64]*linReg
 }
 
@@ -233,7 +233,7 @@ type requestCostStatsRlp []struct {
 
 var rcStatsKey = []byte("_requestCostStats")
 
-func newCostStats(db ethdb.Database) *requestCostStats {
+func newCostStats(db vapdb.Database) *requestCostStats {
 	stats := make(map[uint64]*linReg)
 	for _, code := range reqList {
 		stats[code] = &linReg{cnt: 100}

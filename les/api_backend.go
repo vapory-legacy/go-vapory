@@ -28,9 +28,9 @@ import (
 	"github.com/vaporyco/go-vapory/core/state"
 	"github.com/vaporyco/go-vapory/core/types"
 	"github.com/vaporyco/go-vapory/core/vm"
-	"github.com/vaporyco/go-vapory/eth/downloader"
-	"github.com/vaporyco/go-vapory/eth/gasprice"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vap/downloader"
+	"github.com/vaporyco/go-vapory/vap/gasprice"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/event"
 	"github.com/vaporyco/go-vapory/light"
 	"github.com/vaporyco/go-vapory/params"
@@ -91,10 +91,10 @@ func (b *LesApiBackend) GetTd(blockHash common.Hash) *big.Int {
 	return b.eth.blockchain.GetTdByHash(blockHash)
 }
 
-func (b *LesApiBackend) GetEVM(ctx context.Context, msg core.Message, state *state.StateDB, header *types.Header, vmCfg vm.Config) (*vm.EVM, func() error, error) {
+func (b *LesApiBackend) GetVVM(ctx context.Context, msg core.Message, state *state.StateDB, header *types.Header, vmCfg vm.Config) (*vm.VVM, func() error, error) {
 	state.SetBalance(msg.From(), math.MaxBig256)
-	context := core.NewEVMContext(msg, header, b.eth.blockchain, nil)
-	return vm.NewEVM(context, state, b.eth.chainConfig, vmCfg), state.Error, nil
+	context := core.NewVVMContext(msg, header, b.eth.blockchain, nil)
+	return vm.NewVVM(context, state, b.eth.chainConfig, vmCfg), state.Error, nil
 }
 
 func (b *LesApiBackend) SendTx(ctx context.Context, signedTx *types.Transaction) error {
@@ -161,7 +161,7 @@ func (b *LesApiBackend) SuggestPrice(ctx context.Context) (*big.Int, error) {
 	return b.gpo.SuggestPrice(ctx)
 }
 
-func (b *LesApiBackend) ChainDb() ethdb.Database {
+func (b *LesApiBackend) ChainDb() vapdb.Database {
 	return b.eth.chainDb
 }
 

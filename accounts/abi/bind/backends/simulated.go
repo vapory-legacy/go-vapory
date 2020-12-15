@@ -33,7 +33,7 @@ import (
 	"github.com/vaporyco/go-vapory/core/state"
 	"github.com/vaporyco/go-vapory/core/types"
 	"github.com/vaporyco/go-vapory/core/vm"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/params"
 )
 
@@ -46,7 +46,7 @@ var errGasEstimationFailed = errors.New("gas required exceeds allowance or alway
 // SimulatedBackend implements bind.ContractBackend, simulating a blockchain in
 // the background. Its main purpose is to allow easily testing contract bindings.
 type SimulatedBackend struct {
-	database   ethdb.Database   // In memory database to store our testing data
+	database   vapdb.Database   // In memory database to store our testing data
 	blockchain *core.BlockChain // Vapory blockchain to handle the consensus
 
 	mu           sync.Mutex
@@ -59,7 +59,7 @@ type SimulatedBackend struct {
 // NewSimulatedBackend creates a new binding backend using a simulated blockchain
 // for testing purposes.
 func NewSimulatedBackend(alloc core.GenesisAlloc) *SimulatedBackend {
-	database, _ := ethdb.NewMemDatabase()
+	database, _ := vapdb.NewMemDatabase()
 	genesis := core.Genesis{Config: params.AllVapashProtocolChanges, Alloc: alloc}
 	genesis.MustCommit(database)
 	blockchain, _ := core.NewBlockChain(database, genesis.Config, vapash.NewFaker(), vm.Config{})
@@ -267,10 +267,10 @@ func (b *SimulatedBackend) callContract(ctx context.Context, call vapory.CallMsg
 	// Execute the call.
 	msg := callmsg{call}
 
-	evmContext := core.NewEVMContext(msg, block.Header(), b.blockchain, nil)
+	vvmContext := core.NewVVMContext(msg, block.Header(), b.blockchain, nil)
 	// Create a new environment which holds all relevant information
 	// about the transaction and calling mechanisms.
-	vmenv := vm.NewEVM(evmContext, statedb, b.config, vm.Config{})
+	vmenv := vm.NewVVM(vvmContext, statedb, b.config, vm.Config{})
 	gaspool := new(core.GasPool).AddGas(math.MaxUint64)
 
 	return core.NewStateTransition(vmenv, msg, gaspool).TransitionDb()

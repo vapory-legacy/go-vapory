@@ -10,7 +10,7 @@ import (
 
 func TestByteOp(t *testing.T) {
 	var (
-		env   = NewEVM(Context{}, nil, params.TestChainConfig, Config{EnableJit: false, ForceJit: false})
+		env   = NewVVM(Context{}, nil, params.TestChainConfig, Config{EnableJit: false, ForceJit: false})
 		stack = newstack()
 	)
 	tests := []struct {
@@ -41,9 +41,9 @@ func TestByteOp(t *testing.T) {
 	}
 }
 
-func opBenchmark(bench *testing.B, op func(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error), args ...string) {
+func opBenchmark(bench *testing.B, op func(pc *uint64, vvm *VVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error), args ...string) {
 	var (
-		env   = NewEVM(Context{}, nil, params.TestChainConfig, Config{EnableJit: false, ForceJit: false})
+		env   = NewVVM(Context{}, nil, params.TestChainConfig, Config{EnableJit: false, ForceJit: false})
 		stack = newstack()
 	)
 	// convert args

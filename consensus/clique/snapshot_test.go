@@ -26,7 +26,7 @@ import (
 	"github.com/vaporyco/go-vapory/core"
 	"github.com/vaporyco/go-vapory/core/types"
 	"github.com/vaporyco/go-vapory/crypto"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/params"
 )
 
@@ -71,7 +71,7 @@ func (ap *testerAccountPool) address(account string) common.Address {
 // testerChainReader implements consensus.ChainReader to access the genesis
 // block. All other methods and requests will panic.
 type testerChainReader struct {
-	db ethdb.Database
+	db vapdb.Database
 }
 
 func (r *testerChainReader) Config() *params.ChainConfig                 { return params.AllCliqueProtocolChanges }
@@ -351,7 +351,7 @@ func TestVoting(t *testing.T) {
 			copy(genesis.ExtraData[extraVanity+j*common.AddressLength:], signer[:])
 		}
 		// Create a pristine blockchain with the genesis injected
-		db, _ := ethdb.NewMemDatabase()
+		db, _ := vapdb.NewMemDatabase()
 		genesis.Commit(db)
 
 		// Assemble a chain of headers from the cast votes

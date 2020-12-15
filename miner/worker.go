@@ -31,7 +31,7 @@ import (
 	"github.com/vaporyco/go-vapory/core/state"
 	"github.com/vaporyco/go-vapory/core/types"
 	"github.com/vaporyco/go-vapory/core/vm"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/event"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/params"
@@ -109,7 +109,7 @@ type worker struct {
 	eth     Backend
 	chain   *core.BlockChain
 	proc    core.Validator
-	chainDb ethdb.Database
+	chainDb vapdb.Database
 
 	coinbase common.Address
 	extra    []byte

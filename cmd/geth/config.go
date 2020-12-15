@@ -31,7 +31,7 @@ import (
 	"github.com/vaporyco/go-vapory/cmd/utils"
 	"github.com/vaporyco/go-vapory/contracts/release"
 	"github.com/vaporyco/go-vapory/dashboard"
-	"github.com/vaporyco/go-vapory/eth"
+	"github.com/vaporyco/go-vapory/vap"
 	"github.com/vaporyco/go-vapory/node"
 	"github.com/vaporyco/go-vapory/params"
 	whisper "github.com/vaporyco/go-vapory/whisper/whisperv5"
@@ -72,7 +72,7 @@ var tomlSettings = toml.Config{
 	},
 }
 
-type ethstatsConfig struct {
+type vapstatsConfig struct {
 	URL string `toml:",omitempty"`
 }
 
@@ -80,7 +80,7 @@ type gvapConfig struct {
 	Eth       eth.Config
 	Shh       whisper.Config
 	Node      node.Config
-	Ethstats  ethstatsConfig
+	Vapstats  vapstatsConfig
 	Dashboard dashboard.Config
 }
 
@@ -132,8 +132,8 @@ func makeConfigNode(ctx *cli.Context) (*node.Node, gvapConfig) {
 		utils.Fatalf("Failed to create the protocol stack: %v", err)
 	}
 	utils.SetEthConfig(ctx, stack, &cfg.Eth)
-	if ctx.GlobalIsSet(utils.EthStatsURLFlag.Name) {
-		cfg.Ethstats.URL = ctx.GlobalString(utils.EthStatsURLFlag.Name)
+	if ctx.GlobalIsSet(utils.VapStatsURLFlag.Name) {
+		cfg.Vapstats.URL = ctx.GlobalString(utils.VapStatsURLFlag.Name)
 	}
 
 	utils.SetShhConfig(ctx, stack, &cfg.Shh)
@@ -174,8 +174,8 @@ func makeFullNode(ctx *cli.Context) *node.Node {
 	}
 
 	// Add the Vapory Stats daemon if requested.
-	if cfg.Ethstats.URL != "" {
-		utils.RegisterEthStatsService(stack, cfg.Ethstats.URL)
+	if cfg.Vapstats.URL != "" {
+		utils.RegisterVapStatsService(stack, cfg.Vapstats.URL)
 	}
 
 	// Add the release oracle service so it boots along with node.

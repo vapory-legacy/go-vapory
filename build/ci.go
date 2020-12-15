@@ -73,7 +73,7 @@ var (
 		"COPYING",
 		executablePath("abigen"),
 		executablePath("bootnode"),
-		executablePath("evm"),
+		executablePath("vvm"),
 		executablePath("gvap"),
 		executablePath("puppeth"),
 		executablePath("rlpdump"),
@@ -92,8 +92,8 @@ var (
 			Description: "Vapory bootnode.",
 		},
 		{
-			Name:        "evm",
-			Description: "Developer utility version of the EVM (Vapory Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode.",
+			Name:        "vvm",
+			Description: "Developer utility version of the VVM (Vapory Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode.",
 		},
 		{
 			Name:        "gvap",

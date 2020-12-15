@@ -28,7 +28,7 @@ import (
 	"github.com/vaporyco/go-vapory/contracts/chequebook"
 	"github.com/vaporyco/go-vapory/contracts/ens"
 	"github.com/vaporyco/go-vapory/crypto"
-	"github.com/vaporyco/go-vapory/ethclient"
+	"github.com/vaporyco/go-vapory/vapclient"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/node"
 	"github.com/vaporyco/go-vapory/p2p"
@@ -76,7 +76,7 @@ func (self *Swarm) API() *SwarmAPI {
 
 // creates a new swarm service instance
 // implements node.Service
-func NewSwarm(ctx *node.ServiceContext, backend chequebook.Backend, ensClient *ethclient.Client, config *api.Config, swapEnabled, syncEnabled bool, cors string) (self *Swarm, err error) {
+func NewSwarm(ctx *node.ServiceContext, backend chequebook.Backend, ensClient *vapclient.Client, config *api.Config, swapEnabled, syncEnabled bool, cors string) (self *Swarm, err error) {
 	if bytes.Equal(common.FromHex(config.PublicKey), storage.ZeroKey) {
 		return nil, fmt.Errorf("empty public key")
 	}

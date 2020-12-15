@@ -48,7 +48,7 @@ type dummyStateDB struct {
 
 func TestStoreCapture(t *testing.T) {
 	var (
-		env      = NewEVM(Context{}, nil, params.TestChainConfig, Config{EnableJit: false, ForceJit: false})
+		env      = NewVVM(Context{}, nil, params.TestChainConfig, Config{EnableJit: false, ForceJit: false})
 		logger   = NewStructLogger(nil)
 		mem      = NewMemory()
 		stack    = newstack()

@@ -30,8 +30,8 @@ import (
 	"github.com/vaporyco/go-vapory/cmd/utils"
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/console"
-	"github.com/vaporyco/go-vapory/eth"
-	"github.com/vaporyco/go-vapory/ethclient"
+	"github.com/vaporyco/go-vapory/vap"
+	"github.com/vaporyco/go-vapory/vapclient"
 	"github.com/vaporyco/go-vapory/internal/debug"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/metrics"
@@ -111,7 +111,7 @@ var (
 		utils.VMEnableDebugFlag,
 		utils.NetworkIdFlag,
 		utils.RPCCORSDomainFlag,
-		utils.EthStatsURLFlag,
+		utils.VapStatsURLFlag,
 		utils.MetricsEnabledFlag,
 		utils.FakePoWFlag,
 		utils.NoCompactionFlag,
@@ -244,7 +244,7 @@ func startNode(ctx *cli.Context, stack *node.Node) {
 		if err != nil {
 			utils.Fatalf("Failed to attach to self: %v", err)
 		}
-		stateReader := ethclient.NewClient(rpcClient)
+		stateReader := vapclient.NewClient(rpcClient)
 
 		// Open any wallets already attached
 		for _, wallet := range stack.AccountManager().Wallets() {

@@ -14,19 +14,19 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-vapory library. If not, see <http://www.gnu.org/licenses/>.
 
-// +build evmjit
+// +build vvmjit
 
 package vm
 
 /*
 
-void* evmjit_create();
-int   evmjit_run(void* _jit, void* _data, void* _env);
-void  evmjit_destroy(void* _jit);
+void* vvmjit_create();
+int   vvmjit_run(void* _jit, void* _data, void* _env);
+void  vvmjit_destroy(void* _jit);
 
-// Shared library evmjit (e.g. libevmjit.so) is expected to be installed in /usr/local/lib
-// More: https://github.com/vaporyco/evmjit
-#cgo LDFLAGS: -levmjit
+// Shared library vvmjit (e.g. libvvmjit.so) is expected to be installed in /usr/local/lib
+// More: https://github.com/vaporyco/vvmjit
+#cgo LDFLAGS: -lvvmjit
 */
 import "C"
 
@@ -44,7 +44,7 @@ import (
 )
 
 type JitVm struct {
-	env        EVM
+	env        VVM
 	me         ContextRef
 	callerAddr []byte
 	price      *big.Int
@@ -161,7 +161,7 @@ func assert(condition bool, message string) {
 	}
 }
 
-func NewJitVm(env EVM) *JitVm {
+func NewJitVm(env VVM) *JitVm {
 	return &JitVm{env: env}
 }
 
@@ -202,8 +202,8 @@ func (self *JitVm) Run(me, caller ContextRef, code []byte, value, gas, price *bi
 	self.data.codeSize = uint64(len(code))
 	self.data.codeHash = hash2llvm(crypto.Keccak256(code)) // TODO: Get already computed hash?
 
-	jit := C.evmjit_create()
-	retCode := C.evmjit_run(jit, unsafe.Pointer(&self.data), unsafe.Pointer(self))
+	jit := C.vvmjit_create()
+	retCode := C.vvmjit_run(jit, unsafe.Pointer(&self.data), unsafe.Pointer(self))
 
 	if retCode < 0 {
 		err = errors.New("OOG from JIT")
@@ -223,7 +223,7 @@ func (self *JitVm) Run(me, caller ContextRef, code []byte, value, gas, price *bi
 		}
 	}
 
-	C.evmjit_destroy(jit)
+	C.vvmjit_destroy(jit)
 	return
 }
 
@@ -235,7 +235,7 @@ func (self *JitVm) Endl() VirtualMachine {
 	return self
 }
 
-func (self *JitVm) Env() EVM {
+func (self *JitVm) Env() VVM {
 	return self.env
 }
 

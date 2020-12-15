@@ -16,7 +16,7 @@
 
 package storage
 
-// this is a clone of an earlier state of the vapory ethdb/database
+// this is a clone of an earlier state of the vapory vapdb/database
 // no need for queueing/caching
 
 import (

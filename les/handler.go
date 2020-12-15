@@ -32,8 +32,8 @@ import (
 	"github.com/vaporyco/go-vapory/core"
 	"github.com/vaporyco/go-vapory/core/state"
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/eth/downloader"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vap/downloader"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/event"
 	"github.com/vaporyco/go-vapory/light"
 	"github.com/vaporyco/go-vapory/log"
@@ -100,7 +100,7 @@ type ProtocolManager struct {
 	networkId   uint64
 	chainConfig *params.ChainConfig
 	blockchain  BlockChain
-	chainDb     ethdb.Database
+	chainDb     vapdb.Database
 	odr         *LesOdr
 	server      *LesServer
 	serverPool  *serverPool
@@ -128,7 +128,7 @@ type ProtocolManager struct {
 
 // NewProtocolManager returns a new vapory sub protocol manager. The Vapory sub protocol manages peers capable
 // with the vapory network.
-func NewProtocolManager(chainConfig *params.ChainConfig, lightSync bool, protocolVersions []uint, networkId uint64, mux *event.TypeMux, engine consensus.Engine, peers *peerSet, blockchain BlockChain, txpool txPool, chainDb ethdb.Database, odr *LesOdr, txrelay *LesTxRelay, quitSync chan struct{}, wg *sync.WaitGroup) (*ProtocolManager, error) {
+func NewProtocolManager(chainConfig *params.ChainConfig, lightSync bool, protocolVersions []uint, networkId uint64, mux *event.TypeMux, engine consensus.Engine, peers *peerSet, blockchain BlockChain, txpool txPool, chainDb vapdb.Database, odr *LesOdr, txrelay *LesTxRelay, quitSync chan struct{}, wg *sync.WaitGroup) (*ProtocolManager, error) {
 	// Create the protocol manager with the base fields
 	manager := &ProtocolManager{
 		lightSync:   lightSync,
@@ -839,7 +839,7 @@ func (pm *ProtocolManager) handleMsg(p *peer) error {
 		if reject(uint64(reqCnt), MaxHelperTrieProofsFetch) {
 			return errResp(ErrRequestRejected, "")
 		}
-		trieDb := ethdb.NewTable(pm.chainDb, light.ChtTablePrefix)
+		trieDb := vapdb.NewTable(pm.chainDb, light.ChtTablePrefix)
 		for _, req := range req.Reqs {
 			if bytes >= softResponseLimit {
 				break
@@ -900,7 +900,7 @@ func (pm *ProtocolManager) handleMsg(p *peer) error {
 				var prefix string
 				root, prefix = pm.getHelperTrie(req.HelperTrieType, req.TrieIdx)
 				if root != (common.Hash{}) {
-					if t, err := trie.New(root, ethdb.NewTable(pm.chainDb, prefix)); err == nil {
+					if t, err := trie.New(root, vapdb.NewTable(pm.chainDb, prefix)); err == nil {
 						tr = t
 					}
 				}

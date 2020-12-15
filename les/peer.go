@@ -28,7 +28,7 @@ import (
 
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/eth"
+	"github.com/vaporyco/go-vapory/vap"
 	"github.com/vaporyco/go-vapory/les/flowcontrol"
 	"github.com/vaporyco/go-vapory/light"
 	"github.com/vaporyco/go-vapory/p2p"

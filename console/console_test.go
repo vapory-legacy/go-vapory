@@ -29,7 +29,7 @@ import (
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/consensus/vapash"
 	"github.com/vaporyco/go-vapory/core"
-	"github.com/vaporyco/go-vapory/eth"
+	"github.com/vaporyco/go-vapory/vap"
 	"github.com/vaporyco/go-vapory/internal/jsre"
 	"github.com/vaporyco/go-vapory/node"
 )

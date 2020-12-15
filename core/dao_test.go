@@ -22,7 +22,7 @@ import (
 
 	"github.com/vaporyco/go-vapory/consensus/vapash"
 	"github.com/vaporyco/go-vapory/core/vm"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/params"
 )
 
@@ -32,13 +32,13 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 	forkBlock := big.NewInt(32)
 
 	// Generate a common prefix for both pro-forkers and non-forkers
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	gspec := new(Genesis)
 	genesis := gspec.MustCommit(db)
 	prefix, _ := GenerateChain(params.TestChainConfig, genesis, vapash.NewFaker(), db, int(forkBlock.Int64()-1), func(i int, gen *BlockGen) {})
 
 	// Create the concurrent, conflicting two nodes
-	proDb, _ := ethdb.NewMemDatabase()
+	proDb, _ := vapdb.NewMemDatabase()
 	gspec.MustCommit(proDb)
 
 	proConf := *params.TestChainConfig
@@ -48,7 +48,7 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 	proBc, _ := NewBlockChain(proDb, &proConf, vapash.NewFaker(), vm.Config{})
 	defer proBc.Stop()
 
-	conDb, _ := ethdb.NewMemDatabase()
+	conDb, _ := vapdb.NewMemDatabase()
 	gspec.MustCommit(conDb)
 
 	conConf := *params.TestChainConfig
@@ -67,7 +67,7 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 	// Try to expand both pro-fork and non-fork chains iteratively with other camp's blocks
 	for i := int64(0); i < params.DAOForkExtraRange.Int64(); i++ {
 		// Create a pro-fork block, and try to feed into the no-fork chain
-		db, _ = ethdb.NewMemDatabase()
+		db, _ = vapdb.NewMemDatabase()
 		gspec.MustCommit(db)
 		bc, _ := NewBlockChain(db, &conConf, vapash.NewFaker(), vm.Config{})
 		defer bc.Stop()
@@ -89,7 +89,7 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 			t.Fatalf("contra-fork chain didn't accepted no-fork block: %v", err)
 		}
 		// Create a no-fork block, and try to feed into the pro-fork chain
-		db, _ = ethdb.NewMemDatabase()
+		db, _ = vapdb.NewMemDatabase()
 		gspec.MustCommit(db)
 		bc, _ = NewBlockChain(db, &proConf, vapash.NewFaker(), vm.Config{})
 		defer bc.Stop()
@@ -112,7 +112,7 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 		}
 	}
 	// Verify that contra-forkers accept pro-fork extra-datas after forking finishes
-	db, _ = ethdb.NewMemDatabase()
+	db, _ = vapdb.NewMemDatabase()
 	gspec.MustCommit(db)
 	bc, _ := NewBlockChain(db, &conConf, vapash.NewFaker(), vm.Config{})
 	defer bc.Stop()
@@ -129,7 +129,7 @@ func TestDAOForkRangeExtradata(t *testing.T) {
 		t.Fatalf("contra-fork chain didn't accept pro-fork block post-fork: %v", err)
 	}
 	// Verify that pro-forkers accept contra-fork extra-datas after forking finishes
-	db, _ = ethdb.NewMemDatabase()
+	db, _ = vapdb.NewMemDatabase()
 	gspec.MustCommit(db)
 	bc, _ = NewBlockChain(db, &proConf, vapash.NewFaker(), vm.Config{})
 	defer bc.Stop()

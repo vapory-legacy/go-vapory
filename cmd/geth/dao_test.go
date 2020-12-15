@@ -25,7 +25,7 @@ import (
 
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/core"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/params"
 )
 
@@ -121,7 +121,7 @@ func testDAOForkBlockNewChain(t *testing.T, test int, genesis string, expectBloc
 	}
 	// Retrieve the DAO config flag from the database
 	path := filepath.Join(datadir, "gvap", "chaindata")
-	db, err := ethdb.NewLDBDatabase(path, 0, 0)
+	db, err := vapdb.NewLDBDatabase(path, 0, 0)
 	if err != nil {
 		t.Fatalf("test %d: failed to open test database: %v", test, err)
 	}

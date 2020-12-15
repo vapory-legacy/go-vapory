@@ -27,7 +27,7 @@ import (
 	"sync"
 
 	"github.com/vaporyco/go-vapory/accounts"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/event"
 	"github.com/vaporyco/go-vapory/internal/debug"
 	"github.com/vaporyco/go-vapory/log"
@@ -642,11 +642,11 @@ func (n *Node) EventMux() *event.TypeMux {
 // OpenDatabase opens an existing database with the given name (or creates one if no
 // previous can be found) from within the node's instance directory. If the node is
 // ephemeral, a memory database is returned.
-func (n *Node) OpenDatabase(name string, cache, handles int) (ethdb.Database, error) {
+func (n *Node) OpenDatabase(name string, cache, handles int) (vapdb.Database, error) {
 	if n.config.DataDir == "" {
-		return ethdb.NewMemDatabase()
+		return vapdb.NewMemDatabase()
 	}
-	return ethdb.NewLDBDatabase(n.config.resolvePath(name), cache, handles)
+	return vapdb.NewLDBDatabase(n.config.resolvePath(name), cache, handles)
 }
 
 // ResolvePath returns the absolute path of a resource in the instance directory.

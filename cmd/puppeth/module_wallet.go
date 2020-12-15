@@ -37,7 +37,7 @@ ADD genesis.json /genesis.json
 RUN \
   echo 'node server.js &'                     > wallet.sh && \
 	echo 'gvap --cache 512 init /genesis.json' >> wallet.sh && \
-	echo $'gvap --networkid {{.NetworkID}} --port {{.NodePort}} --bootnodes {{.Bootnodes}} --ethstats \'{{.Ethstats}}\' --cache=512 --rpc --rpcaddr=0.0.0.0 --rpccorsdomain "*"' >> wallet.sh
+	echo $'gvap --networkid {{.NetworkID}} --port {{.NodePort}} --bootnodes {{.Bootnodes}} --vapstats \'{{.Vapstats}}\' --cache=512 --rpc --rpcaddr=0.0.0.0 --rpccorsdomain "*"' >> wallet.sh
 
 RUN \
 	sed -i 's/PuppethNetworkID/{{.NetworkID}}/g' dist/js/vaporwallet-master.js && \
@@ -66,7 +66,7 @@ services:
       - {{.Datadir}}:/root/.vapory
     environment:
       - NODE_PORT={{.NodePort}}/tcp
-      - STATS={{.Ethstats}}{{if .VHost}}
+      - STATS={{.Vapstats}}{{if .VHost}}
       - VIRTUAL_HOST={{.VHost}}
       - VIRTUAL_PORT=80{{end}}
     logging:
@@ -93,7 +93,7 @@ func deployWallet(client *sshClient, network string, bootnodes []string, config 
 		"NodePort":  config.nodePort,
 		"RPCPort":   config.rpcPort,
 		"Bootnodes": strings.Join(bootnodes, ","),
-		"Ethstats":  config.ethstats,
+		"Vapstats":  config.vapstats,
 		"Host":      client.address,
 	})
 	files[filepath.Join(workdir, "Dockerfile")] = dockerfile.Bytes()
@@ -106,7 +106,7 @@ func deployWallet(client *sshClient, network string, bootnodes []string, config 
 		"RPCPort":  config.rpcPort,
 		"VHost":    config.webHost,
 		"WebPort":  config.webPort,
-		"Ethstats": config.ethstats[:strings.Index(config.ethstats, ":")],
+		"Vapstats": config.vapstats[:strings.Index(config.vapstats, ":")],
 	})
 	files[filepath.Join(workdir, "docker-compose.yaml")] = composefile.Bytes()
 
@@ -131,7 +131,7 @@ type walletInfos struct {
 	genesis  []byte
 	network  int64
 	datadir  string
-	ethstats string
+	vapstats string
 	nodePort int
 	rpcPort  int
 	webHost  string
@@ -143,7 +143,7 @@ type walletInfos struct {
 func (info *walletInfos) Report() map[string]string {
 	report := map[string]string{
 		"Data directory":         info.datadir,
-		"Ethstats username":      info.ethstats,
+		"Vapstats username":      info.vapstats,
 		"Node listener port ":    strconv.Itoa(info.nodePort),
 		"RPC listener port ":     strconv.Itoa(info.rpcPort),
 		"Website address ":       info.webHost,
@@ -194,7 +194,7 @@ func checkWallet(client *sshClient, network string) (*walletInfos, error) {
 		rpcPort:  rpcPort,
 		webHost:  host,
 		webPort:  webPort,
-		ethstats: infos.envvars["STATS"],
+		vapstats: infos.envvars["STATS"],
 	}
 	return stats, nil
 }

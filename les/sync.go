@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/vaporyco/go-vapory/core"
-	"github.com/vaporyco/go-vapory/eth/downloader"
+	"github.com/vaporyco/go-vapory/vap/downloader"
 	"github.com/vaporyco/go-vapory/light"
 )
 

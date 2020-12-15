@@ -32,14 +32,14 @@ import (
 
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/core/types"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 )
 
 // Tests that updating a state trie does not leak any database writes prior to
 // actually committing the state.
 func TestUpdateLeaks(t *testing.T) {
 	// Create an empty state database
-	db, _ := ethdb.NewMemDatabase()
+	db, _ := vapdb.NewMemDatabase()
 	state, _ := New(common.Hash{}, NewDatabase(db))
 
 	// Update it with some accounts
@@ -66,8 +66,8 @@ func TestUpdateLeaks(t *testing.T) {
 // only the one right before the commit.
 func TestIntermediateLeaks(t *testing.T) {
 	// Create two state databases, one transitioning to the final state, the other final from the beginning
-	transDb, _ := ethdb.NewMemDatabase()
-	finalDb, _ := ethdb.NewMemDatabase()
+	transDb, _ := vapdb.NewMemDatabase()
+	finalDb, _ := vapdb.NewMemDatabase()
 	transState, _ := New(common.Hash{}, NewDatabase(transDb))
 	finalState, _ := New(common.Hash{}, NewDatabase(finalDb))
 
@@ -122,7 +122,7 @@ func TestIntermediateLeaks(t *testing.T) {
 // https://github.com/vaporyco/go-vapory/pull/15549.
 func TestCopy(t *testing.T) {
 	// Create a random state test to copy and modify "independently"
-	mem, _ := ethdb.NewMemDatabase()
+	mem, _ := vapdb.NewMemDatabase()
 	orig, _ := New(common.Hash{}, NewDatabase(mem))
 
 	for i := byte(0); i < 255; i++ {
@@ -334,7 +334,7 @@ func (test *snapshotTest) String() string {
 func (test *snapshotTest) run() bool {
 	// Run all actions and create snapshots.
 	var (
-		db, _        = ethdb.NewMemDatabase()
+		db, _        = vapdb.NewMemDatabase()
 		state, _     = New(common.Hash{}, NewDatabase(db))
 		snapshotRevs = make([]int, len(test.snapshots))
 		sindex       = 0

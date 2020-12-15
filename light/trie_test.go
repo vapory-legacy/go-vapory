@@ -27,15 +27,15 @@ import (
 	"github.com/vaporyco/go-vapory/core"
 	"github.com/vaporyco/go-vapory/core/state"
 	"github.com/vaporyco/go-vapory/core/vm"
-	"github.com/vaporyco/go-vapory/ethdb"
+	"github.com/vaporyco/go-vapory/vapdb"
 	"github.com/vaporyco/go-vapory/params"
 	"github.com/vaporyco/go-vapory/trie"
 )
 
 func TestNodeIterator(t *testing.T) {
 	var (
-		fulldb, _  = ethdb.NewMemDatabase()
-		lightdb, _ = ethdb.NewMemDatabase()
+		fulldb, _  = vapdb.NewMemDatabase()
+		lightdb, _ = vapdb.NewMemDatabase()
 		gspec      = core.Genesis{Alloc: core.GenesisAlloc{testBankAddress: {Balance: testBankFunds}}}
 		genesis    = gspec.MustCommit(fulldb)
 	)

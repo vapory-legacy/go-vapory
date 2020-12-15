@@ -42,7 +42,7 @@ ADD genesis.json /genesis.json
 RUN \
   echo 'gvap --cache 512 init /genesis.json' > gvap.sh && \{{if .Unlock}}
 	echo 'mkdir -p /root/.vapory/keystore/ && cp /signer.json /root/.vapory/keystore/' >> gvap.sh && \{{end}}
-	echo $'gvap --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --maxpeers {{.Peers}} {{.LightFlag}} --ethstats \'{{.Ethstats}}\' {{if .BootV4}}--bootnodesv4 {{.BootV4}}{{end}} {{if .BootV5}}--bootnodesv5 {{.BootV5}}{{end}} {{if .Etherbase}}--vaporbase {{.Etherbase}} --mine --minerthreads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --targetgaslimit {{.GasTarget}} --gasprice {{.GasPrice}}' >> gvap.sh
+	echo $'gvap --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --maxpeers {{.Peers}} {{.LightFlag}} --vapstats \'{{.Vapstats}}\' {{if .BootV4}}--bootnodesv4 {{.BootV4}}{{end}} {{if .BootV5}}--bootnodesv5 {{.BootV5}}{{end}} {{if .Etherbase}}--vaporbase {{.Etherbase}} --mine --minerthreads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --targetgaslimit {{.GasTarget}} --gasprice {{.GasPrice}}' >> gvap.sh
 
 ENTRYPOINT ["/bin/sh", "gvap.sh"]
 `
@@ -67,7 +67,7 @@ services:
       - LIGHT_PORT={{.LightPort}}/udp
       - TOTAL_PEERS={{.TotalPeers}}
       - LIGHT_PEERS={{.LightPeers}}
-      - STATS_NAME={{.Ethstats}}
+      - STATS_NAME={{.Vapstats}}
       - MINER_NAME={{.Etherbase}}
       - GAS_TARGET={{.GasTarget}}
       - GAS_PRICE={{.GasPrice}}
@@ -105,7 +105,7 @@ func deployNode(client *sshClient, network string, bootv4, bootv5 []string, conf
 		"LightFlag": lightFlag,
 		"BootV4":    strings.Join(bootv4, ","),
 		"BootV5":    strings.Join(bootv5, ","),
-		"Ethstats":  config.ethstats,
+		"Vapstats":  config.vapstats,
 		"Etherbase": config.vaporbase,
 		"GasTarget": uint64(1000000 * config.gasTarget),
 		"GasPrice":  uint64(1000000000 * config.gasPrice),
@@ -124,7 +124,7 @@ func deployNode(client *sshClient, network string, bootv4, bootv5 []string, conf
 		"Light":      config.peersLight > 0,
 		"LightPort":  config.portFull + 1,
 		"LightPeers": config.peersLight,
-		"Ethstats":   config.ethstats[:strings.Index(config.ethstats, ":")],
+		"Vapstats":   config.vapstats[:strings.Index(config.vapstats, ":")],
 		"Etherbase":  config.vaporbase,
 		"GasTarget":  config.gasTarget,
 		"GasPrice":   config.gasPrice,
@@ -156,7 +156,7 @@ type nodeInfos struct {
 	network    int64
 	datadir    string
 	vapashdir  string
-	ethstats   string
+	vapstats   string
 	portFull   int
 	portLight  int
 	enodeFull  string
@@ -178,7 +178,7 @@ func (info *nodeInfos) Report() map[string]string {
 		"Listener port (full nodes)": strconv.Itoa(info.portFull),
 		"Peer count (all total)":     strconv.Itoa(info.peersTotal),
 		"Peer count (light nodes)":   strconv.Itoa(info.peersLight),
-		"Ethstats username":          info.ethstats,
+		"Vapstats username":          info.vapstats,
 	}
 	if info.peersLight > 0 {
 		// Light server enabled
@@ -263,7 +263,7 @@ func checkNode(client *sshClient, network string, boot bool) (*nodeInfos, error)
 		portLight:  infos.portmap[infos.envvars["LIGHT_PORT"]],
 		peersTotal: totalPeers,
 		peersLight: lightPeers,
-		ethstats:   infos.envvars["STATS_NAME"],
+		vapstats:   infos.envvars["STATS_NAME"],
 		vaporbase:  infos.envvars["MINER_NAME"],
 		keyJSON:    keyJSON,
 		keyPass:    keyPass,

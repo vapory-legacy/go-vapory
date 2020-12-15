@@ -38,7 +38,7 @@ import (
 	"github.com/vaporyco/go-vapory/console"
 	"github.com/vaporyco/go-vapory/contracts/ens"
 	"github.com/vaporyco/go-vapory/crypto"
-	"github.com/vaporyco/go-vapory/ethclient"
+	"github.com/vaporyco/go-vapory/vapclient"
 	"github.com/vaporyco/go-vapory/internal/debug"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/node"
@@ -152,8 +152,8 @@ var (
 	}
 
 	// the following flags are deprecated and should be removed in the future
-	DeprecatedEthAPIFlag = cli.StringFlag{
-		Name:  "ethapi",
+	DeprecatedVapAPIFlag = cli.StringFlag{
+		Name:  "vapapi",
 		Usage: "DEPRECATED: please use --ens-api and --swap-api",
 	}
 )
@@ -362,7 +362,7 @@ DEPRECATED: use 'swarm db clean'.
 		SwarmUpFromStdinFlag,
 		SwarmUploadMimeType,
 		//deprecated flags
-		DeprecatedEthAPIFlag,
+		DeprecatedVapAPIFlag,
 	}
 	app.Flags = append(app.Flags, debug.Flags...)
 	app.Before = func(ctx *cli.Context) error {
@@ -460,7 +460,7 @@ func detectEnsAddr(client *rpc.Client) (common.Address, error) {
 		return common.Address{}, err
 	}
 
-	block, err := ethclient.NewClient(client).BlockByNumber(ctx, big.NewInt(0))
+	block, err := vapclient.NewClient(client).BlockByNumber(ctx, big.NewInt(0))
 	if err != nil {
 		return common.Address{}, err
 	}
@@ -484,24 +484,24 @@ func registerBzzService(bzzconfig *bzzapi.Config, ctx *cli.Context, stack *node.
 
 	//define the swarm service boot function
 	boot := func(ctx *node.ServiceContext) (node.Service, error) {
-		var swapClient *ethclient.Client
+		var swapClient *vapclient.Client
 		var err error
 		if bzzconfig.SwapApi != "" {
 			log.Info("connecting to SWAP API", "url", bzzconfig.SwapApi)
-			swapClient, err = ethclient.Dial(bzzconfig.SwapApi)
+			swapClient, err = vapclient.Dial(bzzconfig.SwapApi)
 			if err != nil {
 				return nil, fmt.Errorf("error connecting to SWAP API %s: %s", bzzconfig.SwapApi, err)
 			}
 		}
 
-		var ensClient *ethclient.Client
+		var ensClient *vapclient.Client
 		if bzzconfig.EnsApi != "" {
 			log.Info("connecting to ENS API", "url", bzzconfig.EnsApi)
 			client, err := rpc.Dial(bzzconfig.EnsApi)
 			if err != nil {
 				return nil, fmt.Errorf("error connecting to ENS API %s: %s", bzzconfig.EnsApi, err)
 			}
-			ensClient = ethclient.NewClient(client)
+			ensClient = vapclient.NewClient(client)
 
 			//no ENS root address set yet
 			if bzzconfig.EnsRoot == (common.Address{}) {

@@ -27,8 +27,8 @@ import (
 
 	"github.com/vaporyco/go-vapory/accounts/abi/bind"
 	"github.com/vaporyco/go-vapory/common"
-	"github.com/vaporyco/go-vapory/eth"
-	"github.com/vaporyco/go-vapory/internal/ethapi"
+	"github.com/vaporyco/go-vapory/vap"
+	"github.com/vaporyco/go-vapory/internal/vapapi"
 	"github.com/vaporyco/go-vapory/les"
 	"github.com/vaporyco/go-vapory/log"
 	"github.com/vaporyco/go-vapory/node"
@@ -61,7 +61,7 @@ type ReleaseService struct {
 // releases and notify the user of such.
 func NewReleaseService(ctx *node.ServiceContext, config Config) (node.Service, error) {
 	// Retrieve the Vapory service dependency to access the blockchain
-	var apiBackend ethapi.Backend
+	var apiBackend vapapi.Backend
 	var vapory *eth.Vapory
 	if err := ctx.Service(&vapory); err == nil {
 		apiBackend = vapory.ApiBackend

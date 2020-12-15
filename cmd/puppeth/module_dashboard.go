@@ -78,7 +78,7 @@ var dashboardContent = `
 						<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
 							<div class="menu_section">
 								<ul class="nav side-menu">
-									{{if .EthstatsPage}}<li id="stats_menu"><a onclick="load('#stats')"><i class="fa fa-tachometer"></i> Network Stats</a></li>{{end}}
+									{{if .VapstatsPage}}<li id="stats_menu"><a onclick="load('#stats')"><i class="fa fa-tachometer"></i> Network Stats</a></li>{{end}}
 									{{if .ExplorerPage}}<li id="explorer_menu"><a onclick="load('#explorer')"><i class="fa fa-database"></i> Block Explorer</a></li>{{end}}
 									{{if .WalletPage}}<li id="wallet_menu"><a onclick="load('#wallet')"><i class="fa fa-address-book-o"></i> Browser Wallet</a></li>{{end}}
 									{{if .FaucetPage}}<li id="faucet_menu"><a onclick="load('#faucet')"><i class="fa fa-bath"></i> Crypto Faucet</a></li>{{end}}
@@ -117,7 +117,7 @@ var dashboardContent = `
 										<br/>
 										<p>To run an archive node, download <a href="/{{.GvapGenesis}}"><code>{{.GvapGenesis}}</code></a> and start Gvap with:
 											<pre>gvap --datadir=$HOME/.{{.Network}} init {{.GvapGenesis}}</pre>
-											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --cache=1024 --syncmode=full{{if .Ethstats}} --ethstats='{{.Ethstats}}'{{end}} --bootnodes={{.BootnodesFullFlat}}</pre>
+											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --cache=1024 --syncmode=full{{if .Vapstats}} --vapstats='{{.Vapstats}}'{{end}} --bootnodes={{.BootnodesFullFlat}}</pre>
 										</p>
 										<br/>
 										<p>You can download Gvap from <a href="https://gvap.vapory.org/downloads/" target="about:blank">https://gvap.vapory.org/downloads/</a>.</p>
@@ -136,7 +136,7 @@ var dashboardContent = `
 										<br/>
 										<p>To run a full node, download <a href="/{{.GvapGenesis}}"><code>{{.GvapGenesis}}</code></a> and start Gvap with:
 											<pre>gvap --datadir=$HOME/.{{.Network}} init {{.GvapGenesis}}</pre>
-											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --cache=512{{if .Ethstats}} --ethstats='{{.Ethstats}}'{{end}} --bootnodes={{.BootnodesFullFlat}}</pre>
+											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --cache=512{{if .Vapstats}} --vapstats='{{.Vapstats}}'{{end}} --bootnodes={{.BootnodesFullFlat}}</pre>
 										</p>
 										<br/>
 										<p>You can download Gvap from <a href="https://gvap.vapory.org/downloads/" target="about:blank">https://gvap.vapory.org/downloads/</a>.</p>
@@ -158,7 +158,7 @@ var dashboardContent = `
 										<br/>
 										<p>To run a light node, download <a href="/{{.GvapGenesis}}"><code>{{.GvapGenesis}}</code></a> and start Gvap with:
 											<pre>gvap --datadir=$HOME/.{{.Network}} init {{.GvapGenesis}}</pre>
-											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --syncmode=light{{if .Ethstats}} --ethstats='{{.Ethstats}}'{{end}} --bootnodes={{.BootnodesLightFlat}}</pre>
+											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --syncmode=light{{if .Vapstats}} --vapstats='{{.Vapstats}}'{{end}} --bootnodes={{.BootnodesLightFlat}}</pre>
 										</p>
 										<br/>
 										<p>You can download Gvap from <a href="https://gvap.vapory.org/downloads/" target="about:blank">https://gvap.vapory.org/downloads/</a>.</p>
@@ -177,7 +177,7 @@ var dashboardContent = `
 										<br/>
 										<p>To run an embedded node, download <a href="/{{.GvapGenesis}}"><code>{{.GvapGenesis}}</code></a> and start Gvap with:
 											<pre>gvap --datadir=$HOME/.{{.Network}} init {{.GvapGenesis}}</pre>
-											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --cache=16 --vapash.cachesinmem=1 --syncmode=light{{if .Ethstats}} --ethstats='{{.Ethstats}}'{{end}} --bootnodes={{.BootnodesLightFlat}}</pre>
+											<pre>gvap --networkid={{.NetworkID}} --datadir=$HOME/.{{.Network}} --cache=16 --vapash.cachesinmem=1 --syncmode=light{{if .Vapstats}} --vapstats='{{.Vapstats}}'{{end}} --bootnodes={{.BootnodesLightFlat}}</pre>
 										</p>
 										<br/>
 										<p>You can download Gvap from <a href="https://gvap.vapory.org/downloads/" target="about:blank">https://gvap.vapory.org/downloads/</a>.</p>
@@ -208,7 +208,7 @@ var dashboardContent = `
 											<pre>gvap --datadir=$HOME/.{{.Network}} init {{.GvapGenesis}}</pre>
 										</p>
 										<p>With your local chain initialized, you can start the Vapory Wallet:
-											<pre>vaporywallet --rpc $HOME/.{{.Network}}/gvap.ipc --node-networkid={{.NetworkID}} --node-datadir=$HOME/.{{.Network}}{{if .Ethstats}} --node-ethstats='{{.Ethstats}}'{{end}} --node-bootnodes={{.BootnodesFullFlat}}</pre>
+											<pre>vaporywallet --rpc $HOME/.{{.Network}}/gvap.ipc --node-networkid={{.NetworkID}} --node-datadir=$HOME/.{{.Network}}{{if .Vapstats}} --node-vapstats='{{.Vapstats}}'{{end}} --node-bootnodes={{.BootnodesFullFlat}}</pre>
 										<p>
 										<br/>
 										<p>You can download the Vapory Wallet from <a href="https://github.com/vaporyco/mist/releases" target="about:blank">https://github.com/vaporyco/mist/releases</a>.</p>
@@ -229,7 +229,7 @@ var dashboardContent = `
 											<pre>gvap --datadir=$HOME/.{{.Network}} init {{.GvapGenesis}}</pre>
 										</p>
 										<p>With your local chain initialized, you can start Mist:
-											<pre>mist --rpc $HOME/.{{.Network}}/gvap.ipc --node-networkid={{.NetworkID}} --node-datadir=$HOME/.{{.Network}}{{if .Ethstats}} --node-ethstats='{{.Ethstats}}'{{end}} --node-bootnodes={{.BootnodesFullFlat}}</pre>
+											<pre>mist --rpc $HOME/.{{.Network}}/gvap.ipc --node-networkid={{.NetworkID}} --node-datadir=$HOME/.{{.Network}}{{if .Vapstats}} --node-vapstats='{{.Vapstats}}'{{end}} --node-bootnodes={{.BootnodesFullFlat}}</pre>
 										<p>
 										<br/>
 										<p>You can download the Mist browser from <a href="https://github.com/vaporyco/mist/releases" target="about:blank">https://github.com/vaporyco/mist/releases</a>.</p>
@@ -267,8 +267,8 @@ bootnodes.append(new Enode("{{.}}"));{{end}}
 NodeConfig config = new NodeConfig();
 config.setBootstrapNodes(bootnodes);
 config.setVaporyNetworkID({{.NetworkID}});
-config.setVaporyGenesis(genesis);{{if .Ethstats}}
-config.setVaporyNetStats("{{.Ethstats}}");{{end}}
+config.setVaporyGenesis(genesis);{{if .Vapstats}}
+config.setVaporyNetStats("{{.Vapstats}}");{{end}}
 
 Node node = new Node(getFilesDir() + "/.{{.Network}}", config);
 node.start();
@@ -300,8 +300,8 @@ bootnodes?.append(GvapNewEnode("{{.}}", &error)){{end}}
 let config = GvapNewNodeConfig()
 config?.setBootstrapNodes(bootnodes)
 config?.setVaporyNetworkID({{.NetworkID}})
-config?.setVaporyGenesis(genesis){{if .Ethstats}}
-config?.setVaporyNetStats("{{.Ethstats}}"){{end}}
+config?.setVaporyGenesis(genesis){{if .Vapstats}}
+config?.setVaporyNetStats("{{.Vapstats}}"){{end}}
 
 let datadir = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
 let node = GvapNewNode(datadir + "/.{{.Network}}", config, &error);
@@ -416,7 +416,7 @@ try! node?.start();
 										<div class="clearfix"></div>
 									</div>
 									<div style="display: inline-block; vertical-align: bottom; width: 623px; margin-top: 16px;">
-										<p>Puppeth is a tool to aid you in creating a new Vapory network down to the genesis block, bootnodes, signers, ethstats server, crypto faucet, wallet browsers, block explorer, dashboard and more; without the hassle that it would normally entail to manually configure all these services one by one.</p>
+										<p>Puppeth is a tool to aid you in creating a new Vapory network down to the genesis block, bootnodes, signers, vapstats server, crypto faucet, wallet browsers, block explorer, dashboard and more; without the hassle that it would normally entail to manually configure all these services one by one.</p>
 										<p>Puppeth uses ssh to dial in to remote servers, and builds its network components out of docker containers using docker-compose. The user is guided through the process via a command line wizard that does the heavy lifting and topology configuration automatically behind the scenes.</p>
 										<br/>
 										<p>Puppeth is distributed as part of the <a href="https://gvap.vapory.org/downloads/" target="about:blank">Gvap &amp; Tools</a> bundles, but can also be installed separately via:<pre>go get github.com/vaporyco/go-vapory/cmd/puppeth</pre></p>
@@ -456,7 +456,7 @@ try! node?.start();
 				var url = hash;
 				switch (hash) {
 					case "#stats":
-						url = "//{{.EthstatsPage}}";
+						url = "//{{.VapstatsPage}}";
 						break;
 					case "#explorer":
 						url = "//{{.ExplorerPage}}";
@@ -551,7 +551,7 @@ services:
     ports:
       - "{{.Port}}:80"{{end}}
     environment:
-      - ETHSTATS_PAGE={{.EthstatsPage}}
+      - VAPSTATS_PAGE={{.VapstatsPage}}
       - EXPLORER_PAGE={{.ExplorerPage}}
       - WALLET_PAGE={{.WalletPage}}
       - FAUCET_PAGE={{.FaucetPage}}{{if .VHost}}
@@ -583,14 +583,14 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 		"Network":      network,
 		"Port":         config.port,
 		"VHost":        config.host,
-		"EthstatsPage": config.ethstats,
+		"VapstatsPage": config.vapstats,
 		"ExplorerPage": config.explorer,
 		"WalletPage":   config.wallet,
 		"FaucetPage":   config.faucet,
 	})
 	files[filepath.Join(workdir, "docker-compose.yaml")] = composefile.Bytes()
 
-	statsLogin := fmt.Sprintf("yournode:%s", conf.ethstats)
+	statsLogin := fmt.Sprintf("yournode:%s", conf.vapstats)
 	if !config.trusted {
 		statsLogin = ""
 	}
@@ -611,7 +611,7 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 		"Network":            network,
 		"NetworkID":          conf.Genesis.Config.ChainId,
 		"NetworkTitle":       strings.Title(network),
-		"EthstatsPage":       config.ethstats,
+		"VapstatsPage":       config.vapstats,
 		"ExplorerPage":       config.explorer,
 		"WalletPage":         config.wallet,
 		"FaucetPage":         config.faucet,
@@ -620,7 +620,7 @@ func deployDashboard(client *sshClient, network string, conf *config, config *da
 		"BootnodesLight":     conf.bootLight,
 		"BootnodesFullFlat":  strings.Join(conf.bootFull, ","),
 		"BootnodesLightFlat": strings.Join(conf.bootLight, ","),
-		"Ethstats":           statsLogin,
+		"Vapstats":           statsLogin,
 		"Vapash":             conf.Genesis.Config.Vapash != nil,
 		"CppGenesis":         network + "-cpp.json",
 		"CppBootnodes":       strings.Join(bootCpp, " "),
@@ -691,7 +691,7 @@ type dashboardInfos struct {
 	port    int
 	trusted bool
 
-	ethstats string
+	vapstats string
 	explorer string
 	wallet   string
 	faucet   string
@@ -703,7 +703,7 @@ func (info *dashboardInfos) Report() map[string]string {
 	return map[string]string{
 		"Website address":       info.host,
 		"Website listener port": strconv.Itoa(info.port),
-		"Ethstats service":      info.ethstats,
+		"Vapstats service":      info.vapstats,
 		"Explorer service":      info.explorer,
 		"Wallet service":        info.wallet,
 		"Faucet service":        info.faucet,
@@ -713,7 +713,7 @@ func (info *dashboardInfos) Report() map[string]string {
 // checkDashboard does a health-check against a dashboard container to verify if
 // it's running, and if yes, gathering a collection of useful infos about it.
 func checkDashboard(client *sshClient, network string) (*dashboardInfos, error) {
-	// Inspect a possible ethstats container on the host
+	// Inspect a possible vapstats container on the host
 	infos, err := inspectContainer(client, fmt.Sprintf("%s_dashboard_1", network))
 	if err != nil {
 		return nil, err
@@ -744,7 +744,7 @@ func checkDashboard(client *sshClient, network string) (*dashboardInfos, error) 
 	return &dashboardInfos{
 		host:     host,
 		port:     port,
-		ethstats: infos.envvars["ETHSTATS_PAGE"],
+		vapstats: infos.envvars["VAPSTATS_PAGE"],
 		explorer: infos.envvars["EXPLORER_PAGE"],
 		wallet:   infos.envvars["WALLET_PAGE"],
 		faucet:   infos.envvars["FAUCET_PAGE"],
