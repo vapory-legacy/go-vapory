@@ -95,7 +95,7 @@ type Config struct {
 	GasPrice     *big.Int
 
 	// Vapash options
-	Vapash vpash.Config
+	Vapash vapash.Config
 
 	// Transaction pool options
 	TxPool core.TxPoolConfig
