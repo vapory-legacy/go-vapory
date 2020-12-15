@@ -25,7 +25,7 @@ import (
 
 	"github.com/vaporyco/go-vapory/common"
 	"github.com/vaporyco/go-vapory/common/hexutil"
-	"github.com/vaporyco/go-vapory/consensus/vpash"
+	"github.com/vaporyco/go-vapory/consensus/vapash"
 	"github.com/vaporyco/go-vapory/core"
 	"github.com/vaporyco/go-vapory/vap/downloader"
 	"github.com/vaporyco/go-vapory/vap/gasprice"
