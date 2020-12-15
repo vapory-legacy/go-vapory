@@ -35,8 +35,8 @@ import (
 // DefaultConfig contains default settings for use on the Vapory main net.
 var DefaultConfig = Config{
 	SyncMode: downloader.FastSync,
-	Vapash: vpash.Config{
-		CacheDir:       "vpash",
+	Vapash: vapash.Config{
+		CacheDir:       "vapash",
 		CachesInMem:    2,
 		CachesOnDisk:   3,
 		DatasetsInMem:  1,
