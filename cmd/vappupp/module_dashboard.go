@@ -334,7 +334,7 @@ try! node?.start();
 										<p>C++ Vapory is the third most popular of the Vapory clients, focusing on code portability to a broad range of operating systems and hardware. The client is currently a full node with transaction processing based synchronization.</p>
 										<br/>
 										<p>To run a cpp-vapory node, download <a href="/{{.CppGenesis}}"><code>{{.CppGenesis}}</code></a> and start the node with:
-											<pre>eth --config {{.CppGenesis}} --datadir $HOME/.{{.Network}} --peerset "{{.CppBootnodes}}"</pre>
+											<pre>vap --config {{.CppGenesis}} --datadir $HOME/.{{.Network}} --peerset "{{.CppBootnodes}}"</pre>
 										</p>
 										<br/>
 										<p>You can find cpp-vapory at <a href="https://github.com/vaporyco/cpp-vapory/" target="about:blank">https://github.com/vaporyco/cpp-vapory/</a>.</p>

@@ -2632,7 +2632,7 @@ Web3.prototype.createBatch = function () {
 module.exports = Web3;
 
 
-},{"./utils/sha3":19,"./utils/utils":20,"./version.json":21,"./web3/batch":24,"./web3/extend":28,"./web3/httpprovider":32,"./web3/iban":33,"./web3/ipcprovider":34,"./web3/methods/db":37,"./web3/methods/eth":38,"./web3/methods/net":39,"./web3/methods/personal":40,"./web3/methods/shh":41,"./web3/methods/swarm":42,"./web3/property":45,"./web3/requestmanager":46,"./web3/settings":47,"bignumber.js":"bignumber.js"}],23:[function(require,module,exports){
+},{"./utils/sha3":19,"./utils/utils":20,"./version.json":21,"./web3/batch":24,"./web3/extend":28,"./web3/httpprovider":32,"./web3/iban":33,"./web3/ipcprovider":34,"./web3/methods/db":37,"./web3/methods/vap":38,"./web3/methods/net":39,"./web3/methods/personal":40,"./web3/methods/shh":41,"./web3/methods/swarm":42,"./web3/property":45,"./web3/requestmanager":46,"./web3/settings":47,"bignumber.js":"bignumber.js"}],23:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -2711,7 +2711,7 @@ AllSolidityEvents.prototype.execute = function (options, callback) {
 
     var o = this.encode(options);
     var formatter = this.decode.bind(this);
-    return new Filter(o, 'eth', this._requestManager, watches.vap(), formatter, callback);
+    return new Filter(o, 'vap', this._requestManager, watches.vap(), formatter, callback);
 };
 
 AllSolidityEvents.prototype.attachToContract = function (contract) {
@@ -2849,7 +2849,7 @@ var addFunctionsToContract = function (contract) {
     contract.abi.filter(function (json) {
         return json.type === 'function';
     }).map(function (json) {
-        return new SolidityFunction(contract._eth, json, contract.address);
+        return new SolidityFunction(contract._vap, json, contract.address);
     }).forEach(function (f) {
         f.attachToContract(contract);
     });
@@ -2956,7 +2956,7 @@ var checkForContractAddress = function(contract, callback){
  * @param {Array} abi
  */
 var ContractFactory = function (vap, abi) {
-    this.vap = eth;
+    this.vap = vap;
     this.abi = abi;
 
     /**
@@ -3094,7 +3094,7 @@ ContractFactory.prototype.getData = function () {
  * @param {Address} contract address
  */
 var Contract = function (vap, abi, address) {
-    this._eth = eth;
+    this._vap = vap;
     this.transactionHash = null;
     this.address = address;
     this.abi = abi;
@@ -3336,7 +3336,7 @@ SolidityEvent.prototype.execute = function (indexed, options, callback) {
 
     var o = this.encode(indexed, options);
     var formatter = this.decode.bind(this);
-    return new Filter(o, 'eth', this._requestManager, watches.vap(), formatter, callback);
+    return new Filter(o, 'vap', this._requestManager, watches.vap(), formatter, callback);
 };
 
 /**
@@ -3470,7 +3470,7 @@ var getOptions = function (options, type) {
 
 
     switch(type) {
-        case 'eth':
+        case 'vap':
 
             // make sure topics, get converted to hex
             options.topics = options.topics || [];
@@ -3997,7 +3997,7 @@ var sha3 = require('../utils/sha3');
  * This prototype should be used to call/sendTransaction to solidity functions
  */
 var SolidityFunction = function (vap, json, address) {
-    this._eth = eth;
+    this._vap = vap;
     this._inputTypes = json.inputs.map(function (i) {
         return i.type;
     });
@@ -5506,7 +5506,7 @@ Vap.prototype.contract = function (abi) {
 };
 
 Vap.prototype.filter = function (options, callback, filterCreationErrorCallback) {
-    return new Filter(options, 'eth', this._requestManager, watches.vap(), formatters.outputLogFormatter, callback, filterCreationErrorCallback);
+    return new Filter(options, 'vap', this._requestManager, watches.vap(), formatters.outputLogFormatter, callback, filterCreationErrorCallback);
 };
 
 Vap.prototype.namereg = function () {
@@ -6013,7 +6013,7 @@ module.exports = Swarm;
 var Method = require('../method');
 
 /// @returns an array of objects describing web3.vap.filter api methods
-var eth = function () {
+var vap = function () {
     var newFilterCall = function (args) {
         var type = args[0];
 
@@ -6091,7 +6091,7 @@ var shh = function () {
 };
 
 module.exports = {
-    eth: eth,
+    vap: vap,
     shh: shh
 };
 

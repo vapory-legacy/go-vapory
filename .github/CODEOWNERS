@@ -4,6 +4,6 @@
 accounts/usbwallet @karalabe
 consensus          @karalabe
 core/              @karalabe @holiman
-eth/               @karalabe
+vap/               @karalabe
 mobile/            @karalabe
 p2p/               @fjl @zsfelfoldi

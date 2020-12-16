@@ -30,7 +30,7 @@ import (
 )
 
 // ContractBackend implements bind.ContractBackend with direct calls to Vapory
-// internals to support operating on contracts within subprotocols like eth and
+// internals to support operating on contracts within subprotocols like vap and
 // swarm.
 //
 // Internally this backend uses the already exposed API endpoints of the Vapory

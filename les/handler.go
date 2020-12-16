@@ -49,7 +49,7 @@ const (
 	softResponseLimit = 2 * 1024 * 1024 // Target maximum size of returned blocks, headers or node data.
 	estHeaderRlpSize  = 500             // Approximate size of an RLP encoded block header
 
-	ethVersion = 63 // equivalent eth version for the downloader
+	vapVersion = 63 // equivalent vap version for the downloader
 
 	MaxHeaderFetch           = 192 // Amount of block headers to be fetched per retrieval request
 	MaxBodyFetch             = 32  // Amount of block bodies to be fetched per retrieval request
@@ -1210,7 +1210,7 @@ func (d *downloaderPeerNotify) registerPeer(p *peer) {
 		manager: pm,
 		peer:    p,
 	}
-	pm.downloader.RegisterLightPeer(p.id, ethVersion, pc)
+	pm.downloader.RegisterLightPeer(p.id, vapVersion, pc)
 }
 
 func (d *downloaderPeerNotify) unregisterPeer(p *peer) {

@@ -377,7 +377,7 @@ web3._extend({
 
 const Vap_JS = `
 web3._extend({
-	property: 'eth',
+	property: 'vap',
 	methods: [
 		new web3._extend.Method({
 			name: 'sign',

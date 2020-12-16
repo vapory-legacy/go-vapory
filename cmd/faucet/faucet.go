@@ -173,7 +173,7 @@ func main() {
 	ks.Unlock(acc, pass)
 
 	// Assemble and start the faucet light service
-	faucet, err := newFaucet(genesis, *ethPortFlag, enodes, *netFlag, *statsFlag, ks, website.Bytes())
+	faucet, err := newFaucet(genesis, *vapPortFlag, enodes, *netFlag, *statsFlag, ks, website.Bytes())
 	if err != nil {
 		log.Crit("Failed to start faucet", "err", err)
 	}

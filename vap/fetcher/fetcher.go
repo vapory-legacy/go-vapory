@@ -142,7 +142,7 @@ type Fetcher struct {
 	queueChangeHook    func(common.Hash, bool) // Method to call upon adding or deleting a block from the import queue
 	fetchingHook       func([]common.Hash)     // Method to call upon starting a block (vap/61) or header (vap/62) fetch
 	completingHook     func([]common.Hash)     // Method to call upon starting a block body fetch (vap/62)
-	importedHook       func(*types.Block)      // Method to call upon successful block import (both eth/61 and eth/62)
+	importedHook       func(*types.Block)      // Method to call upon successful block import (both vap/61 and vap/62)
 }
 
 // New creates a block fetcher to retrieve blocks based on hash announcements.

@@ -967,7 +967,7 @@ func SetShhConfig(ctx *cli.Context, stack *node.Node, cfg *whisper.Config) {
 	}
 }
 
-// SetVapConfig applies eth-related command line flags to the config.
+// SetVapConfig applies vap-related command line flags to the config.
 func SetVapConfig(ctx *cli.Context, stack *node.Node, cfg *vap.Config) {
 	// Avoid conflicting network flags
 	checkExclusive(ctx, DeveloperFlag, TestnetFlag, RinkebyFlag)
@@ -1113,14 +1113,14 @@ func RegisterShhService(stack *node.Node, cfg *whisper.Config) {
 // th egiven node.
 func RegisterVapStatsService(stack *node.Node, url string) {
 	if err := stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
-		// Retrieve both eth and les services
-		var ethServ *vap.Vapory
-		ctx.Service(&ethServ)
+		// Retrieve both vap and les services
+		var vapServ *vap.Vapory
+		ctx.Service(&vapServ)
 
 		var lesServ *les.LightVapory
 		ctx.Service(&lesServ)
 
-		return vapstats.New(url, ethServ, lesServ)
+		return vapstats.New(url, vapServ, lesServ)
 	}); err != nil {
 		Fatalf("Failed to register the Vapory Stats service: %v", err)
 	}

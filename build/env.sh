@@ -10,10 +10,10 @@ fi
 # Create fake Go workspace if it doesn't exist yet.
 workspace="$PWD/build/_workspace"
 root="$PWD"
-ethdir="$workspace/src/github.com/vaporyco"
-if [ ! -L "$ethdir/go-vapory" ]; then
-    mkdir -p "$ethdir"
-    cd "$ethdir"
+vapdir="$workspace/src/github.com/vaporyco"
+if [ ! -L "$vapdir/go-vapory" ]; then
+    mkdir -p "$vapdir"
+    cd "$vapdir"
     ln -s ../../../../../. go-vapory
     cd "$root"
 fi
@@ -23,8 +23,8 @@ GOPATH="$workspace"
 export GOPATH
 
 # Run the command inside the workspace.
-cd "$ethdir/go-vapory"
-PWD="$ethdir/go-vapory"
+cd "$vapdir/go-vapory"
+PWD="$vapdir/go-vapory"
 
 # Launch the arguments with the configured environment.
 exec "$@"

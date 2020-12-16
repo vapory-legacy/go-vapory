@@ -30,24 +30,24 @@ import (
 
 // Constants to match up protocol versions and messages
 const (
-	eth62 = 62
-	eth63 = 63
+	vap62 = 62
+	vap63 = 63
 )
 
 // Official short name of the protocol used during capability negotiation.
 var ProtocolName = "vap"
 
-// Supported versions of the eth protocol (first is primary).
-var ProtocolVersions = []uint{eth63, eth62}
+// Supported versions of the vap protocol (first is primary).
+var ProtocolVersions = []uint{vap63, vap62}
 
 // Number of implemented message corresponding to different protocol versions.
 var ProtocolLengths = []uint64{17, 8}
 
 const ProtocolMaxMsgSize = 10 * 1024 * 1024 // Maximum cap on the size of a protocol message
 
-// eth protocol message codes
+// vap protocol message codes
 const (
-	// Protocol messages belonging to eth/62
+	// Protocol messages belonging to vap/62
 	StatusMsg          = 0x00
 	NewBlockHashesMsg  = 0x01
 	TxMsg              = 0x02
@@ -57,7 +57,7 @@ const (
 	BlockBodiesMsg     = 0x06
 	NewBlockMsg        = 0x07
 
-	// Protocol messages belonging to eth/63
+	// Protocol messages belonging to vap/63
 	GetNodeDataMsg = 0x0d
 	NodeDataMsg    = 0x0e
 	GetReceiptsMsg = 0x0f

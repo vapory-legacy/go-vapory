@@ -254,7 +254,7 @@ EOF
 }
 
 # create_node_network creates a network namespace and connects it to the Linux
-# bridge using a veth pair
+# bridge using a vvap pair
 create_node_network() {
   local name="$1"
   local ip="$2"
@@ -262,18 +262,18 @@ create_node_network() {
   # create the namespace
   ip netns add "${name}"
 
-  # create the veth pair
-  local veth0="veth${name}0"
-  local veth1="veth${name}1"
-  ip link add name "${veth0}" type veth peer name "${veth1}"
+  # create the vvap pair
+  local vvap0="vvap${name}0"
+  local vvap1="vvap${name}1"
+  ip link add name "${vvap0}" type vvap peer name "${vvap1}"
 
   # add one end to the bridge
-  ip link set dev "${veth0}" master "${BRIDGE_NAME}"
-  ip link set dev "${veth0}" up
+  ip link set dev "${vvap0}" master "${BRIDGE_NAME}"
+  ip link set dev "${vvap0}" up
 
   # add the other end to the namespace, rename it eth0 and give it the ip
-  ip link set dev "${veth1}" netns "${name}"
-  ip netns exec "${name}" ip link set dev "${veth1}" name "eth0"
+  ip link set dev "${vvap1}" netns "${name}"
+  ip netns exec "${name}" ip link set dev "${vvap1}" name "eth0"
   ip netns exec "${name}" ip link set dev "eth0" up
   ip netns exec "${name}" ip address add "${ip}/24" dev "eth0"
 }
