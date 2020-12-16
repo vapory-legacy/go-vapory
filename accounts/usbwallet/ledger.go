@@ -16,7 +16,7 @@
 
 // This file contains the implementation for interacting with the Ledger hardware
 // wallets. The wire protocol spec can be found in the Ledger Blue GitHub repo:
-// https://raw.githubusercontent.com/LedgerHQ/blue-app-eth/master/doc/vapapp.asc
+// https://raw.githubusercontent.com/LedgerHQ/blue-app-vap/master/doc/vapapp.asc
 
 package usbwallet
 
