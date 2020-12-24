@@ -36,7 +36,7 @@ var (
 		DAOForkBlock:   big.NewInt(0),
 		DAOForkSupport: true,
 		EIP150Block:    big.NewInt(1),
-		EIP150Hash:     common.HexToHash("0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0"),
+		EIP150Hash:     common.HexToHash("0xa67f4c296f77da362af974dc60c1284b4bc3cefd95cf79a7db9bcfb29de1105a"),
 		EIP155Block:    big.NewInt(0),
 		EIP158Block:    big.NewInt(0),
 		ByzantiumBlock: big.NewInt(0),
