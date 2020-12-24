@@ -17,9 +17,9 @@ Section "Uninstall"
   rmDir "$SMPROGRAMS\${APPNAME}"
 
   # Firewall - remove rules if exists
-  SimpleFC::AdvRemoveRule "Gvap incoming peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Gvap outgoing peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Gvap UDP discovery (UDP:30303)"
+  SimpleFC::AdvRemoveRule "Gvap incoming peers (TCP:10801)"
+  SimpleFC::AdvRemoveRule "Gvap outgoing peers (TCP:10801)"
+  SimpleFC::AdvRemoveRule "Gvap UDP discovery (UDP:10801)"
 
   # Remove IPC endpoint (https://github.com/vaporyco/EIPs/issues/147)
   ${un.EnvVarUpdate} $0 "VAPORY_SOCKET" "R" "HKLM" "\\.\pipe\gvap.ipc"

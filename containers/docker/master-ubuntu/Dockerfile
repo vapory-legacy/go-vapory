@@ -11,7 +11,7 @@ RUN \
   apt-get remove -y golang-1.9 git make gcc libc-dev && apt autoremove -y && apt-get clean && \
   rm -rf /go-vapory
 
-EXPOSE 8545
-EXPOSE 30303
+EXPOSE 8575
+EXPOSE 10801
 
 ENTRYPOINT ["/gvap"]

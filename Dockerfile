@@ -12,5 +12,5 @@ FROM alpine:latest
 RUN apk add --no-cache ca-certificates
 COPY --from=builder /go-vapory/build/bin/gvap /usr/local/bin/
 
-EXPOSE 8545 8546 30303 30303/udp 30304/udp
+EXPOSE 8575 8576 10801 10801/udp 30304/udp
 ENTRYPOINT ["gvap"]

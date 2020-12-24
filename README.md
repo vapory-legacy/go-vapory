@@ -124,7 +124,7 @@ One of the quickest ways to get Vapory up and running on your machine is by usin
 
 ```
 docker run -d --name vapory-node -v /Users/alice/vapory:/root \
-           -p 8545:8545 -p 30303:30303 \
+           -p 8545:8545 -p 10801:10801 \
            vapory/client-go --fast --cache=512
 ```
 
@@ -153,7 +153,7 @@ HTTP based JSON-RPC API options:
   * `--rpccorsdomain` Comma separated list of domains from which to accept cross origin requests (browser enforced)
   * `--ws` Enable the WS-RPC server
   * `--wsaddr` WS-RPC server listening interface (default: "localhost")
-  * `--wsport` WS-RPC server listening port (default: 8546)
+  * `--wsport` WS-RPC server listening port (default: 8576)
   * `--wsapi` API's offered over the WS-RPC interface (default: "eth,net,web3")
   * `--wsorigins` Origins from which to accept websockets requests
   * `--ipcdisable` Disable the IPC-RPC server

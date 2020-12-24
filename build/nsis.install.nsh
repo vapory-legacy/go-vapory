@@ -24,14 +24,14 @@ Section "Gvap" GVAP_IDX
   createShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "" ""
 
   # Firewall - remove rules (if exists)
-  SimpleFC::AdvRemoveRule "Gvap incoming peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Gvap outgoing peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "Gvap UDP discovery (UDP:30303)"
+  SimpleFC::AdvRemoveRule "Gvap incoming peers (TCP:10801)"
+  SimpleFC::AdvRemoveRule "Gvap outgoing peers (TCP:10801)"
+  SimpleFC::AdvRemoveRule "Gvap UDP discovery (UDP:10801)"
 
   # Firewall - add rules
-  SimpleFC::AdvAddRule "Gvap incoming peers (TCP:30303)" ""  6 1 1 2147483647 1 "$INSTDIR\gvap.exe" "" "" "Vapory" 30303 "" "" ""
-  SimpleFC::AdvAddRule "Gvap outgoing peers (TCP:30303)" ""  6 2 1 2147483647 1 "$INSTDIR\gvap.exe" "" "" "Vapory" "" 30303 "" ""
-  SimpleFC::AdvAddRule "Gvap UDP discovery (UDP:30303)" "" 17 2 1 2147483647 1 "$INSTDIR\gvap.exe" "" "" "Vapory" "" 30303 "" ""
+  SimpleFC::AdvAddRule "Gvap incoming peers (TCP:10801)" ""  6 1 1 2147483647 1 "$INSTDIR\gvap.exe" "" "" "Vapory" 10801 "" "" ""
+  SimpleFC::AdvAddRule "Gvap outgoing peers (TCP:10801)" ""  6 2 1 2147483647 1 "$INSTDIR\gvap.exe" "" "" "Vapory" "" 10801 "" ""
+  SimpleFC::AdvAddRule "Gvap UDP discovery (UDP:10801)" "" 17 2 1 2147483647 1 "$INSTDIR\gvap.exe" "" "" "Vapory" "" 10801 "" ""
 
   # Set default IPC endpoint (https://github.com/vaporyco/EIPs/issues/147)
   ${EnvVarUpdate} $0 "VAPORY_SOCKET" "R" "HKLM" "\\.\pipe\gvap.ipc"
