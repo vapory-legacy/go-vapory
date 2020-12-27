@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Go Ethereum Guide</title>
+    <title>Go Vapory Guide</title>
     <link rel="icon" type="image/png" href="../static/images/favicon.png" />
 
     <link href="../static/styles/bootstrap.min.css" rel="stylesheet" />
@@ -39,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../">Go Ethereum</a>
+          <a class="navbar-brand" href="../">Go Vapory</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -58,14 +58,14 @@
       </div>
       <hr/>
       <footer>
-        <p>&copy; 2013-2016. The go-ethereum Authors.</p>
+        <p>&copy; 2013-2016. The go-vapory Authors.</p>
       </footer>
     </div>
 
     <script type="text/javascript">
       // Download the developer guide ToC and convert it into a guide sidebar
       $.ajax({
-        url: 'https://raw.githubusercontent.com/wiki/ethereum/go-ethereum/Developer-Guide.md',
+        url: 'https://raw.githubusercontent.com/wiki/vapory/go-vapory/Developer-Guide.md',
         error: function() {
           alert("Failed to load latest release!");
         },
@@ -108,7 +108,7 @@
                   $.ajax({
                     url: link,
                     error: function() {
-                      $('#content').html("<div class='alert alert-dismissible alert-danger'>Failed to load guide page \"" + name + "\". Please report this issue on our <a href='https://github.com/ethereum/go-ethereum/issues' class='alert-link'>bug tracker</a>. Thank you!</div>");
+                      $('#content').html("<div class='alert alert-dismissible alert-danger'>Failed to load guide page \"" + name + "\". Please report this issue on our <a href='https://github.com/vaporyco/go-vapory/issues' class='alert-link'>bug tracker</a>. Thank you!</div>");
                     },
                     dataType: 'text',
                     success: function(data) {
