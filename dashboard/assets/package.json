@@ -31,7 +31,7 @@
         "react-dom": "^16.2.0",
         "react-fa": "^5.0.0",
         "react-transition-group": "^2.2.1",
-        "recharts": "^1.0.0-beta.7",
+        "recharts": "^2.1.14",
         "style-loader": "^0.19.1",
         "typeface-roboto": "^0.0.50",
         "url": "^0.11.0",
